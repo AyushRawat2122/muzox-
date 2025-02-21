@@ -13,6 +13,9 @@ const playlistSchema = new mongoose.Schema(
       required: [true, "Playlist description is required"],
       trim: true,
     },
+    playListCover: {
+      type: String,
+    },
     songs: [
       {
         type: mongoose.Schema.Types.ObjectId,

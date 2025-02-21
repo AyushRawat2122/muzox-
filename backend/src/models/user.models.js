@@ -28,10 +28,6 @@ const userSchema = new mongoose.Schema(
       type: String, // UploadThing
       default: null,
     },
-    coverPic: {
-      type: String, // UploadThing
-      default: null,
-    },
     playlists: [
       {
         type: mongoose.Schema.Types.ObjectId,
