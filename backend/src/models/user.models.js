@@ -6,48 +6,69 @@ const userSchema = new mongoose.Schema(
     username: {
       type: String,
       unique: true,
-      required: [true, "Username is a required field"],
+      required: [true, "Username is required"],
       lowercase: true,
       trim: true,
-      minlength: [6, "Username Must Contain at least 6 letters"],
+      minlength: [6, "Username must contain at least 6 characters"],
     },
     email: {
       type: String,
-      trim: true,
       unique: true,
+      required: [true, "Email is required"],
+      trim: true,
       match: [/\S+@\S+\.\S+/, "Please provide a valid email address"],
-      required: [true, "Email is a required field"],
     },
     password: {
       type: String,
-      required: true,
+      required: [true, "Password is required"],
       trim: true,
-      required: [true, "Password is a required field"],
-      minlength: [8, "Username Must Contain at least 6 letters"],
+      minlength: [8, "Password must be at least 8 characters"],
     },
-    playlist:[
-        {
-            type: mongoose.Schema.Types.ObjectId,
-            ref: 'Playlist'
-        }
+    profilePic: {
+      type: String, // UploadThing
+      default: null,
+    },
+    coverPic: {
+      type: String, // UploadThing
+      default: null,
+    },
+    playlists: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Playlist",
+      },
     ],
-    avatar: {
-      type: {
-        public_id: String,
-        url: String,
+    likedSongs: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Song",
       },
+    ],
+    verifyToken: {
+      type: String,
+      default: null,
     },
-    coverImage: {
-      type: {
-        public_id: String,
-        url: String,
-      },
+    verifyTokenExpiry: {
+      type: Date,
+      default: null,
+    },
+    refreshToken: {
+      type: String,
+      default: null,
+    },
+    refreshTokenExpiry: {
+      type: Date,
+      default: null,
+    },
+    passwordToken: {
+      type: String,
+      default: null,
+    },
+    passwordTokenExpiry: {
+      type: Date,
+      default: null,
     },
     isVerified: {
-      type: Boolean,
-      default: false,
-    },
-    isPremiumUser: {
       type: Boolean,
       default: false,
     },
@@ -55,25 +76,15 @@ const userSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
-    verifyToken: {
-      type: Number,
-      default: null,
-    },
-    verifyTokenExpiry: {
-      type: Date,
-      default: null,
-    },
-    passwordToken: {
-      type: Number,
-      default: null,
-    },
-    passwordTokenExpiry: {
-      type: Date,
-      default: null,
+    isPremiumUser: {
+      type: Boolean,
+      default: false,
     },
   },
   { timestamps: true }
 );
+
 userSchema.plugin(mongooseAggregatePaginate);
+
 const User = mongoose.model("User", userSchema);
 export default User;

@@ -1,25 +1,34 @@
 import mongoose from "mongoose";
 import mongooseAggregatePaginate from "mongoose-aggregate-paginate-v2";
-const playlistSchema=new mongoose.Schema({
-    name:{
-        type:String,
-        required:[true,"playlist name is required field"]
+
+const playlistSchema = new mongoose.Schema(
+  {
+    name: {
+      type: String,
+      required: [true, "Playlist name is required"],
+      trim: true,
     },
-    description:{
-        type:String,
-        required:[true,"Description for this playlist is required field"]
+    description: {
+      type: String,
+      required: [true, "Playlist description is required"],
+      trim: true,
     },
-    songs:[
-        {
-            type:mongoose.Schema.Types.ObjectId,
-            ref:"Song"
-        }
+    songs: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Song",
+      },
     ],
-    owner:{
-        type:mongoose.Schema.Types.ObjectId,
-        ref:"User"
-    }
-},{timestamps:true});
+    owner: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      required: true,
+    },
+  },
+  { timestamps: true }
+);
+
 playlistSchema.plugin(mongooseAggregatePaginate);
+
 const Playlist = mongoose.model("Playlist", playlistSchema);
 export default Playlist;
