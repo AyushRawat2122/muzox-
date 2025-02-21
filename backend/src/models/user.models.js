@@ -1,5 +1,7 @@
 import mongoose from "mongoose";
 import mongooseAggregatePaginate from "mongoose-aggregate-paginate-v2";
+import bcryptjs from "bcryptjs";
+import jwt from "jsonwebtoken";
 
 const userSchema = new mongoose.Schema(
   {
@@ -81,6 +83,22 @@ const userSchema = new mongoose.Schema(
 );
 
 userSchema.plugin(mongooseAggregatePaginate);
+userSchema.methods = {
+  comparePassword: async function (normalPassword) {
+    return await bcryptjs.compare(normalPassword, this.password);
+  },
+  generateRefreshToken: function () {
+    return jwt.sign(
+      {
+        _id: this._id,
+      },
+      process.env.REFRESH_TOKEN_SECRET,
+      {
+        expiresIn: process.env.REFRESH_TOKEN_EXPIRY,
+      }
+    );
+  },
+};
 
 const User = mongoose.model("User", userSchema);
 export default User;
