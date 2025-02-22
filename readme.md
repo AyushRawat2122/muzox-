@@ -38,9 +38,6 @@ Muzox is a modern music streaming app designed to deliver a seamless audio exper
 - 🔗 **Social Sharing Features**
 - 📱 **Mobile App Development**
 
-## 📜 License
-This project is licensed under the MIT License.
-
 ---
 🎧 Built with passion for music lovers! Enjoy Muzox! 🚀
 
