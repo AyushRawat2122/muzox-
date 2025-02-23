@@ -11,11 +11,7 @@
   },
   "author": "ayush roshan",
   "license": "ISC",
-  "devDependencies": {
-    "nodemon": "^3.1.9"
-  },
   "dependencies": {
-    "@uploadthing/react": "^7.3.0",
     "bcryptjs": "^3.0.2",
     "cloudinary": "^2.5.1",
     "cookie-parser": "^1.4.7",
@@ -25,6 +21,8 @@
     "mongodb": "^6.13.0",
     "mongoose": "^8.10.1",
     "mongoose-aggregate-paginate-v2": "^1.1.4",
-    "uploadthing": "^7.5.2"
+    "multer": "^1.4.5-lts.1",
+    "nodemailer": "^6.10.0",
+    "nodemon": "^3.1.9"
   }
 }

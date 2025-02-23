@@ -1,14 +1,12 @@
 //imports
 
-import express, { urlencoded } from "express";
+import express  from "express";
 import connect from "./src/database/dbConfig.js";
 import dotenv from "dotenv";
 import cookieParser from "cookie-parser";
-import uploadThingRoute from "./src/utils/uploadThingHandler.js";
-import User from "./src/models/user.models.js";
-import userRouter from "./src/router/user.route.js";
+
+import userRouter from "./src/router/user.routes.js";
 dotenv.config({
-  debug: process.env.DEBUG,
 });
 
 const app = express();
@@ -16,9 +14,11 @@ const PORT = process.env.PORT || 5000;
 
 // Middlewares
 
-app.use(urlencoded({ extended: true }));
+app.use(express.urlencoded({ extended: true,limit:'16kb' }));
 app.use(express.json());
 app.use(cookieParser());
+app.use(express.static("public"));
+
 
 // Test route
 app.get("/welcome-to-my-app", (req, res) => {
@@ -38,6 +38,5 @@ const startServer = async () => {
 };
 
 startServer();
-app.use("/api/uploadthing", uploadThingRoute);
 //Testing
-app.use('/api/user',userRouter);
+app.use('/api/muzox-/user',userRouter);
