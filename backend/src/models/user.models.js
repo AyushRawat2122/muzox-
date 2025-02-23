@@ -54,10 +54,6 @@ const userSchema = new mongoose.Schema(
       type: String,
       default: null,
     },
-    refreshTokenExpiry: {
-      type: Date,
-      default: null,
-    },
     passwordToken: {
       type: String,
       default: null,
@@ -95,6 +91,17 @@ userSchema.methods = {
       process.env.REFRESH_TOKEN_SECRET,
       {
         expiresIn: process.env.REFRESH_TOKEN_EXPIRY,
+      }
+    );
+  },
+  generateAccessToken: function () {
+    return jwt.sign(
+      {
+        _id: this._id,
+      },
+      process.env.ACCESS_TOKEN_SECRET,
+      {
+        expiresIn: process.env.ACCESS_TOKEN_EXPIRY,
       }
     );
   },

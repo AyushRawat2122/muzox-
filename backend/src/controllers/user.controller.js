@@ -4,7 +4,22 @@ import ApiError from "../utils/ApiError.js";
 import bcryptjs from "bcryptjs";
 import { sendEmail } from "../utils/mailer.js";
 import ApiResponse from "../utils/ApiResponse.js";
+import jwt from "jsonwebtoken";
 import { uploadOnCloudinary, deleteOnCloudinary } from "../utils/cloudinary.js";
+
+const tokenGenerators = async (userId) => {
+  try {
+    const user = await User.findById(userId);
+    const aToken = user.generateAccessToken();
+    const rToken = user.generateRefreshToken();
+    user.refreshToken = rToken;
+    await user.save();
+    return { aToken, rToken };
+  } catch (error) {
+    throw new ApiError(500, "Internal Server Error");
+  }
+};
+
 export const signup = asyncHandler(async (req, res) => {
   /* //get user details from client
   //validate the details
@@ -63,25 +78,25 @@ export const signup = asyncHandler(async (req, res) => {
     );
 });
 export const verifyUser = asyncHandler(async (req, res) => {
- 
   const { userId } = req.params;
-  const {otp} = req.body;
-   
+  const { otp } = req.body;
+
   if (!userId || !otp) {
     throw new ApiError(400, "Please enter to confirm your validations");
   }
-  
+
   const user = await User.findById(userId);
   if (!user) {
     throw new ApiError(404, "User not found");
   }
- console.log(user);
+  console.log(user);
   if (user.verifyToken != otp) {
     throw new ApiError(400, "Invalid OTP");
   }
-   console.log("hello");
+  console.log("hello");
   if (Date.now() > user.verifyTokenExpiry) {
     await User.findByIdAndDelete(userId);
+    await deleteOnCloudinary(user.profilePic);
     throw new ApiError(400, "OTP has expired.You need to signup again");
   }
   user.isVerified = true;
@@ -92,10 +107,41 @@ export const verifyUser = asyncHandler(async (req, res) => {
     .status(200)
     .json(new ApiResponse(200, user, "User verified successfully"));
 });
-export const login=asyncHandler(async(req,res)=>{
-  const {email,password}=req.body;
-  if(email==="" || password===""){
-    
+export const login = asyncHandler(async (req, res) => {
+  const { email, password } = req.body;
+  if (email === "" || password === "") {
+    throw new ApiError(400, "Please enter your email and password");
   }
-}) 
-export default { signup, verifyUser };
+
+  const user = await User.findOne({ email });
+  console.log(user);
+  if (!user) {
+    
+    throw new ApiError(404, "User not found");
+  }
+ 
+
+  const isPassWordCorrect = await bcryptjs.compare(password, user.password);
+  if (!isPassWordCorrect) {
+    throw new ApiError(400, "Invalid Email or  password");
+  }
+  if (!user.isVerified) {
+    throw new ApiError(400, "Please verify your account first");
+  }
+  const { aToken, rToken } = tokenGenerators(user._id);
+  res
+    .cookie("accessToken", aToken, {
+      secure: true,
+      sameSite: "None",
+      httpOnly: true,
+    })
+    .cookie("refreshToken", rToken, {
+      secure: true,
+      sameSite: "None",
+      httpOnly: true,
+    });
+  return res
+    .status(200)
+    .json(new ApiResponse(200, user, "User verified successfully"));
+});
+export default { signup, verifyUser, login };

@@ -1,6 +1,6 @@
 import express from "express";
 import uploader from "../middlewares/multer.middleware.js";
-import {signup,verifyUser} from "../controllers/user.controller.js";
+import {login, signup,verifyUser} from "../controllers/user.controller.js";
 const userRouter = express.Router();
 userRouter.post(
   "/signup",
@@ -8,4 +8,5 @@ userRouter.post(
   signup
 );
 userRouter.post("/verifyUser/:userId",verifyUser);
+userRouter.get('/login',login);
 export default userRouter;
