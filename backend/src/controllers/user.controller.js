@@ -4,9 +4,9 @@ import ApiError from "../utils/ApiError.js";
 import bcryptjs from "bcryptjs";
 import { sendEmail } from "../utils/mailer.js";
 import ApiResponse from "../utils/ApiResponse.js";
-import { uploadOnCloudinary,deleteOnCloudinary } from "../utils/cloudinary.js";
+import { uploadOnCloudinary, deleteOnCloudinary } from "../utils/cloudinary.js";
 export const signup = asyncHandler(async (req, res) => {
- /* //get user details from client
+  /* //get user details from client
   //validate the details
   //now check the database using email or password
   //now check if image if it has came or not
@@ -37,7 +37,7 @@ export const signup = asyncHandler(async (req, res) => {
   const salt = await bcryptjs.genSalt(10);
   const hashedPassword = await bcryptjs.hash(password, salt);
   const otp = Math.floor(100000 + Math.random() * 900000).toString();
-  const expiryDate = new Date(Date.now() + 3600000);
+  const expiryDate = new Date(Date.now() + 600000);
   const user = await User.create({
     username: username.toLowerCase(),
     email: email.toLowerCase(),
@@ -55,41 +55,47 @@ export const signup = asyncHandler(async (req, res) => {
   });
   return res
     .status(201)
-    .json(new ApiResponse(200, user, "User registered successfully"));
+    .json(
+      new ApiResponse(
+        200,
+        "User registered successfully Now verify the code within 10 min to validate the process"
+      )
+    );
 });
-export const verifyUser=asyncHandler(async(req,res)=>{
-   const { userId } = req.params;
-   const { otp } = req.body;
-
-  if (!otp) {
-    // If no OTP  delete the user after 3 minutes
-    setTimeout(async () => {
-      const user=await User.findById(userId);
-      await User.findByIdAndDelete(userId);
-      const urlOfProfilePic=user.profilePic;
-      await deleteOnCloudinary(urlOfProfilePic)
-      console.log(`Unverified user ${userId} deleted both from db and cloudinary`);
-    }, 180000); 
-    throw new ApiError(400, "OTP required for verification");
+export const verifyUser = asyncHandler(async (req, res) => {
+ 
+  const { userId } = req.params;
+  const {otp} = req.body;
+   
+  if (!userId || !otp) {
+    throw new ApiError(400, "Please enter to confirm your validations");
   }
-
-  // Find the user
+  
   const user = await User.findById(userId);
   if (!user) {
     throw new ApiError(404, "User not found");
   }
-
-  // Match OTP
-  if (user.verifyToken !== otp || user.verifyTokenExpiry < new Date()) {
-    throw new ApiError(400, "Invalid or expired OTP");
+ console.log(user);
+  if (user.verifyToken != otp) {
+    throw new ApiError(400, "Invalid OTP");
   }
-
-  // finally save 
+   console.log("hello");
+  if (Date.now() > user.verifyTokenExpiry) {
+    await User.findByIdAndDelete(userId);
+    throw new ApiError(400, "OTP has expired.You need to signup again");
+  }
   user.isVerified = true;
-  user.verifyToken = undefined;
-  user.verifyTokenExpiry = undefined;
+  user.verifyToken = null;
+  user.verifyTokenExpiry = null;
   await user.save();
-
-  return res.status(200).json(new ApiResponse(200, user, "User verified successfully"));
-})
-export default {signup,verifyUser};
+  return res
+    .status(200)
+    .json(new ApiResponse(200, user, "User verified successfully"));
+});
+export const login=asyncHandler(async(req,res)=>{
+  const {email,password}=req.body;
+  if(email==="" || password===""){
+    
+  }
+}) 
+export default { signup, verifyUser };

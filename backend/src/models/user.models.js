@@ -43,7 +43,7 @@ const userSchema = new mongoose.Schema(
       },
     ],
     verifyToken: {
-      type: String,
+      type: Number,
       default: null,
     },
     verifyTokenExpiry: {
