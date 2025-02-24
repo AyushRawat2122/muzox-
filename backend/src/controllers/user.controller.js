@@ -86,7 +86,8 @@ export const signup = asyncHandler(async (req, res) => {
 
 export const verifyUser = asyncHandler(async (req, res) => {
   const { userId } = req.params;
-  const { otp } = req.body;
+  const {otp}  = req.body;
+
 
   if (!userId || !otp) {
     throw new ApiError(400, "Please enter to confirm your validations");
@@ -96,6 +97,10 @@ export const verifyUser = asyncHandler(async (req, res) => {
 
   if (!user) {
     throw new ApiError(404, "User not found");
+  }
+
+  if(user.isVerified === true){
+    throw new ApiError(400 ,"User already verified");
   }
 
   console.log(user);
