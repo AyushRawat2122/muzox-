@@ -15,7 +15,7 @@ const tokenGenerators = async (userId) => {
     const refreshToken = user.generateRefreshToken();
 
     user.refreshToken = refreshToken;
-    await user.save({validateBeforeSave:false});
+    await user.save({ validateBeforeSave: false });
 
     return { accessToken, refreshToken };
   } catch (error) {
@@ -31,7 +31,7 @@ export const signup = asyncHandler(async (req, res) => {
 
   if (!username || !email || !password) {
     throw new ApiError(400, "All fields are required");
-  }
+  } // check that incoming body isn't empty
 
   const alreadyAUser = await User.findOne({
     $or: [{ username }, { email }],
@@ -148,29 +148,44 @@ export const login = asyncHandler(async (req, res) => {
   if (!user.isVerified) {
     throw new ApiError(400, "Please verify your account first");
   }
-  
-  const isPassWordCorrect = await bcryptjs.compare(password, user.password);
+
+  const isPassWordCorrect = await user.comparePassword(password);
 
   if (!isPassWordCorrect) {
     throw new ApiError(400, "Invalid Email or  password");
   }
-  
+
+  const options = {
+    secure: true,
+    sameSite: "None",
+    httpOnly: true,
+  };
 
   const { accessToken, refreshToken } = tokenGenerators(user._id);
   res
-    .cookie("accessToken", accessToken, {
-      secure: true,
-      sameSite: "None",
-      httpOnly: true,
-    })
-    .cookie("refreshToken", refreshToken, {
-      secure: true,
-      sameSite: "None",
-      httpOnly: true,
-    });
+    .cookie("accessToken", accessToken, options)
+    .cookie("refreshToken", refreshToken, options)
   return res
     .status(200)
     .json(new ApiResponse(200, user, "User verified successfully"));
 });
+
+//log-out
+
+
+//updateAccountDetails
+
+
+//update profile image 
+
+
+//generate Access Token
+
+
+//me router
+
+
+//admin Page Access
+
 
 export default { signup, verifyUser, login };
