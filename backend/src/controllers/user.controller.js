@@ -13,10 +13,8 @@ const tokenGenerators = async (userId) => {
 
     const accessToken = user.generateAccessToken();
     const refreshToken = user.generateRefreshToken();
-
     user.refreshToken = refreshToken;
-    await user.save({validateBeforeSave:false});
-
+    await user.save({ validateBeforeSave: false });
     return { accessToken, refreshToken };
   } catch (error) {
     throw new ApiError(500, "Internal Server Error");
@@ -26,7 +24,6 @@ const tokenGenerators = async (userId) => {
 //sign up
 
 export const signup = asyncHandler(async (req, res) => {
-
   const { username, email, password } = req.body;
 
   if (!username || !email || !password) {
@@ -98,23 +95,17 @@ export const verifyUser = asyncHandler(async (req, res) => {
     throw new ApiError(404, "User not found");
   }
 
-  console.log(user);
-
   if (user.verifyToken != otp) {
     throw new ApiError(400, "Invalid OTP");
   }
 
-  console.log("hello");
-
   //fucked upon this logic we need to think something about this
 
   if (Date.now() > user.verifyTokenExpiry) {
-
     await User.findByIdAndDelete(userId);
     await deleteOnCloudinary(user.profilePic);
 
     throw new ApiError(400, "OTP has expired.You need to signup again");
-
   }
 
   user.isVerified = true;
@@ -126,37 +117,26 @@ export const verifyUser = asyncHandler(async (req, res) => {
   return res
     .status(200)
     .json(new ApiResponse(200, user, "User verified successfully"));
-
 });
 
 export const login = asyncHandler(async (req, res) => {
-
   const { email, password } = req.body;
-
+  console.log(email + " " + password);
   if (email === "" || password === "") {
     throw new ApiError(400, "Please enter your email and password");
   }
-
   const user = await User.findOne({ email });
-
-  console.log(user);
-
   if (!user) {
     throw new ApiError(404, "User not found");
   }
-
   if (!user.isVerified) {
     throw new ApiError(400, "Please verify your account first");
   }
-  
   const isPassWordCorrect = await bcryptjs.compare(password, user.password);
-
   if (!isPassWordCorrect) {
     throw new ApiError(400, "Invalid Email or  password");
   }
-  
-
-  const { accessToken, refreshToken } = tokenGenerators(user._id);
+  const { accessToken, refreshToken } = await tokenGenerators(user._id);
   res
     .cookie("accessToken", accessToken, {
       secure: true,
@@ -168,9 +148,27 @@ export const login = asyncHandler(async (req, res) => {
       sameSite: "None",
       httpOnly: true,
     });
+  user.refreshToken = refreshToken;
+  await user.save();
   return res
     .status(200)
     .json(new ApiResponse(200, user, "User verified successfully"));
 });
+export const getUserDetails = asyncHandler(async (req, res) => {
+  const token = req.cookies.refreshToken;
+  if (!token && req.headers.authorization) {
+    token = req.headers.authorization.replace("Bearer", "");
+  }
+  if (!token) {
+    throw new ApiError(404, "User not Authorized");
+  }
+  const decoded = jwt.verify(token, process.env.REFRESH_TOKEN_SECRET);
+  const userId = decoded._id;
+  const user = await User.findById(userId).select("-password -refreshToken");
+  if (!user) {
+    throw new ApiError(404, "User not found");
+  }
+  return res.status(200).json(new ApiResponse(200, user, "User details"));
+});
 
-export default { signup, verifyUser, login };
+export default { signup, verifyUser, login, getUserDetails };
