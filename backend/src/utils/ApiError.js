@@ -1,5 +1,5 @@
 class ApiError extends Error {
-  constructor(message = "Something went wrong", statusCode = 500, errors = []) {
+  constructor(statusCode = 500, message = "Something went wrong", errors = []) {
     super(message);
     this.statusCode = statusCode;
     this.errors = errors;
@@ -10,4 +10,4 @@ class ApiError extends Error {
   }
 }
 
-export default ApiError ;
+export default ApiError;

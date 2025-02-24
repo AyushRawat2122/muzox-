@@ -160,6 +160,7 @@ export const login = asyncHandler(async (req, res) => {
     .status(200)
     .json(new ApiResponse(200, user, "User verified successfully"));
 });
+
 export const getUserDetails = asyncHandler(async (req, res) => {
   const token = req.cookies.refreshToken;
   if (!token && req.headers.authorization) {
