@@ -27,8 +27,10 @@ const userSchema = new mongoose.Schema(
       minlength: [8, "Password must be at least 8 characters"],
     },
     profilePic: {
-      type: String, // UploadThing
-      default: null,
+      type:{
+        public_id:String,
+        url:String
+      }
     },
     playlists: [
       {

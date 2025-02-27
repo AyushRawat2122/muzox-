@@ -8,6 +8,7 @@ SongRouter.route("/uploadMusic").post(
     { name: "song", maxCount: 1 },
     { name: "coverImg", maxCount: 1 },
   ]),
+  
   uploadSong
 );
 

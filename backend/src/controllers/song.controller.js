@@ -9,6 +9,8 @@ import mongoose from "mongoose";
 
 const uploadSong = asyncHandler(async (req, res) => {
   const user = req.user; //this will come from middleware verifyJWT
+  //where are you excepting it from ?
+  //i have given it name authRequired situated in ../middleware/authRequired.middleware.js!
 
   const { title, artist, genre = "" } = req.body; //extract data from req body
 
