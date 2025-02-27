@@ -1,9 +1,8 @@
 import jwt from "jsonwebtoken";
-
 import { User } from "../models/user.models.js";
 
-export const authRequired = asyncHandler(async (req, res) => {
-  const token = req.cookies.refreshToken;
+export const authRequired = asyncHandler(async (req, res , next) => {
+  const token = req.cookies.accessToken;
 
   if (!token && req.headers.authorization) {
     token = req.headers.authorization.replace("Bearer", "");
@@ -13,7 +12,7 @@ export const authRequired = asyncHandler(async (req, res) => {
     throw new ApiError(404, "User not Authorized");
   }
   
-  const decoded = jwt.verify(token, process.env.REFRESH_TOKEN_SECRET);
+  const decoded = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
 
   const userId = decoded._id;
 
@@ -25,4 +24,5 @@ export const authRequired = asyncHandler(async (req, res) => {
 
   return res.status(200).json(new ApiResponse(200, user, "User details"));
 });
+
 export default authRequired;

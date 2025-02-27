@@ -18,8 +18,8 @@ const uploadSong = asyncHandler(async (req, res) => {
     throw new ApiError(400, "title and artist are required");
   } // title and artist shouldnt be empty
 
-  const localSongPath = req.files?.song[0]?.path;
-  const localCoverImgPath = req.files?.coverImg[0]?.path;
+  const localSongPath = req.files?.song?.[0]?.path;
+  const localCoverImgPath = req.files?.coverImg?.[0]?.path;
 
   if (!localSongPath || !localCoverImgPath) {
     throw new ApiError(400, "cover and song both are required");
@@ -75,4 +75,25 @@ const deleteSong = asyncHandler(async (req, res) => {
     .json(new ApiResponse(200, {}, "successfully deleted the video"));
 });
 
-export { uploadSong, deleteSong };
+//search Song
+const getSuggestionList = asyncHandler(async (req, res) => {
+  const { query } = req.query;
+  const searchedSuggestion = await Song.aggregate([
+    {
+      $match: { title: { $regex: query } },
+    },
+    { $limit: 15 },
+    {
+      $project: {
+        uploadedBy: 0,
+      },
+    },
+  ]);
+  return res
+    .status(200)
+    .json(
+      new ApiResponse(200, searchedSuggestion, "songs fetched successfully")
+    );
+});
+
+export { uploadSong, deleteSong, getSuggestionList};

@@ -29,7 +29,7 @@ const tokenGenerators = async (userId) => {
 
 //sign up
 
-export const signup = asyncHandler(async (req, res) => {
+const signup = asyncHandler(async (req, res) => {
   const { username, email, password } = req.body;
 
   if (!username || !email || !password) {
@@ -90,7 +90,7 @@ export const signup = asyncHandler(async (req, res) => {
 
 //verify user
 
-export const verifyUser = asyncHandler(async (req, res) => {
+const verifyUser = asyncHandler(async (req, res) => {
   const { userId } = req.params;
 
   const { otp } = req.body;
@@ -133,7 +133,7 @@ export const verifyUser = asyncHandler(async (req, res) => {
     .json(new ApiResponse(200, user, "User verified successfully"));
 });
 
-export const login = asyncHandler(async (req, res) => {
+const login = asyncHandler(async (req, res) => {
   const { email, password } = req.body;
 
   if (email === "" || password === "") {
@@ -171,7 +171,7 @@ export const login = asyncHandler(async (req, res) => {
     .json(new ApiResponse(200, user, "User verified successfully"));
 });
 
-export const forgotPassword = asyncHandler(async (req, res) => {
+const forgotPassword = asyncHandler(async (req, res) => {
   const { email } = req.body;
 
   if (!email) {
@@ -209,7 +209,8 @@ export const forgotPassword = asyncHandler(async (req, res) => {
       )
     );
 });
-export const passwordResetMail = asyncHandler(async (req, res) => {
+
+const passwordResetMail = asyncHandler(async (req, res) => {
   const userId = req.user._id;
 
   if (!userId) {
@@ -247,6 +248,7 @@ export const passwordResetMail = asyncHandler(async (req, res) => {
       )
     );
 });
+
 const refreshAccessToken = asyncHandler(async (req, res) => {
   const currRefreshToken = req.cookies?.refreshToken || req.body.refreshToken;
   if (!currRefreshToken) return new ApiError(401, "No refresh token provided");
@@ -278,7 +280,7 @@ const refreshAccessToken = asyncHandler(async (req, res) => {
     );
 });
 
-export const resetPassword = asyncHandler(async (req, res) => {
+const resetPassword = asyncHandler(async (req, res) => {
   
   const { userId } = req.params;
 
@@ -325,7 +327,7 @@ export const resetPassword = asyncHandler(async (req, res) => {
     .json(new ApiResponse(200, "Password reset successfully"));
 });
 
-export const logout = asyncHandler(async (req, res) => {
+const logout = asyncHandler(async (req, res) => {
   const id = req.user._id;
 
   const user = await User.findByIdAndUpdate(
@@ -353,11 +355,11 @@ export const logout = asyncHandler(async (req, res) => {
     .json(new ApiResponse(200, "Logged out successfully"));
 });
 
-export const getCurrentUser = asyncHandler(async (req, res) => {
+const getCurrentUser = asyncHandler(async (req, res) => {
   return res.status(200).json(new ApiResponse(200, "User found", req.user));
 });
 
-export const updateUserDetails = asyncHandler(async (req, res) => {
+const updateUserDetails = asyncHandler(async (req, res) => {
   //what do i want to change
 
   const { username, email } = req.body;
@@ -391,7 +393,7 @@ export const updateUserDetails = asyncHandler(async (req, res) => {
     .json(new ApiResponse(200, "User details updated successfully", user));
 });
 
-export const updateProfilePic = asyncHandler(async (req, res) => {
+const updateProfilePic = asyncHandler(async (req, res) => {
   const id = req.user._id;
 
   const profilePic = req.file?.path;
@@ -430,15 +432,16 @@ export const updateProfilePic = asyncHandler(async (req, res) => {
     .json(new ApiResponse(200, "Profile picture updated successfully", user));
 });
 
-export const getUserPlaylist=asyncHandler(async(req,res)=>{
+const getUserPlaylist=asyncHandler(async(req,res)=>{
   const id=req.user._id;
-  const playlists=await Playlist.findOne({id});
+  const playlists=await Playlist.findOne({owner:id});
   if(!playlists){
     return res.status(404).json(new ApiResponse(404, "No playlists found for this user"))
   }
   return res.status(200).json(new ApiResponse(200, "User playlists", playlists));
-})
-export const userSongs = asyncHandler(async (req, res) => {
+}); // risky
+
+const userSongs = asyncHandler(async (req, res) => {
   const id = req.user._id;
 
   const pipeline = [
@@ -458,8 +461,7 @@ export const userSongs = asyncHandler(async (req, res) => {
   res.json(songs);
 });
 
-
-export const likedSong = asyncHandler(async (req, res) => {
+const likedSong = asyncHandler(async (req, res) => {
   const page = parseInt(req.query.page, 10) || 1;
   const limit = parseInt(req.query.limit, 10) || 10;
   const sortField = req.query.sortField || "createdAt";
@@ -494,9 +496,6 @@ export const likedSong = asyncHandler(async (req, res) => {
   res.json(likedSongs);
 });
 
-
-
-
 export default {
   signup,
   verifyUser,
@@ -510,7 +509,6 @@ export default {
   updateUserDetails,
   getCurrentUser,
   logout,
-  getLikedSongs,
   userSongs,
   likedSong,
   refreshAccessToken,
