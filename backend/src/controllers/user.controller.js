@@ -14,7 +14,7 @@ const tokenGenerators = async (userId) => {
     const accessToken = user.generateAccessToken();
     const refreshToken = user.generateRefreshToken();
     user.refreshToken = refreshToken;
-    await user.save({ validateBeforeSave: false });
+    await user.save({  validateBeforeSave:  false  });
     return { accessToken, refreshToken };
   } catch (error) {
     throw new ApiError(500, "Internal Server Error");
@@ -28,7 +28,7 @@ export const signup = asyncHandler(async (req, res) => {
 
   if (!username || !email || !password) {
     throw new ApiError(400, "All fields are required");
-  }
+  } // check that incoming body isn't empty
 
   const alreadyAUser = await User.findOne({
     $or: [{ username }, { email }],
@@ -83,7 +83,8 @@ export const signup = asyncHandler(async (req, res) => {
 
 export const verifyUser = asyncHandler(async (req, res) => {
   const { userId } = req.params;
-  const { otp } = req.body;
+  const {otp}  = req.body;
+
 
   if (!userId || !otp) {
     throw new ApiError(400, "Please enter to confirm your validations");
@@ -94,6 +95,12 @@ export const verifyUser = asyncHandler(async (req, res) => {
   if (!user) {
     throw new ApiError(404, "User not found");
   }
+
+  if(user.isVerified === true){
+    throw new ApiError(400 ,"User already verified");
+  }
+
+  console.log(user);
 
   if (user.verifyToken != otp) {
     throw new ApiError(400, "Invalid OTP");
@@ -132,28 +139,28 @@ export const login = asyncHandler(async (req, res) => {
   if (!user.isVerified) {
     throw new ApiError(400, "Please verify your account first");
   }
-  const isPassWordCorrect = await bcryptjs.compare(password, user.password);
+
+  const isPassWordCorrect = await user.comparePassword(password);
+
   if (!isPassWordCorrect) {
     throw new ApiError(400, "Invalid Email or  password");
   }
-  const { accessToken, refreshToken } = await tokenGenerators(user._id);
+
+  const options = {
+    secure: true,
+    sameSite: "None",
+    httpOnly: true,
+  };
+
+  const { accessToken, refreshToken } = tokenGenerators(user._id);
   res
-    .cookie("accessToken", accessToken, {
-      secure: true,
-      sameSite: "None",
-      httpOnly: true,
-    })
-    .cookie("refreshToken", refreshToken, {
-      secure: true,
-      sameSite: "None",
-      httpOnly: true,
-    });
-  user.refreshToken = refreshToken;
-  await user.save();
+    .cookie("accessToken", accessToken, options)
+    .cookie("refreshToken", refreshToken, options)
   return res
     .status(200)
     .json(new ApiResponse(200, user, "User verified successfully"));
 });
+
 export const getUserDetails = asyncHandler(async (req, res) => {
   const token = req.cookies.refreshToken;
   if (!token && req.headers.authorization) {
