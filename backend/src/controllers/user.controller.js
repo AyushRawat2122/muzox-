@@ -170,5 +170,101 @@ export const getUserDetails = asyncHandler(async (req, res) => {
   }
   return res.status(200).json(new ApiResponse(200, user, "User details"));
 });
+export const forgotPassword = asyncHandler(async (req, res) => {
+  const { email } = req.body;
+  if (!email) {
+    return new ApiError(400, "Email field is required");
+  }
+  const user = await User.findOne({ email });
+  if (!user) {
+    return new ApiError(404, "Please provide the valid email ");
+  }
+  const otp = Math.floor(100000 + Math.random() * 900000).toString();
+  const expiryDate = new Date(Date.now() + 600000);
 
-export default { signup, verifyUser, login, getUserDetails };
+  user.passwordToken = otp;
+  user.passwordTokenExpiry = expiryDate;
+  await sendEmail({
+    email: email,
+    otp: otp,
+    name: username,
+    type: "PASSWORD_RESET",
+    userId: user._id,
+  });
+  return res
+    .status(200)
+    .json(
+      new ApiResponse(
+        200,
+        "Email sent successfully to the User Email with a password reset follow the instructions to reset to password"
+      )
+    );
+});
+export const passwordResetMail = asyncHandler(async (req, res) => {
+  const userId = getUserDetails().data.userId;
+  if (!userId) {
+    return new ApiError(404, "User not found");
+  }
+  const user = await User.findById(userId);
+  if (!user) {
+    return new ApiError(404, "User not found");
+  }
+  const otp = Math.floor(100000 + Math.random() * 900000).toString();
+  const expiryDate = new Date(Date.now() + 600000);
+  user.passwordToken = otp;
+  user.passwordTokenExpiry = expiryDate;
+  await sendEmail({
+    email: email,
+    otp: otp,
+    name: username,
+    type: "PASSWORD_RESET",
+    userId: user._id,
+  });
+  return res
+    .status(200)
+    .json(
+      new ApiResponse(
+        200,
+        "Email sent successfully to the User Email with a password reset follow the instructions to reset to password"
+      )
+    );
+});
+export const resetPassword = asyncHandler(async (req, res) => {
+  const { userId } = req.params;
+  const { otp, newPassword } = req.body;
+
+  if (!userId) {
+    return new ApiError(404, "Page  Not Found");
+  }
+  if (otp === "" || newPassword === "") {
+    return new ApiError(400, "OTP and New Password fields are required");
+  }
+  const user = await User.findById(userId);
+  if (!user) {
+    return new ApiError(404, "User not found Please try again later");
+  }
+  if (user.passwordToken !== otp) {
+    return new ApiError(404, "Please enter the valid OTP");
+  }
+  if (new Date() > user.passwordTokenExpiry) {
+    return new ApiError(404, "OTP has expired Please try again later");
+  }
+  const salt = await bcryptjs.genSalt(10);
+  const hashedPassword = await bcryptjs.hashSync(password, salt);
+  user.password = hashedPassword;
+  user.passwordToken = null;
+  user.passwordTokenExpiry = null;
+  await user.save();
+  return res
+    .status(200)
+    .json(new ApiResponse(200, "Password reset successfully"));
+});
+export default {
+  signup,
+  verifyUser,
+  login,
+  getUserDetails,
+  forgotPassword,
+  passwordResetMail,
+  resetPassword,
+};
