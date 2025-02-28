@@ -5,6 +5,7 @@ import { deleteOnCloudinary, uploadOnCloudinary } from "../utils/cloudinary.js";
 import Playlist from "../models/playlist.models.js";
 import mongoose from "mongoose";
 
+//create PlayList
 const createPlayList = asyncHandler(async (req, res) => {
   const { name, description } = req.body;
   const { _id } = req.user;
@@ -35,3 +36,32 @@ const createPlayList = asyncHandler(async (req, res) => {
     .status(200)
     .json(new ApiResponse(200, "", "playlist created successfully"));
 });
+
+//delete PlayList
+
+const deletePlayList = asyncHandler(async (req, res) => {
+  const { playListID } = req.params;
+});
+
+//add to PlayList
+const addToPlayList = asyncHandler(async (req, res) => {
+  const { playListID } = req.params;
+});
+
+//remove from PlayList
+const removeFromPlayList = asyncHandler(async (req, res) => {
+  const { playListID } = req.params;
+});
+
+//toggle playList publish status
+const togglePlayListStatus = asyncHandler(async (req, res) => {
+  const { playListID } = req.params;
+});
+
+export {
+  createPlayList,
+  addToPlayList,
+  removeFromPlayList,
+  deletePlayList,
+  togglePlayListStatus,
+};
