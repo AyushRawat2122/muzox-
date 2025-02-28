@@ -28,7 +28,7 @@ const createPlayList = asyncHandler(async (req, res) => {
     description: description,
     playListCover: playListCover || "",
     songs: [],
-    owner: new mongoose.Types.ObjectId(_id),
+    owner: mongoose.Types.ObjectId(_id),
   });
 
   return res

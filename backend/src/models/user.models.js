@@ -38,12 +38,6 @@ const userSchema = new mongoose.Schema(
         ref: "Playlist",
       },
     ],
-    likedSongs: [
-      {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "Song",
-      },
-    ],
     verifyToken: {
       type: Number,
       default: null,
