@@ -4,7 +4,7 @@ import ApiResponse from "../utils/ApiResponse.js";
 import { deleteOnCloudinary, uploadOnCloudinary } from "../utils/cloudinary.js";
 import Song from "../models/song.models.js";
 import mongoose from "mongoose";
-
+import Like from "../models/like.models.js";
 //upload song
 
 const uploadSong = asyncHandler(async (req, res) => {
@@ -96,4 +96,98 @@ const getSuggestionList = asyncHandler(async (req, res) => {
     );
 });
 
-export { uploadSong, deleteSong, getSuggestionList};
+//get liked Songs
+const getLikedSongs = asyncHandler(async (req, res) => {
+  const { _id } = req.user; //extracting id from user request
+
+  const likedSongs = await Like.aggregate([
+    {
+      $match: { likedBy: mongoose.Types.ObjectId(_id) },
+    },
+    {
+      $lookup: {
+        from: "songs",
+        localField: "song",
+        foreignField: "_id",
+        as: "songDetailsArray",
+        pipeline: [
+          {
+            $project: {
+              uploadedBy: 0,
+            },
+          },
+        ],
+      },
+    },
+    {
+      $addFields: {
+        songDetail: { $first: "$songDetailsArray" },
+        isLiked: true,
+      },
+    },
+    {
+      $project: {
+        songDetail: 1,
+        isLiked: 1,
+      },
+    },
+  ]); //aggregation PipeLine to get Liked Song
+
+  return res
+    .status(200)
+    .json(new ApiResponse(200, likedSongs, "likedSongs fetched Successfully")); //return the liked song array
+});
+
+//like a song
+const likeSong = asyncHandler(async (req, res) => {
+  const { songId } = req.params; //extract incoming song id
+  const { _id } = req.user; //extract incoming user _id
+  const song = await Like.findOne({
+    $and: [
+      { song: mongoose.Types.ObjectId(songId) },
+      { likedBy: mongoose.Types.ObjectId(_id) },
+    ],
+  });
+  if (song) {
+    throw new ApiError(400, "song is already liked");
+  }
+
+  const likedSong = await Like.create({
+    song: mongoose.Types.ObjectId(songId),
+    likedBy: mongoose.Types.ObjectId(_id),
+  });
+
+  return res
+    .status(200)
+    .json(new ApiResponse(200, likedSong, "liked the song"));
+});
+
+//dislike song
+const unlikeSong = asyncHandler(async (req, res) => {
+  const { songId } = req.params;
+  const { _id } = req.user;
+
+  const song = await Like.deleteOne({
+    $and: [
+      { song: mongoose.Types.ObjectId(songId) },
+      { likedBy: mongoose.Types.ObjectId(_id) },
+    ],
+  });
+
+  if (!song.deletedCount) {
+    throw new ApiError(400, "not a liked song");
+  }
+
+  return res
+    .status(200)
+    .json(new ApiResponse(200, "", "successfully removed from liked song"));
+});
+
+export {
+  uploadSong,
+  deleteSong,
+  getSuggestionList,
+  getLikedSongs,
+  likeSong,
+  unlikeSong,
+};
