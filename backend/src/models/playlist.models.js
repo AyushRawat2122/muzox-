@@ -14,7 +14,10 @@ const playlistSchema = new mongoose.Schema(
       trim: true,
     },
     playListCover: {
-      type: String,
+       type:{
+        public_id:String,
+        url:String
+      }
     },
     songs: [
       {
