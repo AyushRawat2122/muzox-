@@ -40,8 +40,8 @@ const uploadSong = asyncHandler(async (req, res) => {
     title: title,
     artist: artist,
     genre: genre,
-    url: song.url,
-    coverImage: coverImg.url,
+    song: { url: song.url, public_id: song.public_id },
+    coverImage: { url: coverImg.url, public_id: coverImg.public_id },
     duration: song?.duration,
     uploadedBy: mongoose.Types.ObjectId(user._id),
   });

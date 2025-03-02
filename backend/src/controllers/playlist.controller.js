@@ -68,12 +68,12 @@ const addToPlayList = asyncHandler(async (req, res) => {
   if (!playlist) {
     throw new ApiError(404, "Playlist not found");
   }
+  if (playlist.owner?.toString() !== req.user?._id.toString()) {
+    return new ApiError(403, "You are not the owner of this playlist");
+  }
   const song = await Song.findById(songId);
   if (!song) {
     throw new ApiError(404, "Playlist Not Found");
-  }
-  if (playlist.owner?.toString() !== req.user?._id.toString()) {
-    return new ApiError(403, "You are not the owner of this playlist");
   }
   const songAlreadyInPlaylist = playlist.findOne({ songId });
   if (songAlreadyInPlaylist) {
@@ -111,6 +111,7 @@ const removeFromPlayList = asyncHandler(async (req, res) => {
 const togglePlayListStatus = asyncHandler(async (req, res) => {
   const { playListID } = req.params;
 });
+
 const searchPlaylist = asyncHandler(async (req, res) => {
   const { nameOfPlaylist } = req.body;
   if (!nameOfPlaylist || nameOfPlaylist.trim() === "") {

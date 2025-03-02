@@ -15,12 +15,18 @@ const songSchema = new mongoose.Schema(
     genre: {
       type: String,
     },
-    url: {
-      type: String, // Cloudinary URL[first we will save it to cloudinary and save it to db].
+    song: {
+      type: {
+        public_id: String,
+        url: String,
+      }, // Cloudinary URL[first we will save it to cloudinary and save it to db].
       required: [true, "Song file URL is required"],
     },
     coverImage: {
-      type: String, // Cloudinary URL
+      type: {
+        public_id: String,
+        url: String,
+      }, // Cloudinary URL
       default: null,
     },
     duration: {
