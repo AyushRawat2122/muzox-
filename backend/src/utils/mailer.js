@@ -75,7 +75,7 @@ export const sendEmail = async ({ email, otp, name, type, userId }) => {
 </a>
 
 <p style="margin-top: 20px; font-size: 14px; color: #bbb;">
-    This OTP is valid for <strong>1 hour</strong>.  
+    This OTP is valid for <strong>10 min</strong>.  
     If you didn’t request this, please ignore this email.
 </p>
 
