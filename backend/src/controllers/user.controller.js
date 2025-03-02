@@ -192,44 +192,7 @@ const login = asyncHandler(async (req, res) => {
     );
 });
 
-const forgotPassword = asyncHandler(async (req, res) => {
-  const { email } = req.body;
 
-  if (!email) {
-    return new ApiError(400, "Email field is required");
-  }
-
-  const user = await User.findOne({ email });
-
-  if (!user) {
-    return new ApiError(404, "Please provide the valid email ");
-  }
-
-  const otp = Math.floor(100000 + Math.random() * 900000).toString();
-
-  const expiryDate = new Date(Date.now() + 600000);
-
-  user.passwordToken = otp;
-
-  user.passwordTokenExpiry = expiryDate;
-
-  await sendEmail({
-    email: email,
-    otp: otp,
-    name: username,
-    type: "PASSWORD_RESET",
-    userId: user._id,
-  });
-
-  return res
-    .status(200)
-    .json(
-      new ApiResponse(
-        200,
-        "Email sent successfully to the User Email with a password reset follow the instructions to reset to password"
-      )
-    );
-});
 
 const passwordResetMail = asyncHandler(async (req, res) => {
   const userId = req.user._id;
@@ -251,13 +214,13 @@ const passwordResetMail = asyncHandler(async (req, res) => {
   user.passwordToken = otp;
 
   user.passwordTokenExpiry = expiryDate;
-
+   await user.save();
   await sendEmail({
-    email: email,
+    email: user.email,
     otp: otp,
-    name: username,
+    name: user.username,
     type: "PASSWORD_RESET",
-    userId: user._id,
+    userId: userId,
   });
 
   return res
@@ -300,32 +263,33 @@ const refreshAccessToken = asyncHandler(async (req, res) => {
       )
     );
 });
-
+// console.log("haha")
 const resetPassword = asyncHandler(async (req, res) => {
-  const { userId } = req.params;
+ 
+  const  userId  = req.user._id;
 
   const { otp, newPassword } = req.body;
-
+   
   if (!userId) {
     return new ApiError(404, "Page  Not Found");
   }
-
+ 
   if (otp === "" || newPassword === "") {
     return new ApiError(400, "OTP and New Password fields are required");
   }
 
   const user = await User.findById(userId);
-
+// console.log(user);
   if (!user) {
-    return new ApiError(404, "User not found Please try again later");
+    throw new ApiError(404, "User not found Please try again later");
   }
-
+// console.log("dhdhhdh")
   if (user.passwordToken !== otp) {
-    return new ApiError(404, "Please enter the valid OTP");
+    throw new ApiError(404, "Please enter the valid OTP");
   }
-
+console.log("dhdhhdh")
   if (new Date() > user.passwordTokenExpiry) {
-    return new ApiError(404, "OTP has expired Please try again later");
+    throw new ApiError(404, "OTP has expired Please try again later");
   }
 
   const salt = await bcryptjs.genSalt(10);
@@ -429,19 +393,15 @@ const updateProfilePic = asyncHandler(async (req, res) => {
   const id = req.user._id;
 
   const profilePicLocal =  req.files?.profilePic[0]?.path;
-
-  if (!profilePic) {
+  if (!profilePicLocal) {
     return res
       .status(400)
       .json(new ApiResponse(400, "Please upload a profile picture"));
   }
-
   const user = await User.findById(req.user._id).select("profilePic");
   console.log(user)
   const PF = await uploadOnCloudinary(profilePicLocal);
-
   const avatarToDelete = user.profilePic.public_id;
-
   await User.findByIdAndUpdate(
     id,
     {
@@ -456,8 +416,7 @@ const updateProfilePic = asyncHandler(async (req, res) => {
   );
 
   if (avatarToDelete) {
-    console.log("haha hui hui")
-    await deleteFromCloudinary(avatarToDelete);
+    await deleteOnCloudinary(avatarToDelete);
   }
 
   return res
@@ -482,7 +441,7 @@ const userSongs = asyncHandler(async (req, res) => {
   const id = req.user._id;
 
   const pipeline = [
-    { $match: { userId: id } },
+    { $match: { uploadedBy: id } },
     {
       $lookup: {
         from: "users",
@@ -538,7 +497,6 @@ export {
   signup,
   verifyUser,
   login,
-  forgotPassword,
   passwordResetMail,
   resetPassword,
   getUserPlaylist,

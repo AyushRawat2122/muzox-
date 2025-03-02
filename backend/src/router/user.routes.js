@@ -10,11 +10,13 @@ import {
   signup,
   verifyUser,
   logout,
-  forgotPassword,
   passwordResetMail,
   resetPassword,
   updateUserDetails,
   updateProfilePic,
+  getUserPlaylist,
+  userSongs,
+  likedSong,
 } from "../controllers/user.controller.js";
 const userRouter = express.Router();
 
@@ -32,14 +34,18 @@ userRouter.post("/userDetails", authRequired, getCurrentUser);
 
 userRouter.post("/logout", authRequired, logout);
 
-userRouter.post("/forgotPass", forgotPassword);
+userRouter.post("/PasswordResetMail",authRequired, passwordResetMail);
 
-userRouter.get("/PasswordResetMail", passwordResetMail);
-
-userRouter.post("/resetPassword", resetPassword);
+userRouter.post("/resetPassword", authRequired,resetPassword);
 
 userRouter.post("/updateUserDetails", authRequired, updateUserDetails);
 
 userRouter.post("/updateProfilePic", uploader.fields([{ name: "profilePic", maxCount: 1 }]),authRequired, updateProfilePic);
+
+userRouter.get('/getPlaylist',authRequired,getUserPlaylist);
+
+userRouter.get('/getMySongs',authRequired,userSongs);
+
+userRouter.get('/myLikedSongs',authRequired,likedSong);
 
 export default userRouter;
