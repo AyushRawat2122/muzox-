@@ -17,6 +17,7 @@ import {
   getUserPlaylist,
   userSongs,
   likedSong,
+  refreshAccessToken,
 } from "../controllers/user.controller.js";
 const userRouter = express.Router();
 
@@ -37,6 +38,8 @@ userRouter.post("/logout", authRequired, logout);
 userRouter.post("/PasswordResetMail",authRequired, passwordResetMail);
 
 userRouter.post("/resetPassword", authRequired,resetPassword);
+
+userRouter.post('/generateAccessToken',refreshAccessToken)
 
 userRouter.post("/updateUserDetails", authRequired, updateUserDetails);
 
