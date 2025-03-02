@@ -380,37 +380,49 @@ const getCurrentUser = asyncHandler(async (req, res) => {
 });
 
 const updateUserDetails = asyncHandler(async (req, res) => {
-  //what do i want to change
+  const { username } = req.body;
 
-  const { username, email } = req.body;
+  if (!username || username.trim() === "") {
+    return res
+      .status(400)
+      .json(new ApiResponse(400, "Username cannot be empty"));
+  }
 
-  const takenUserNameOrEmail = await User.findOne(
-    $or[({ username }, { email })]
+  const userId = req.user._id;
+
+  const currentUser = await User.findById(userId);
+  if (!currentUser) {
+    return next(new ApiError(404, "User not found"));
+  }
+
+  if (currentUser.username === username) {
+    return next(
+      new ApiError(400, "New username must be different from the current username")
+    );
+  }
+
+  const isUsernameTaken = await User.findOne({ username });
+  if (isUsernameTaken) {
+    return res
+      .status(400)
+      .json(new ApiResponse(400, "Username already taken"));
+  }
+
+  const updatedUser = await User.findByIdAndUpdate(
+    userId,
+    { username },
+    { new: true, runValidators: true }
+  ).select(
+    "-playlists -password -refreshToken -verifyToken -verifyTokenExpiry -passwordToken -passwordTokenExpiry"
   );
 
-  if (username === "" || email === "") {
-    return res
-      .status(400)
-      .json(new ApiResponse(400, "Username and Email cannot be empty"));
+  if (!updatedUser) {
+    return next(new ApiError(500, "User update failed"));
   }
-
-  if (takenUserNameOrEmail) {
-    return res
-      .status(400)
-      .json(new ApiResponse(400, "Username or Email already taken"));
-  }
-
-  const id = req.user._id;
-
-  const user = await User.findByIdAndUpdate(
-    id,
-    { $set: { username, email } },
-    { new: true }
-  ).select("-password -refreshToken");
 
   return res
     .status(200)
-    .json(new ApiResponse(200, "User details updated successfully", user));
+    .json(new ApiResponse(200, "User details updated successfully", updatedUser));
 });
 
 const updateProfilePic = asyncHandler(async (req, res) => {
