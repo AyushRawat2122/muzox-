@@ -7,7 +7,7 @@ import ApiResponse from "../utils/ApiResponse.js";
 import jwt from "jsonwebtoken";
 import { uploadOnCloudinary, deleteOnCloudinary } from "../utils/cloudinary.js";
 import Playlist from "../models/playlist.models.js";
-import Song from "../models/song.models.js"
+import Song from "../models/song.models.js";
 //will generate token
 const tokenGenerators = async (userId) => {
   try {
@@ -17,7 +17,7 @@ const tokenGenerators = async (userId) => {
 
     const refreshToken = user.generateRefreshToken();
 
-    user.refreshToken = refreshToken;
+    user.refreshToken = refreshToken ||  "";
 
     await user.save({ validateBeforeSave: false });
 
@@ -29,7 +29,7 @@ const tokenGenerators = async (userId) => {
 
 //sign up
 
- const signup = asyncHandler(async (req, res) => {
+const signup = asyncHandler(async (req, res) => {
   const { username, email, password } = req.body;
 
   if (!username || !email || !password) {
@@ -90,7 +90,7 @@ const tokenGenerators = async (userId) => {
 
 //verify user
 
- const verifyUser = asyncHandler(async (req, res) => {
+const verifyUser = asyncHandler(async (req, res) => {
   const { userId } = req.params;
 
   const { otp } = req.body;
@@ -130,17 +130,19 @@ const tokenGenerators = async (userId) => {
 
   return res
     .status(200)
-    .json(new ApiResponse(200, user, "User verified successfully"));
+    .json(new ApiResponse(200, "", "User verified successfully"));
 });
 
- const login = asyncHandler(async (req, res) => {
+const login = asyncHandler(async (req, res) => {
   const { email, password } = req.body;
 
   if (email === "" || password === "") {
     throw new ApiError(400, "Please enter your email and password");
   }
 
-  const user = await User.findOne({ email });
+  const user = await User.findOne({ email }).select(
+    "-password -playlists -verifyToken -verifyTokenExpiry -refreshToken -passwordToken -passwordTokenExpiry"
+  );
 
   if (!user) {
     throw new ApiError(404, "User not found");
@@ -171,7 +173,7 @@ const tokenGenerators = async (userId) => {
     .json(new ApiResponse(200, user, "User verified successfully"));
 });
 
- const forgotPassword = asyncHandler(async (req, res) => {
+const forgotPassword = asyncHandler(async (req, res) => {
   const { email } = req.body;
 
   if (!email) {
@@ -210,7 +212,7 @@ const tokenGenerators = async (userId) => {
     );
 });
 
- const passwordResetMail = asyncHandler(async (req, res) => {
+const passwordResetMail = asyncHandler(async (req, res) => {
   const userId = req.user._id;
 
   if (!userId) {
@@ -249,7 +251,7 @@ const tokenGenerators = async (userId) => {
     );
 });
 
- const refreshAccessToken = asyncHandler(async (req, res) => {
+const refreshAccessToken = asyncHandler(async (req, res) => {
   const currRefreshToken = req.cookies?.refreshToken || req.body.refreshToken;
   if (!currRefreshToken) return new ApiError(401, "No refresh token provided");
 
@@ -280,8 +282,7 @@ const tokenGenerators = async (userId) => {
     );
 });
 
- const resetPassword = asyncHandler(async (req, res) => {
-  
+const resetPassword = asyncHandler(async (req, res) => {
   const { userId } = req.params;
 
   const { otp, newPassword } = req.body;
@@ -327,7 +328,7 @@ const tokenGenerators = async (userId) => {
     .json(new ApiResponse(200, "Password reset successfully"));
 });
 
- const logout = asyncHandler(async (req, res) => {
+const logout = asyncHandler(async (req, res) => {
   const id = req.user._id;
 
   const user = await User.findByIdAndUpdate(
@@ -355,11 +356,11 @@ const tokenGenerators = async (userId) => {
     .json(new ApiResponse(200, "Logged out successfully"));
 });
 
- const getCurrentUser = asyncHandler(async (req, res) => {
+const getCurrentUser = asyncHandler(async (req, res) => {
   return res.status(200).json(new ApiResponse(200, "User found", req.user));
 });
 
- const updateUserDetails = asyncHandler(async (req, res) => {
+const updateUserDetails = asyncHandler(async (req, res) => {
   //what do i want to change
 
   const { username, email } = req.body;
@@ -393,7 +394,7 @@ const tokenGenerators = async (userId) => {
     .json(new ApiResponse(200, "User details updated successfully", user));
 });
 
- const updateProfilePic = asyncHandler(async (req, res) => {
+const updateProfilePic = asyncHandler(async (req, res) => {
   const id = req.user._id;
 
   const profilePic = req.file?.path;
@@ -432,36 +433,40 @@ const tokenGenerators = async (userId) => {
     .json(new ApiResponse(200, "Profile picture updated successfully", user));
 });
 
- const getUserPlaylist=asyncHandler(async(req,res)=>{
-  const id=req.user._id;
-  const playlists=await Playlist.findOne({owner:id});
-  if(!playlists){
-    return res.status(404).json(new ApiResponse(404, "No playlists found for this user"))
+const getUserPlaylist = asyncHandler(async (req, res) => {
+  const id = req.user._id;
+  const playlists = await Playlist.findOne({ owner: id });
+  if (!playlists) {
+    return res
+      .status(404)
+      .json(new ApiResponse(404, "No playlists found for this user"));
   }
-  return res.status(200).json(new ApiResponse(200, "User playlists", playlists));
+  return res
+    .status(200)
+    .json(new ApiResponse(200, "User playlists", playlists));
 }); // risky
 
- const userSongs = asyncHandler(async (req, res) => {
+const userSongs = asyncHandler(async (req, res) => {
   const id = req.user._id;
 
   const pipeline = [
     { $match: { userId: id } },
     {
       $lookup: {
-        from: "users",       
-        localField: "users",  
-        foreignField: "_id",  
-        as: "artist"
-      }
+        from: "users",
+        localField: "users",
+        foreignField: "_id",
+        as: "artist",
+      },
     },
-    { $unwind: "$artist" }    
+    { $unwind: "$artist" },
   ];
 
   const songs = await Song.aggregate(pipeline);
   res.json(songs);
 });
 
- const likedSong = asyncHandler(async (req, res) => {
+const likedSong = asyncHandler(async (req, res) => {
   const page = parseInt(req.query.page, 10) || 1;
   const limit = parseInt(req.query.limit, 10) || 10;
   const sortField = req.query.sortField || "createdAt";
@@ -473,28 +478,31 @@ const tokenGenerators = async (userId) => {
     prevPage: "prev",
     totalPage: "pagesCount",
     pagingCounter: "slNo",
-    meta: "paginator"
+    meta: "paginator",
   };
 
   const options = { page, limit, customLabels };
   const pipeline = [
     { $match: { userId: req.user._id } },
-    { 
-      $lookup: { 
-        from: "songs", 
-        localField: "songId", 
-        foreignField: "_id", 
-        as: "song" 
-      } 
+    {
+      $lookup: {
+        from: "songs",
+        localField: "songId",
+        foreignField: "_id",
+        as: "song",
+      },
     },
     { $unwind: "$song" },
-    { $sort: { [sortField]: sortOrder } }
+    { $sort: { [sortField]: sortOrder } },
   ];
-  const likedSongs = await Song.aggregatePaginate(Song.aggregate(pipeline), options);
+  const likedSongs = await Song.aggregatePaginate(
+    Song.aggregate(pipeline),
+    options
+  );
   res.json(likedSongs);
 });
 
-export  {
+export {
   signup,
   verifyUser,
   login,

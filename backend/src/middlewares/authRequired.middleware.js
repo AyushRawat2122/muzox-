@@ -1,6 +1,7 @@
 import jwt from "jsonwebtoken";
 import  User  from "../models/user.models.js";
 import asyncHandler from "../utils/asyncHandler.js";
+import ApiError from "../utils/ApiError.js";
 
 export const authRequired = asyncHandler(async (req, res , next) => {
   const token = req.cookies.accessToken;
@@ -22,8 +23,8 @@ export const authRequired = asyncHandler(async (req, res , next) => {
   if (!user) {
     throw new ApiError(404, "User not found");
   }
-
-  return res.status(200).json(new ApiResponse(200, user, "User details"));
+  req.user=user;
+  next();
 });
 
 export default authRequired;
