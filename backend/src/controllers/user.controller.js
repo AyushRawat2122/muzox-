@@ -11,13 +11,15 @@ import Song from "../models/song.models.js";
 //will generate token
 const tokenGenerators = async (userId) => {
   try {
+    console.log("Reached token generators");
+
     const user = await User.findById(userId);
 
     const accessToken = user.generateAccessToken();
 
     const refreshToken = user.generateRefreshToken();
 
-    user.refreshToken = refreshToken ||  "";
+    user.refreshToken = refreshToken || "";
 
     await user.save({ validateBeforeSave: false });
 
@@ -136,13 +138,17 @@ const verifyUser = asyncHandler(async (req, res) => {
 const login = asyncHandler(async (req, res) => {
   const { email, password } = req.body;
 
+  console.log(email, password);
+
   if (email === "" || password === "") {
     throw new ApiError(400, "Please enter your email and password");
   }
 
   const user = await User.findOne({ email }).select(
-    "-password -playlists -verifyToken -verifyTokenExpiry -refreshToken -passwordToken -passwordTokenExpiry"
+    "-playlists -refreshToken -verifyToken -verifyTokenExpiry -passwordToken -passwordTokenExpiry"
   );
+
+  console.log(user);
 
   if (!user) {
     throw new ApiError(404, "User not found");
@@ -155,7 +161,7 @@ const login = asyncHandler(async (req, res) => {
   const isPassWordCorrect = await user.comparePassword(password);
 
   if (!isPassWordCorrect) {
-    throw new ApiError(400, "Invalid Email or  password");
+    throw new ApiError(400, "Invalid Email or password");
   }
 
   const options = {
@@ -170,7 +176,20 @@ const login = asyncHandler(async (req, res) => {
     .cookie("refreshToken", refreshToken, options);
   return res
     .status(200)
-    .json(new ApiResponse(200, user, "User verified successfully"));
+    .json(
+      new ApiResponse(
+        200,
+        {
+          username: user.username,
+          email: user.email,
+          profilePic: user.profilePic,
+          isVerified: user.isVerified,
+          isAdmin: user.isAdmin,
+          isPremiumUser: user.isPremiumUser,
+        },
+        "User verified successfully"
+      )
+    );
 });
 
 const forgotPassword = asyncHandler(async (req, res) => {
