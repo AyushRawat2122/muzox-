@@ -40,8 +40,6 @@ userRouter.post("/resetPassword", resetPassword);
 
 userRouter.post("/updateUserDetails", authRequired, updateUserDetails);
 
-userRouter.post("/updateProfilePic",uploader.single({
-  name: "profilePic",
-}),authRequired, updateProfilePic);
+userRouter.post("/updateProfilePic", uploader.fields([{ name: "profilePic", maxCount: 1 }]),authRequired, updateProfilePic);
 
 export default userRouter;

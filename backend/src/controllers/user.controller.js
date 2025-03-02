@@ -428,7 +428,7 @@ const updateUserDetails = asyncHandler(async (req, res) => {
 const updateProfilePic = asyncHandler(async (req, res) => {
   const id = req.user._id;
 
-  const profilePic = req.file?.path;
+  const profilePicLocal =  req.files?.profilePic[0]?.path;
 
   if (!profilePic) {
     return res
@@ -436,9 +436,9 @@ const updateProfilePic = asyncHandler(async (req, res) => {
       .json(new ApiResponse(400, "Please upload a profile picture"));
   }
 
-  const user = await User.findById(req.user._id).select("avatar");
-
-  const PF = await uploadOnCloudinary(profilePic);
+  const user = await User.findById(req.user._id).select("profilePic");
+  console.log(user)
+  const PF = await uploadOnCloudinary(profilePicLocal);
 
   const avatarToDelete = user.profilePic.public_id;
 
@@ -456,6 +456,7 @@ const updateProfilePic = asyncHandler(async (req, res) => {
   );
 
   if (avatarToDelete) {
+    console.log("haha hui hui")
     await deleteFromCloudinary(avatarToDelete);
   }
 
