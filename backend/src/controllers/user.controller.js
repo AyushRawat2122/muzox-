@@ -238,7 +238,7 @@ const refreshAccessToken = asyncHandler(async (req, res) => {
   );
   if (!user) throw new ApiError(401, "Invalid refresh token");
 
-  const { accessToken, refreshToken } = await generateAccessToken(user._id);
+  const { accessToken, refreshToken } = await tokenGenerators(user._id);
 
   const options = {
     httpOnly: true,
@@ -264,32 +264,32 @@ const resetPassword = asyncHandler(async (req, res) => {
   const userId = req.user._id;
 
   const { otp, newPassword } = req.body;
-
   if (!userId) {
     throw new ApiError(404, "Page  Not Found");
   }
-
+  
   if (otp === "" || newPassword === "") {
     throw new ApiError(400, "OTP and New Password fields are required");
   }
-
+  
   const user = await User.findById(userId);
-  // console.log(user);
+
   if (!user) {
     throw new ApiError(404, "User not found Please try again later");
   }
-  // console.log("dhdhhdh")
+
+  console.log(typeof(user.passwordToken));
   if (user.passwordToken !== otp) {
     throw new ApiError(404, "Please enter the valid OTP");
   }
-  console.log("dhdhhdh");
+
   if (new Date() > user.passwordTokenExpiry) {
     throw new ApiError(404, "OTP has expired Please try again later");
   }
 
   const salt = await bcryptjs.genSalt(10);
 
-  const hashedPassword = bcryptjs.hashSync(password, salt);
+  const hashedPassword = bcryptjs.hashSync(newPassword, salt);
 
   user.password = hashedPassword;
 
@@ -329,8 +329,8 @@ const logout = asyncHandler(async (req, res) => {
 
   return res
     .status(200)
-    .clearCookies("accessToken", options)
-    .clearCookies("refreshToken", options)
+    .clearCookie("accessToken", options)
+    .clearCookie("refreshToken", options)
     .json(new ApiResponse(200, "Logged out successfully"));
 });
 
