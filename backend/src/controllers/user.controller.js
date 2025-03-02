@@ -174,37 +174,33 @@ const login = asyncHandler(async (req, res) => {
   res
     .cookie("accessToken", accessToken, options)
     .cookie("refreshToken", refreshToken, options);
-  return res
-    .status(200)
-    .json(
-      new ApiResponse(
-        200,
-        {
-          username: user.username,
-          email: user.email,
-          profilePic: user.profilePic,
-          isVerified: user.isVerified,
-          isAdmin: user.isAdmin,
-          isPremiumUser: user.isPremiumUser,
-        },
-        "User verified successfully"
-      )
-    );
+  return res.status(200).json(
+    new ApiResponse(
+      200,
+      {
+        username: user.username,
+        email: user.email,
+        profilePic: user.profilePic,
+        isVerified: user.isVerified,
+        isAdmin: user.isAdmin,
+        isPremiumUser: user.isPremiumUser,
+      },
+      "User verified successfully"
+    )
+  );
 });
-
-
 
 const passwordResetMail = asyncHandler(async (req, res) => {
   const userId = req.user._id;
 
   if (!userId) {
-    return new ApiError(404, "User not found");
+    throw new ApiError(404, "User not found");
   }
 
   const user = await User.findById(userId);
 
   if (!user) {
-    return new ApiError(404, "User not found");
+    throw new ApiError(404, "User not found");
   }
 
   const otp = Math.floor(100000 + Math.random() * 900000).toString();
@@ -214,7 +210,7 @@ const passwordResetMail = asyncHandler(async (req, res) => {
   user.passwordToken = otp;
 
   user.passwordTokenExpiry = expiryDate;
-   await user.save();
+  await user.save();
   await sendEmail({
     email: user.email,
     otp: otp,
@@ -235,12 +231,12 @@ const passwordResetMail = asyncHandler(async (req, res) => {
 
 const refreshAccessToken = asyncHandler(async (req, res) => {
   const currRefreshToken = req.cookies?.refreshToken || req.body.refreshToken;
-  if (!currRefreshToken) return new ApiError(401, "No refresh token provided");
+  if (!currRefreshToken) throw new ApiError(401, "No refresh token provided");
 
   const user = await User.findOne({ refreshToken: currRefreshToken }).select(
     "-refreshToken"
   );
-  if (!user) return new ApiError(401, "Invalid refresh token");
+  if (!user) throw new ApiError(401, "Invalid refresh token");
 
   const { accessToken, refreshToken } = await generateAccessToken(user._id);
 
@@ -265,36 +261,35 @@ const refreshAccessToken = asyncHandler(async (req, res) => {
 });
 // console.log("haha")
 const resetPassword = asyncHandler(async (req, res) => {
- 
-  const  userId  = req.user._id;
+  const userId = req.user._id;
 
   const { otp, newPassword } = req.body;
-   
+
   if (!userId) {
-    return new ApiError(404, "Page  Not Found");
+    throw new ApiError(404, "Page  Not Found");
   }
- 
+
   if (otp === "" || newPassword === "") {
-    return new ApiError(400, "OTP and New Password fields are required");
+    throw new ApiError(400, "OTP and New Password fields are required");
   }
 
   const user = await User.findById(userId);
-// console.log(user);
+  // console.log(user);
   if (!user) {
     throw new ApiError(404, "User not found Please try again later");
   }
-// console.log("dhdhhdh")
+  // console.log("dhdhhdh")
   if (user.passwordToken !== otp) {
     throw new ApiError(404, "Please enter the valid OTP");
   }
-console.log("dhdhhdh")
+  console.log("dhdhhdh");
   if (new Date() > user.passwordTokenExpiry) {
     throw new ApiError(404, "OTP has expired Please try again later");
   }
 
   const salt = await bcryptjs.genSalt(10);
 
-  const hashedPassword = await bcryptjs.hashSync(password, salt);
+  const hashedPassword = bcryptjs.hashSync(password, salt);
 
   user.password = hashedPassword;
 
@@ -347,29 +342,26 @@ const updateUserDetails = asyncHandler(async (req, res) => {
   const { username } = req.body;
 
   if (!username || username.trim() === "") {
-    return res
-      .status(400)
-      .json(new ApiResponse(400, "Username cannot be empty"));
+    throw new ApiError(400, "Username cannot be empty");
   }
 
   const userId = req.user._id;
 
   const currentUser = await User.findById(userId);
   if (!currentUser) {
-    return next(new ApiError(404, "User not found"));
+    throw new ApiError(404, "User not found");
   }
 
   if (currentUser.username === username) {
-    return next(
-      new ApiError(400, "New username must be different from the current username")
+    throw new ApiError(
+      400,
+      "New username must be different from the current username"
     );
   }
 
   const isUsernameTaken = await User.findOne({ username });
   if (isUsernameTaken) {
-    return res
-      .status(400)
-      .json(new ApiResponse(400, "Username already taken"));
+    throw new ApiError(400, "Username already taken");
   }
 
   const updatedUser = await User.findByIdAndUpdate(
@@ -381,25 +373,25 @@ const updateUserDetails = asyncHandler(async (req, res) => {
   );
 
   if (!updatedUser) {
-    return next(new ApiError(500, "User update failed"));
+    throw new ApiError(500, "User update failed");
   }
 
   return res
     .status(200)
-    .json(new ApiResponse(200, "User details updated successfully", updatedUser));
+    .json(
+      new ApiResponse(200, "User details updated successfully", updatedUser)
+    );
 });
 
 const updateProfilePic = asyncHandler(async (req, res) => {
   const id = req.user._id;
 
-  const profilePicLocal =  req.files?.profilePic[0]?.path;
+  const profilePicLocal = req.files?.profilePic[0]?.path;
   if (!profilePicLocal) {
-    return res
-      .status(400)
-      .json(new ApiResponse(400, "Please upload a profile picture"));
+   throw new ApiError(400, "Please upload a profile picture");
   }
   const user = await User.findById(req.user._id).select("profilePic");
-  console.log(user)
+  console.log(user);
   const PF = await uploadOnCloudinary(profilePicLocal);
   const avatarToDelete = user.profilePic.public_id;
   await User.findByIdAndUpdate(
@@ -428,9 +420,7 @@ const getUserPlaylist = asyncHandler(async (req, res) => {
   const id = req.user._id;
   const playlists = await Playlist.findOne({ owner: id });
   if (!playlists) {
-    return res
-      .status(404)
-      .json(new ApiResponse(404, "No playlists found for this user"));
+    throw new ApiError(404, "No playlists found for this user");
   }
   return res
     .status(200)
@@ -455,7 +445,7 @@ const userSongs = asyncHandler(async (req, res) => {
 
   const songs = await Song.aggregate(pipeline);
   res.json(songs);
-});
+}); // nhi  chahiye
 
 const likedSong = asyncHandler(async (req, res) => {
   const page = parseInt(req.query.page, 10) || 1;
@@ -491,7 +481,7 @@ const likedSong = asyncHandler(async (req, res) => {
     options
   );
   res.json(likedSongs);
-});
+}); //nhi chahiye
 
 export {
   signup,

@@ -11,5 +11,7 @@ SongRouter.route("/uploadMusic").post(
   ]),
   uploadSong
 );
+SongRouter.route("/")
+
 
 SongRouter.route("/:public_id").delete()
