@@ -6,6 +6,7 @@ import dotenv from "dotenv";
 import cookieParser from "cookie-parser";
 
 import userRouter from "./src/router/user.routes.js";
+import SongRouter from "./src/router/song.routes.js";
 dotenv.config({
 });
 
@@ -40,3 +41,4 @@ const startServer = async () => {
 startServer();
 //Testing
 app.use('/api/muzox-/user',userRouter);
+app.use('/api/muzox-/songs',SongRouter);

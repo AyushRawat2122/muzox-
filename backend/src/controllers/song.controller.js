@@ -5,21 +5,32 @@ import { deleteOnCloudinary, uploadOnCloudinary } from "../utils/cloudinary.js";
 import Song from "../models/song.models.js";
 import mongoose from "mongoose";
 import Like from "../models/like.models.js";
+import { unlinkSync } from "fs";
 //upload song
 
 const uploadSong = asyncHandler(async (req, res) => {
-  const user = req.user; //this will come from middleware verifyJWT
+  const userId = req.user._id; //this will come from middleware verifyJWT
   //where are you excepting it from ?
   //i have given it name authRequired situated in ../middleware/authRequired.middleware.js!
 
   const { title, artist, genre = "" } = req.body; //extract data from req body
-
   if (!title || !artist) {
     throw new ApiError(400, "title and artist are required");
   } // title and artist shouldnt be empty
-
   const localSongPath = req.files?.song?.[0]?.path;
   const localCoverImgPath = req.files?.coverImg?.[0]?.path;
+  const isPresent=await Song.findOne({
+    $and:[
+      {title:title},
+      {artist:artist}
+    ]
+  })
+   if(isPresent){
+    unlinkSync(localSongPath);
+    unlinkSync(localCoverImgPath);
+    throw new ApiError(400,"song already exists");
+  }
+ 
 
   if (!localSongPath || !localCoverImgPath) {
     throw new ApiError(400, "cover and song both are required");
@@ -36,6 +47,8 @@ const uploadSong = asyncHandler(async (req, res) => {
   }
   //check for the successful upload
 
+ 
+
   const uploadedSong = await Song.create({
     title: title,
     artist: artist,
@@ -43,7 +56,7 @@ const uploadSong = asyncHandler(async (req, res) => {
     song: { url: song.url, public_id: song.public_id },
     coverImage: { url: coverImg.url, public_id: coverImg.public_id },
     duration: song?.duration,
-    uploadedBy: mongoose.Types.ObjectId(user._id),
+    uploadedBy:new  mongoose.Types.ObjectId(userId),
   });
   //creating document
 
@@ -102,7 +115,7 @@ const getLikedSongs = asyncHandler(async (req, res) => {
 
   const likedSongs = await Like.aggregate([
     {
-      $match: { likedBy: mongoose.Types.ObjectId(_id) },
+      $match: { likedBy:new  mongoose.Types.ObjectId(_id) },
     },
     {
       $lookup: {
@@ -144,8 +157,8 @@ const likeSong = asyncHandler(async (req, res) => {
   const { _id } = req.user; //extract incoming user _id
   const song = await Like.findOne({
     $and: [
-      { song: mongoose.Types.ObjectId(songId) },
-      { likedBy: mongoose.Types.ObjectId(_id) },
+      { song: new mongoose.Types.ObjectId(songId) },
+      { likedBy:new  mongoose.Types.ObjectId(_id) },
     ],
   });
   if (song) {
@@ -153,8 +166,8 @@ const likeSong = asyncHandler(async (req, res) => {
   }
 
   const likedSong = await Like.create({
-    song: mongoose.Types.ObjectId(songId),
-    likedBy: mongoose.Types.ObjectId(_id),
+    song:new  mongoose.Types.ObjectId(songId),
+    likedBy: new mongoose.Types.ObjectId(_id),
   });
 
   return res
@@ -169,8 +182,8 @@ const unlikeSong = asyncHandler(async (req, res) => {
 
   const song = await Like.deleteOne({
     $and: [
-      { song: mongoose.Types.ObjectId(songId) },
-      { likedBy: mongoose.Types.ObjectId(_id) },
+      { song: new mongoose.Types.ObjectId(songId) },
+      { likedBy:new  mongoose.Types.ObjectId(_id) },
     ],
   });
 
