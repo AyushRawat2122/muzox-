@@ -18,6 +18,7 @@ const createPlayList = asyncHandler(async (req, res) => {
 
   const playListCoverLocal = req.file?.playListCover?.[0]?.url;
   let playListCover = {};
+
   if (playListCoverLocal) {
     playListCover = await uploadOnCloudinary(playListCoverLocal);
     if (!playListCover) {
@@ -28,7 +29,9 @@ const createPlayList = asyncHandler(async (req, res) => {
   await Playlist.create({
     name: name,
     description: description,
-    playListCover: playListCover || "",
+    playListCover: playListCover
+      ? { public_id: playListCover.public_id, url: playListCover.url }
+      : undefined,
     songs: [],
     owner: mongoose.Types.ObjectId(_id),
   });
@@ -84,7 +87,7 @@ const addToPlayList = asyncHandler(async (req, res) => {
   return res
     .status(201)
     .json(new ApiResponse(200, "", "song added to playlist successfully"));
-});
+}); // improvement :|
 
 //remove from PlayList
 const removeFromPlayList = asyncHandler(async (req, res) => {
@@ -110,6 +113,15 @@ const removeFromPlayList = asyncHandler(async (req, res) => {
 //toggle playList publish status
 const togglePlayListStatus = asyncHandler(async (req, res) => {
   const { playListID } = req.params;
+  if (!playListID) {
+    throw new ApiError(400, "Playlist id is required to toggle publish status");
+  }
+  await Playlist.findByIdAndUpdate(
+    playListID,
+    [{ $set: { publishStatus: { $not: "$publishStatus" } } }],
+    { new: true }
+  );
+  return new ApiResponse(200, "", "Publish Status toggled successfully");
 });
 
 const searchPlaylist = asyncHandler(async (req, res) => {
@@ -117,22 +129,22 @@ const searchPlaylist = asyncHandler(async (req, res) => {
   if (!nameOfPlaylist || nameOfPlaylist.trim() === "") {
     return new ApiError(400, "Playlist name is required");
   }
-  
+
   const userId = req.user && req.user._id;
   if (!userId) {
     return new ApiError(401, "You are not logged in");
   }
-  
+
   const user = await User.findById(userId).populate("playlists");
   if (!user) {
     return new ApiError(404, "User not found");
   }
-    const playlistFound = user.playlists.filter((playlist) =>
+  const playlistFound = user.playlists.filter((playlist) =>
     playlist.name.toLowerCase().includes(nameOfPlaylist.toLowerCase())
   );
-  
+
   res.status(200).json({ playlists: playlistFound });
-});
+}); // umm we need to do regex thingy on this
 
 const getUserPlaylist = asyncHandler(async (req, res) => {
   const { userId } = req.user._id;
@@ -192,7 +204,7 @@ const getUserPlaylist = asyncHandler(async (req, res) => {
     status: "success",
     data: userPlaylist,
   });
-});
+}); // umm okay Idk much about this we ll see this while building frontend : )
 
 export {
   createPlayList,
@@ -200,4 +212,6 @@ export {
   removeFromPlayList,
   deletePlayList,
   togglePlayListStatus,
+  searchPlaylist,
+  getUserPlaylist
 };

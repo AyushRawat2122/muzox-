@@ -14,10 +14,10 @@ const playlistSchema = new mongoose.Schema(
       trim: true,
     },
     playListCover: {
-       type:{
-        public_id:String,
-        url:String
-      }
+      type: {
+        public_id: String,
+        url: String,
+      },
     },
     songs: [
       {
@@ -25,6 +25,11 @@ const playlistSchema = new mongoose.Schema(
         ref: "Song",
       },
     ],
+    publishStatus: {
+      type: Boolean,
+      required: true,
+      default: true,
+    },
     owner: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
