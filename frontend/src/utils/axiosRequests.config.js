@@ -6,11 +6,13 @@ const queryClient = new QueryClient();
 const securedRequest = axios.create({
   baseURL: "http://localhost:3000/api/muzox-",
   withCredentials: true,
+  credentials:'include'
 });
 
 const normalRequest = axios.create({
   baseURL: "http://localhost:3000/api/muzox-",
   withCredentials: false,
+  credentials:'include'
 });
 
 // this is a response interceptor that will work with the response it takes 2 methods as an arguments
@@ -30,6 +32,7 @@ securedRequest.interceptors.response.use(
       try {
         const res = await axios.get("http://localhost:3000/api/muzox-/user/generateAccessToken", {
           withCredentials: true,
+          credentials: 'include'
         });
         return securedRequest(originalRequest); //reposted the request :)
       } catch (RefreshError) {
