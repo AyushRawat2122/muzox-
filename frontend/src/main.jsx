@@ -20,7 +20,7 @@ const route = createBrowserRouter([
       {
         path: "/",
         element: <ProtectedRoute />,
-        children: [{ path: "/home", element: <Home /> }],
+        children: [{ path: "/", element: <Home /> }],
       },
     ],
   },

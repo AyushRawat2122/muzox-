@@ -7,14 +7,6 @@ import MuzoxApp from "./pages/wrapperPages/MuzoxApp";
 const ProtectedRoute = () => {
   const location = useLocation();
   const { data: user , isPending ,error } = getUser();
-  useEffect(()=>{
-   const changingState = setInterval(()=>{console.log(isPending);} , 2000)
-  
-   return () =>{
-    clearInterval(changingState);
-   }
-  },[isPending])
-  console.log("hittt")
 
   if (isPending) {
     return <p className="text-8xl text-white">loading</p>;

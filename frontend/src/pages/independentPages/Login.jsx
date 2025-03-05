@@ -1,17 +1,15 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { CircleAlert, Eye, EyeClosed } from "lucide-react";
 import Logo from "/Logo.png";
-import { Link, Navigate } from "react-router";
-import { normalRequest , queryClient } from "../../utils/axiosRequests.config";
+import { Link, Navigate, useNavigate } from "react-router";
+import { normalRequest, queryClient } from "../../utils/axiosRequests.config";
 import getUser from "../../serverDataHooks/getUser";
-
 
 const schema = z.object({
   email: z.string().email("Invalid email"),
-
   password: z
     .string()
     .min(
@@ -25,11 +23,13 @@ const schema = z.object({
     )
     .max(20),
 });
-const Login = () => {
-  const { data: user } = getUser();
 
-  if (user) {
-    return <Navigate to={"/"} />;
+const Login = () => {
+  const { data: user, isSuccess } = getUser();
+  const navigate = useNavigate();
+
+  if (isSuccess) {
+    navigate("/");
   } // if user is logged in then send it back to home
 
   const [isVisible, setIsVisible] = useState(false);
@@ -56,11 +56,13 @@ const Login = () => {
         }
       );
 
-      if(res){
-        console.log(res , "refetching user if it is found we re gonna navigate him");
-        queryClient.invalidateQueries([{queryKey:"user"}])
+      if (res) {
+        console.log(
+          res,
+          "refetching user if it is found we re gonna navigate him"
+        );
+        queryClient.invalidateQueries([{ queryKey: "user" }]);
       }
-
     } catch (error) {
       console.log(error);
     }
