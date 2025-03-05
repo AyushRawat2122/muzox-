@@ -31,7 +31,7 @@ userRouter.post("/verifyUser/:userId", verifyUser);
 
 userRouter.post("/login", login);
 
-userRouter.post("/userDetails", authRequired, getCurrentUser);
+userRouter.get("/userDetails", authRequired, getCurrentUser);
 
 userRouter.post("/logout", authRequired, logout);
 
@@ -39,7 +39,7 @@ userRouter.post("/PasswordResetMail",authRequired, passwordResetMail);
 
 userRouter.post("/resetPassword", authRequired,resetPassword);
 
-userRouter.post('/generateAccessToken',refreshAccessToken)
+userRouter.get('/generateAccessToken',refreshAccessToken)
 
 userRouter.post("/updateUserDetails", authRequired, updateUserDetails);
 

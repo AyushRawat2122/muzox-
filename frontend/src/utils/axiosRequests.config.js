@@ -2,12 +2,14 @@ import axios from "axios";
 import { QueryClient } from "@tanstack/react-query";
 
 const queryClient = new QueryClient();
+
 const securedRequest = axios.create({
-  baseURL: "",
+  baseURL: "http://localhost:3000/api/muzox-",
   withCredentials: true,
 });
+
 const normalRequest = axios.create({
-  baseURL: "",
+  baseURL: "http://localhost:3000/api/muzox-",
   withCredentials: false,
 });
 
@@ -19,20 +21,19 @@ securedRequest.interceptors.response.use(
   (response) => response,
   async (error) => {
     const originalRequest = error.config; // this will give us the complete instance of req failed
-
+    console.log("request Failed")
     // if the status is 401 which we ve set on backend for unavailable access token and  ._retry if field to object which is undefined (false) at starting to prevent multiple retries
 
-    if (error.status === 401 && !originalRequest._retry) {
+    if (error.response?.status === 401 && !originalRequest?._retry) {
       originalRequest._retry = true; // trying but wont try it again
+      console.log('retrying with refreshToken')
       try {
-        const res = await axios.get("regenerate Refresh & AccessToken", {
+        const res = await axios.get("http://localhost:3000/api/muzox-/user/generateAccessToken", {
           withCredentials: true,
         });
         return securedRequest(originalRequest); //reposted the request :)
       } catch (RefreshError) {
         console.log("Token refresh failed , logging out...");
-        queryClient.clear(); //clear all cache stored :)
-        window.location.href = "/login";
       }
     }
 
@@ -41,3 +42,4 @@ securedRequest.interceptors.response.use(
 );
 
 export { securedRequest, normalRequest , queryClient};
+

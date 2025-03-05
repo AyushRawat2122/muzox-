@@ -1,1 +1,22 @@
 @import "tailwindcss";
+.jakartha {
+  font-family: "Plus Jakarta Sans", sans-serif;
+}
+.gradientButton {
+  background: linear-gradient(to right, #8a2be2, #ff00ff);
+  box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.2);
+}
+.muzoxPurple:hover {
+  color: #a159e4;
+}
+.hiddenScroll {
+  scrollbar-width: none; /* For Firefox */
+  -ms-overflow-style: none; /* For Internet Explorer and Edge */
+}
+
+.hiddenScroll::-webkit-scrollbar {
+  display: none; /* For Chrome, Safari, and Opera */
+}
+.pageBg {
+  background-color: #121212;
+}

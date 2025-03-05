@@ -1,25 +1,29 @@
 //imports
-
-import express  from "express";
+import cors from "cors";
+import express from "express";
 import connect from "./src/database/dbConfig.js";
 import dotenv from "dotenv";
 import cookieParser from "cookie-parser";
-
+import errorHandler from "./src/middlewares/errorHandler.js";
 import userRouter from "./src/router/user.routes.js";
 import SongRouter from "./src/router/song.routes.js";
-dotenv.config({
-});
+dotenv.config({});
 
 const app = express();
 const PORT = process.env.PORT || 5000;
 
 // Middlewares
+app.use(cors({
+  origin: "http://localhost:5173",
+  credentials: true, // Cookies allow karni ho toh
+  methods: ["GET", "POST", "PUT", "DELETE", "PATCH"], // Jo methods allow karni ho
+  allowedHeaders: ["Content-Type", "Authorization"], // Jo headers allow karne ho
 
-app.use(express.urlencoded({ extended: true,limit:'16kb' }));
+}));
+app.use(express.urlencoded({ extended: true, limit: "16kb" }));
 app.use(express.json());
 app.use(cookieParser());
 app.use(express.static("public"));
-
 
 // Test route
 app.get("/welcome-to-my-app", (req, res) => {
@@ -40,5 +44,16 @@ const startServer = async () => {
 
 startServer();
 //Testing
-app.use('/api/muzox-/user',userRouter);
-app.use('/api/muzox-/songs',SongRouter);
+app.use("/api/muzox-/user", userRouter);
+app.use("/api/muzox-/songs", SongRouter);
+
+
+
+
+
+
+
+
+//error in json format :}
+
+// app.use(errorHandler());

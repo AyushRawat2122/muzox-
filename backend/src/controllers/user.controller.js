@@ -8,6 +8,7 @@ import jwt from "jsonwebtoken";
 import { uploadOnCloudinary, deleteOnCloudinary } from "../utils/cloudinary.js";
 import Playlist from "../models/playlist.models.js";
 import Song from "../models/song.models.js";
+//will generate token
 const tokenGenerators = async (userId) => {
   try {
     console.log("Reached token generators");
@@ -80,7 +81,7 @@ const signup = asyncHandler(async (req, res) => {
   });
 
   return res
-    .status(201)
+    .status(200)
     .json(
       new ApiResponse(
         200,
@@ -111,7 +112,7 @@ const verifyUser = asyncHandler(async (req, res) => {
   }
 
   if (user.verifyToken != otp) {
-    throw new ApiError(401, "Invalid OTP");
+    throw new ApiError(400, "Invalid OTP");
   }
 
   //fucked upon this logic we need to think something about this
@@ -120,7 +121,7 @@ const verifyUser = asyncHandler(async (req, res) => {
     await User.findByIdAndDelete(userId);
     await deleteOnCloudinary(user.profilePic);
 
-    throw new ApiError(401, "OTP has expired.You need to signup again");
+    throw new ApiError(400, "OTP has expired.You need to signup again");
   }
 
   user.isVerified = true;
@@ -258,6 +259,7 @@ const refreshAccessToken = asyncHandler(async (req, res) => {
       )
     );
 });
+
 const resetPassword = asyncHandler(async (req, res) => {
   const userId = req.user._id;
 
@@ -278,11 +280,11 @@ const resetPassword = asyncHandler(async (req, res) => {
 
   console.log(typeof(user.passwordToken));
   if (user.passwordToken !== otp) {
-    throw new ApiError(401, "Please enter the valid OTP");
+    throw new ApiError(404, "Please enter the valid OTP");
   }
 
   if (new Date() > user.passwordTokenExpiry) {
-    throw new ApiError(401, "OTP has expired Please try again later");
+    throw new ApiError(404, "OTP has expired Please try again later");
   }
 
   const salt = await bcryptjs.genSalt(10);
