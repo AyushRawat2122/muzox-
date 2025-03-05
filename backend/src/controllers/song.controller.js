@@ -30,7 +30,6 @@ const uploadSong = asyncHandler(async (req, res) => {
     unlinkSync(localCoverImgPath);
     throw new ApiError(400,"song already exists");
   }
- 
 
   if (!localSongPath || !localCoverImgPath) {
     throw new ApiError(400, "cover and song both are required");

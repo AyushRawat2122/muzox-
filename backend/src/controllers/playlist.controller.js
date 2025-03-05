@@ -72,7 +72,7 @@ const addToPlayList = asyncHandler(async (req, res) => {
     throw new ApiError(404, "Playlist not found");
   }
   if (playlist.owner?.toString() !== req.user?._id.toString()) {
-    return new ApiError(403, "You are not the owner of this playlist");
+    return new ApiError(400, "You are not the owner of this playlist");
   }
   const song = await Song.findById(songId);
   if (!song) {
@@ -98,7 +98,7 @@ const removeFromPlayList = asyncHandler(async (req, res) => {
     throw new ApiError(404, "Playlist or Song not found");
   }
   if (playlist.owner?.toString() !== req.user?._id.toString()) {
-    return new ApiError(403, "You are not the owner of this playlist");
+    return new ApiError(400, "You are not the owner of this playlist");
   }
   const updatedPlaylist = await Playlist.findByIdAndUpdate(
     playListID,
