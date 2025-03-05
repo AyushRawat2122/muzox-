@@ -184,7 +184,7 @@ const login = asyncHandler(async (req, res) => {
         isAdmin: user.isAdmin,
         isPremiumUser: user.isPremiumUser,
       },
-      "User verified successfully"
+      "User LoggedIn successfully"
     )
   );
 });
