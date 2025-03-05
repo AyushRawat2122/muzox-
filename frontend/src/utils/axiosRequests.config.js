@@ -11,7 +11,7 @@ const securedRequest = axios.create({
 
 const normalRequest = axios.create({
   baseURL: "http://localhost:3000/api/muzox-",
-  withCredentials: false,
+  withCredentials: true,
   credentials:'include'
 });
 
