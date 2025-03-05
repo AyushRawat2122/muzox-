@@ -229,7 +229,7 @@ const passwordResetMail = asyncHandler(async (req, res) => {
 });
 
 const refreshAccessToken = asyncHandler(async (req, res) => {
-  const currRefreshToken = req.cookies?.refreshToken || req.body.refreshToken;
+  const currRefreshToken = req.cookies?.refreshToken;
   if (!currRefreshToken) throw new ApiError(401, "No refresh token provided");
 
   const user = await User.findOne({ refreshToken: currRefreshToken }).select(

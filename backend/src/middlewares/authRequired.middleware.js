@@ -11,7 +11,7 @@ export const authRequired = asyncHandler(async (req, res , next) => {
   }
 
   if (!token) {
-    throw new ApiError(404, "User not Authorized");
+    throw new ApiError(401, "User not Authorized");
   }
   
   const decoded = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
