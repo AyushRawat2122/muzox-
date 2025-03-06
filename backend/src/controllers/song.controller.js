@@ -89,7 +89,7 @@ const deleteSong = asyncHandler(async (req, res) => {
 
 //search Song
 const getSuggestionList = asyncHandler(async (req, res) => {
-  const { query } = req.query;
+  const { query = "" } = req.query;
   const searchedSuggestion = await Song.aggregate([
     {
       $match: { title: { $regex: query } },

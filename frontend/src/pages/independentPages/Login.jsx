@@ -1,12 +1,12 @@
-import React, { useState } from "react";
+import React, { useState , useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { CircleAlert, Eye, EyeClosed } from "lucide-react";
 import Logo from "/Logo.png";
 import { Link, Navigate, useNavigate } from "react-router";
-import { normalRequest, queryClient } from "../../utils/axiosRequests.config";
-import getUser from "../../serverDataHooks/getUser";
+import { normalRequest, queryClient } from "../../utils/axiosRequests.config.js";
+import getUser from "../../serverDataHooks/getUser.js";
 
 const schema = z.object({
   email: z.string().email("Invalid email"),
@@ -27,10 +27,13 @@ const schema = z.object({
 const Login = () => {
   const { data: user, isSuccess } = getUser();
   const navigate = useNavigate();
-
-  if (isSuccess) {
-    navigate("/");
-  } // if user is logged in then send it back to home
+  
+  useEffect(() => {
+    console.log("Use Effect triggered" , isSuccess);
+    if (isSuccess) {
+      navigate("/");
+    } // if user is logged in then send it back to home
+  }, [isSuccess]);
 
   const [isVisible, setIsVisible] = useState(false);
   const {
@@ -74,7 +77,7 @@ const Login = () => {
 
   return (
     <div className="h-full w-full bg-black text-white flex justify-center items-center jakartha">
-      <div className="h-full max-sm:max-w-[300px] max-w-[350px] flex flex-col gap-7 sm:gap-7 items-center overflowy-scro">
+      <div className="h-full max-sm:max-w-[300px] max-w-[350px] flex flex-col gap-7 sm:gap-7 hiddenScroll items-center overflow-y-scroll">
         <img
           src={Logo}
           alt="logo"

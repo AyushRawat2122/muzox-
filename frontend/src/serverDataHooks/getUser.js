@@ -10,11 +10,16 @@ const fetchUserData = async () => {
     return userData.data;
   } catch (error) {
     console.log(error);
-    throw error 
+    throw error;
   }
 };
 
 const getUser = () =>
-   useQuery({ queryKey: ["user"], queryFn: fetchUserData, retry: false });
+  useQuery({
+    queryKey: ["user"],
+    queryFn: fetchUserData,
+    retry: false,
+    staleTime: Infinity,
+  });
 
 export default getUser;

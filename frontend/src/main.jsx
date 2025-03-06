@@ -16,7 +16,7 @@ const route = createBrowserRouter([
     children: [
       { path: "/login", element: <Login /> },
       { path: "/signup", element: <Signup /> },
-      { path: "/verify", element: <Verify /> },
+      { path: "/verify/:userID", element: <Verify /> },
       {
         path: "/",
         element: <ProtectedRoute />,

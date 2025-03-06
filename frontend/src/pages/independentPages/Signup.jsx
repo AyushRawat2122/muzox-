@@ -11,7 +11,7 @@ import getUser from "../../serverDataHooks/getUser";
 const schema = z.object({
   username: z.string().min(6, "Username must be at least 6 characters"),
   email: z.string().email("Invalid email"),
-  password: z.string().min(8, "Password must be at least 8 characters"),
+  password: z.string().min(6, "Password must be at least 6 characters"),
   profilePic: z
     .instanceof(FileList)
     .refine((files) => files.length > 0, "Profile picture is required")
@@ -29,9 +29,10 @@ const Signup = () => {
     if (onSuccess) {
       navigate("/");
     }
-  }, [onSuccess, navigate]);
+  }, [onSuccess]);
 
   const [isVisible, setIsVisible] = useState(false);
+  const [selectedFileName, setSelectedFileName] = useState("");
 
   const {
     register,
@@ -43,31 +44,28 @@ const Signup = () => {
   });
 
   const onSignup = async (data) => {
-    console.log(data.profilePic[0].name);
     const { email, password, username, profilePic } = data;
-    const file = profilePic;
+    const file = profilePic[0];
+    console.log(data);
     const formData = new FormData();
     formData.append("username", username);
     formData.append("email", email);
     formData.append("password", password);
     formData.append("profilePic", file);
     try {
-      console.log(formData);
-      const res = await normalRequest.post(
-        "/user/signup",
-        {
-          email,
-          password,
-          username,
-          file,
+      const res = await normalRequest.post("/user/signup", formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
         },
-        {
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
-        }
-      );
+      });
+      if (res) {
+        console.log(res);
+        const userID = res?.data?.data?._id;
+        const email = res?.data?.data?.email;
+        navigate(`/verify/${userID}`, { state: { email } });
+      }
     } catch (error) {
+      console.log(formData);
       console.log(error);
     }
   };
@@ -77,7 +75,7 @@ const Signup = () => {
   };
 
   return (
-    <div className="h-full w-full bg-black text-white flex justify-center items-center jakartha lg:p-16 gap-5">
+    <div className="h-full w-full bg-black text-white flex justify-evenly items-center jakartha lg:p-16 gap-5">
       <div className="max-lg:hidden">
         <img src={Logo} alt="logo" className="h-[200px] w-[200px]" />
         <h1 className="text-4xl sm:text-6xl font-extrabold text-left">
@@ -191,19 +189,8 @@ const Signup = () => {
                   className="flex items-center gap-2 px-4 py-2 border-[1px] rounded-md cursor-pointer text-white border-gray-500 hover:border-white"
                 >
                   <Upload className="w-5 h-5" />
-                  Upload Avatar
+                  {selectedFileName || "Upload Avatar"}
                 </label>
-                <input
-                  type="file"
-                  id="profilePic"
-                  {...register("profilePic")}
-                  className="hidden"
-                />
-                <span
-                  className={`text-sm ${
-                    errors.profilePic ? "text-red-400" : "text-gray-400"
-                  } mt-1`}
-                ></span>
                 {errors.profilePic && (
                   <p
                     role="alert"
@@ -213,6 +200,18 @@ const Signup = () => {
                     {errors.profilePic?.message}
                   </p>
                 )}
+                <input
+                  type="file"
+                  id="profilePic"
+                  {...register("profilePic")}
+                  className="opacity-0 pointer-events-none"
+                  onChange={(e) => {
+                    console.log(e);
+                    if (e.target.files.length > 0) {
+                      setSelectedFileName(e.target.files[0].name);
+                    }
+                  }}
+                />
               </div>
             </div>
           </div>

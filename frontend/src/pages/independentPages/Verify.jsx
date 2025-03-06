@@ -1,7 +1,10 @@
+import { useParams, useLocation , useNavigate } from "react-router";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { CircleAlert } from "lucide-react";
+import { normalRequest } from "../../utils/axiosRequests.config";
+import axios from "axios";
 
 const schema = z.object({
   otp: z
@@ -11,6 +14,13 @@ const schema = z.object({
 });
 
 const Verify = () => {
+  const { userID } = useParams();
+  const location = useLocation();
+  const navigate = useNavigate();
+  const email = location?.state?.email || "";
+
+  console.log(userID);
+
   const {
     register,
     handleSubmit,
@@ -20,8 +30,21 @@ const Verify = () => {
     mode: "onChange",
   });
 
-  const onVerifyMe = (data) => {
+  const onVerifyMe = async (data) => {
     console.log("verify me", data);
+    try {
+      const res = await normalRequest.post(
+        `/user//verifyUser/${userID}`,
+        data,
+        { headers: { "Content-Type": "application/json" } }
+      );
+      if(res){
+        navigate("/login");
+      }
+
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   return (
@@ -30,6 +53,10 @@ const Verify = () => {
         <h1 className="text-4xl sm:text-6xl font-extrabold text-center">
           Verify OTP
         </h1>
+        <p className="text-center">
+          otp has been sent successfully to your registerd email address <br />
+          <span className="text-[#a159e4]">{email}</span>
+        </p>
         <form
           onSubmit={handleSubmit(onVerifyMe)}
           className="flex flex-col gap-2 justify-center"
