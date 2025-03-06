@@ -1,87 +1,73 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
+import { Link, useNavigate } from "react-router";
 import { zodResolver } from "@hookform/resolvers/zod";
-import * as z from "zod";
 import { CircleAlert, Eye, EyeClosed, Upload } from "lucide-react";
 import Logo from "/Logo.png";
-import { Link } from "react-router";
+import { normalRequest } from "../../utils/axiosRequests.config.js";
+import * as z from "zod";
+import getUser from "../../serverDataHooks/getUser";
 
 const schema = z.object({
   username: z.string().min(6, "Username must be at least 6 characters"),
   email: z.string().email("Invalid email"),
   password: z.string().min(8, "Password must be at least 8 characters"),
   profilePic: z
-    .instanceof(Image, { message: "File must be an Image" })
-    .refine(
-      (file) => file.size < 5 * 1024 * 1024,
-      "Files must be less than 5 Mb"
-    )
-    .refine(
-      (file) => ["image/jpeg", "image/png", "image/webp"].includes(file.type),
-      "only jpg,png and webp"
-    ),
+    .instanceof(FileList)
+    .refine((files) => files.length > 0, "Profile picture is required")
+    .refine((files) => {
+      const file = files.item(0);
+      return file && (file.type === "image/jpeg" || file.type === "image/jpg");
+    }, "Only JPEG images are allowed"),
 });
 
 const Signup = () => {
+  const navigate = useNavigate();
+  const { data: user, onSuccess } = getUser();
+
+  useEffect(() => {
+    if (onSuccess) {
+      navigate("/");
+    }
+  }, [onSuccess, navigate]);
+
   const [isVisible, setIsVisible] = useState(false);
-  const [fileName, setFileName] = useState("No file chosen");
 
   const {
     register,
     handleSubmit,
-    setError,
-    clearErrors,
     formState: { errors },
   } = useForm({
     resolver: zodResolver(schema),
     mode: "onChange",
   });
 
-  const onSignup = (data) => {
-    console.log("Form submitted:", data);
+  const onSignup = async (data) => {
+    console.log(data.profilePic[0].name);
+    const { email, password, username, profilePic } = data;
+    const file = profilePic[0].name;
+    const formData = new FormData();
+    formData.append("username", username);
+    formData.append("email", email);
+    formData.append("password", password);
+    formData.append("profilePic", file);
+
+    try {
+      const res = await normalRequest.post("/user/signup", formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   const toggleIsVisible = () => {
     setIsVisible((prev) => !prev);
   };
 
-  const handleFileChange = (event) => {
-    const files = event.target.files;
 
-    if (files.length > 0) {
-      const file = files[0];
-
-      // ✅ Check File Type (JPEG only)
-      if (
-        !(
-          file.type === "image/jpeg" ||
-          file.type === "image/png" ||
-          file.type === "webp"
-        )
-      ) {
-        setError("profilePic", {
-          type: "manual",
-          message: "Only JPEG / Jpg , webp and png images are allowed!",
-        });
-        setFileName("Invalid file type!");
-        return;
-      }
-
-      // ✅ Check File Size (Max 2MB)
-      if (file.size >= 5 * 1024 * 1024) {
-        setError("profilePic", {
-          type: "manual",
-          message: "File size must be less than 5MB!",
-        });
-        setFileName("File too large!");
-        return;
-      }
-
-      // ✅ Clear Errors & Update File Name
-      clearErrors("profilePic");
-      setFileName(file.name);
-    }
-  };
 
   return (
     <div className="h-full w-full bg-black text-white flex justify-center items-center jakartha lg:p-16 gap-5">
@@ -193,37 +179,25 @@ const Signup = () => {
                   Profile Pic
                 </label>
 
-                {/* Custom Upload Button */}
                 <label
                   htmlFor="profilePic"
-                  className="flex items-center gap-2 px-4 py-2 border-[1px] 
-    rounded-md cursor-pointer
-    text-white border-gray-500 hover:border-white"
+                  className="flex items-center gap-2 px-4 py-2 border-[1px] rounded-md cursor-pointer text-white border-gray-500 hover:border-white"
                 >
                   <Upload className="w-5 h-5" />
                   Upload Avatar
                 </label>
-
-                {/* Hidden File Input */}
                 <input
                   type="file"
                   id="profilePic"
                   {...register("profilePic")}
-                  onChange={handleFileChange}
                   className="hidden"
-                  accept="image/jpeg" // Only JPG Allowed
                 />
-
-                {/* Show Selected File Name */}
                 <span
                   className={`text-sm ${
                     errors.profilePic ? "text-red-400" : "text-gray-400"
                   } mt-1`}
                 >
-                  {fileName}
                 </span>
-
-                {/* Show Validation Error */}
                 {errors.profilePic && (
                   <p
                     role="alert"
