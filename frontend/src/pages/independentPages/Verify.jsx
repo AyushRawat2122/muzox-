@@ -41,7 +41,6 @@ const Verify = () => {
       if(res){
         navigate("/login");
       }
-
     } catch (error) {
       console.log(error);
     }

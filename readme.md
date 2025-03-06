@@ -3,41 +3,67 @@
 Muzox is a modern music streaming app designed to deliver a seamless audio experience. Built with a robust and scalable tech stack, it ensures smooth performance and feature-rich functionality.
 
 ## 🚀 Features
+
 - 🎶 **Stream & Upload Music**: Upload and listen to your favorite tracks.
-- 🔒 **Secure Authentication**: JWT-based authentication for user security.
+- 🔒 **Secure Authentication**: JWT-based authentication with refresh tokens.
 - 📂 **Cloud Storage**: Multer & Cloudinary integration for media uploads.
-- 🌐 **Fast & Responsive UI**: Built with React and Tailwind CSS.
+- 🌐 **Fast & Responsive UI**: Built with React, Tailwind CSS, and Zustand.
 - 📩 **Email Notifications**: Nodemailer support for user communication.
-- 🛠 **State Management**: Zustand for efficient global state handling.
 
-## 🛠️ Tech Stack
+## 🛠 Tech Stack & Tooling
 
-### **Frontend**
-- ⚛ **[React](https://react.dev/)** ![React](https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB)
-- 🌍 **[React Router DOM](https://reactrouter.com/)** ![React Router](https://img.shields.io/badge/React_Router-CA4245?style=for-the-badge&logo=react-router&logoColor=white)
-- 🏪 **[Zustand](https://github.com/pmndrs/zustand)** ![Zustand](https://img.shields.io/badge/Zustand-%23000000.svg?style=for-the-badge&logoColor=white)
-- 🎨 **[Tailwind CSS](https://tailwindcss.com/)** ![TailwindCSS](https://img.shields.io/badge/Tailwind_CSS-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white)
-- 📏 **[React-Resizable](https://github.com/bokuweb/react-resizable)**
+### **Frontend** (User Interface & Experience)
 
-### **Backend**
-- 🛠 **[Node.js](https://nodejs.org/)** ![Node.js](https://img.shields.io/badge/Node.js-43853D?style=for-the-badge&logo=node.js&logoColor=white)
-- ⚡ **[Express.js](https://expressjs.com/)** ![Express.js](https://img.shields.io/badge/Express.js-000000?style=for-the-badge&logo=express&logoColor=white)
-- 🗄 **[MongoDB](https://www.mongodb.com/)** & **[Mongoose](https://mongoosejs.com/)** ![MongoDB](https://img.shields.io/badge/MongoDB-4EA94B?style=for-the-badge&logo=mongodb&logoColor=white)
-- 🔐 **[JWT](https://jwt.io/)**
-- 📤 **[Multer](https://github.com/expressjs/multer)** & **[Cloudinary](https://cloudinary.com/)**
-- 📩 **[Nodemailer](https://nodemailer.com/)**
-- 📦 **[UploadThing](https://uploadthing.com/)**
+- **Framework & Library:**
+  - ⚪ **[React](https://react.dev/)** - JavaScript library for building UIs.
+- **Routing:**
+  - 🌍 **[React Router](https://reactrouter.com/)** - Declarative routing for React apps.
+- **State Management:**
+  - 🏢 **[Zustand](https://docs.pmnd.rs/zustand/getting-started/introduction)** - Lightweight and scalable global state management.
+- **Styling:**
+  - 🎭 **[Tailwind CSS](https://tailwindcss.com/docs/installation)** - Utility-first CSS framework.
+- **UI Components & Icons:**
+  - 📏 **[React Resizable Panels](https://github.com/bvaughn/react-resizable-panels)** - Resizable UI components.
+  - 🎨 **[Lucide React](https://lucide.dev/)** - Open-source icon library.
+  - 🎶 **[React Icons](https://react-icons.github.io/react-icons/)** - Collection of popular icon sets.
+- **Data Fetching & Validation:**
+  - 📦 **[Axios](https://axios-http.com/docs/intro)** - Promise-based HTTP client for fetching data.
+  - 📦 **[TanStack React Query](https://tanstack.com/query/latest/docs/react/overview)** - Efficient server-state management.
+  - 📝 **[React Hook Form](https://react-hook-form.com/)** - Lightweight form validation.
+  - 📝 **[Zod](https://zod.dev/)** - Schema validation for robust data handling.
+- **Utilities & Enhancements:**
+  - 🎨 **[Lodash](https://lodash.com/docs/)** - Utility functions for JavaScript.
+  - 🎨 **[Fast Average Color](https://github.com/fast-average-color/fast-average-color)** - Extracts dominant colors from images.
 
-## 👨‍💻 Developers
+### **Backend** (Server, API & Database)
+
+- **Runtime & Framework:**
+  - 🛠 **[Node.js](https://nodejs.org/en/docs/)** - JavaScript runtime for backend development.
+  - ⚡ **[Express.js](https://expressjs.com/)** - Fast and minimalistic web framework.
+- **Database & ORM:**
+  - 📚 **[MongoDB](https://www.mongodb.com/docs/)** - NoSQL database for scalable storage.
+  - 📦 **[Mongoose](https://mongoosejs.com/)** - ODM (Object Data Modeling) library for MongoDB.
+  - 📦 **[Mongoose Aggregate Paginate](https://www.npmjs.com/package/mongoose-aggregate-paginate-v2)** - Advanced pagination support for MongoDB aggregations.
+- **Authentication & Security:**
+  - 🔐 **[JWT](https://github.com/auth0/node-jsonwebtoken)** - Secure token-based authentication.
+  - 🛡 **[Cookie-Parser](https://www.npmjs.com/package/cookie-parser)** - Middleware for handling cookies in requests.
+  - 🗡 **[CORS](https://expressjs.com/en/resources/middleware/cors.html)** - Cross-Origin Resource Sharing to enable frontend-backend communication.
+- **File Upload & Media Storage:**
+  - 💾 **[Multer](https://github.com/expressjs/multer)** - Middleware for handling file uploads.
+  - ☁ **[Cloudinary](https://cloudinary.com/documentation)** - Cloud-based media storage and management.
+- **Email & Notifications:**
+  - 📩 **[Nodemailer](https://nodemailer.com/about/)** - Email-sending library for user notifications.
+- **Environment Configuration:**
+  - 🌍 **[Dotenv](https://github.com/motdotla/dotenv)** - Loads environment variables from a `.env` file.
+
+## 👨‍💻 Contributors
+
 - **Ayush Rawat**
 - **Roshan Jha**
 
 ## 🎯 Future Enhancements
-- 🎛 **Playlists & Favorites**
+
+- 🎧 **Playlists & Favorites**
 - 💬 **Live Lyrics Integration**
-- 🔗 **Social Sharing Features**
+- 📮 **Social Sharing Features**
 - 📱 **Mobile App Development**
-
----
-🎧 Built with passion for music lovers! Enjoy Muzox! 🚀
-
