@@ -45,19 +45,28 @@ const Signup = () => {
   const onSignup = async (data) => {
     console.log(data.profilePic[0].name);
     const { email, password, username, profilePic } = data;
-    const file = profilePic[0].name;
+    const file = profilePic;
     const formData = new FormData();
     formData.append("username", username);
     formData.append("email", email);
     formData.append("password", password);
     formData.append("profilePic", file);
-
     try {
-      const res = await normalRequest.post("/user/signup", formData, {
-        headers: {
-          "Content-Type": "multipart/form-data",
+      console.log(formData);
+      const res = await normalRequest.post(
+        "/user/signup",
+        {
+          email,
+          password,
+          username,
+          file,
         },
-      });
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
     } catch (error) {
       console.log(error);
     }
@@ -66,8 +75,6 @@ const Signup = () => {
   const toggleIsVisible = () => {
     setIsVisible((prev) => !prev);
   };
-
-
 
   return (
     <div className="h-full w-full bg-black text-white flex justify-center items-center jakartha lg:p-16 gap-5">
@@ -196,8 +203,7 @@ const Signup = () => {
                   className={`text-sm ${
                     errors.profilePic ? "text-red-400" : "text-gray-400"
                   } mt-1`}
-                >
-                </span>
+                ></span>
                 {errors.profilePic && (
                   <p
                     role="alert"

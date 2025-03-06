@@ -46,12 +46,16 @@ const signup = asyncHandler(async (req, res) => {
     throw new ApiError(400, "User already exists");
   }
 
-  const profilePicLocal = req.files?.profilePic[0]?.path;
+  const profilePicLocal = req.files?.profilePic?.[0]?.path;
 
   console.log(profilePicLocal);
-
+ if(!profilePicLocal){
+  throw new ApiError(400, "Please upload a profile picture");
+ }
   const profilePic = await uploadOnCloudinary(profilePicLocal);
-
+ if(!profilePic){
+  throw new ApiError(500, "Internal Serever Error plx try again later");
+ }
   const salt = await bcryptjs.genSalt(10);
 
   const hashedPassword = await bcryptjs.hash(password, salt);
