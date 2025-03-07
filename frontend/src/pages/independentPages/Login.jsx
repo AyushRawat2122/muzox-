@@ -1,12 +1,17 @@
-import React, { useState , useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { CircleAlert, Eye, EyeClosed } from "lucide-react";
 import Logo from "/Logo.png";
 import { Link, Navigate, useNavigate } from "react-router";
-import { normalRequest, queryClient } from "../../utils/axiosRequests.config.js";
+import {
+  normalRequest,
+  queryClient,
+} from "../../utils/axiosRequests.config.js";
 import getUser from "../../serverDataHooks/getUser.js";
+import { useMutation } from "@tanstack/react-query";
+import Loading from "../../components/Loading.jsx";
 
 const schema = z.object({
   email: z.string().email("Invalid email"),
@@ -27,9 +32,9 @@ const schema = z.object({
 const Login = () => {
   const { data: user, isSuccess } = getUser();
   const navigate = useNavigate();
-  
+
   useEffect(() => {
-    console.log("Use Effect triggered" , isSuccess);
+    console.log("Use Effect triggered", isSuccess);
     if (isSuccess) {
       navigate("/");
     } // if user is logged in then send it back to home
@@ -58,18 +63,24 @@ const Login = () => {
           },
         }
       );
-
-      if (res) {
-        console.log(
-          res,
-          "refetching user if it is found we re gonna navigate him"
-        );
-        queryClient.invalidateQueries([{ queryKey: "user" }]);
+      return res;
       }
-    } catch (error) {
-      console.log(error);
+     catch (error) {
+      throw error;
     }
   };
+
+  const mutation = useMutation({
+    mutationFn: onLogin,
+    onSuccess: () => { queryClient.invalidateQueries([{ queryKey: "user" }]);},
+    onError: (error) => {
+      console.log(error)
+    },
+  });
+
+  if(mutation.isPending){
+    return <Loading/>
+  }
 
   const toggleIsVisible = () => {
     setIsVisible((prev) => !prev);
@@ -88,7 +99,7 @@ const Login = () => {
         </h1>
 
         <form
-          onSubmit={handleSubmit(onLogin)}
+          onSubmit={handleSubmit((data)=>{mutation.mutate(data)})}
           className="flex flex-col gap-2 justify-center w-full"
         >
           <div className="text-md flex flex-col">

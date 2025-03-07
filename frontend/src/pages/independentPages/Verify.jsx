@@ -1,11 +1,11 @@
-import { useParams, useLocation , useNavigate } from "react-router";
+import { useParams, useLocation, useNavigate, data } from "react-router";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { CircleAlert } from "lucide-react";
 import { normalRequest } from "../../utils/axiosRequests.config";
-import axios from "axios";
-
+import { useMutation } from "@tanstack/react-query";
+import Loading from "../../components/Loading";
 const schema = z.object({
   otp: z
     .string()
@@ -31,20 +31,28 @@ const Verify = () => {
   });
 
   const onVerifyMe = async (data) => {
-    console.log("verify me", data);
     try {
-      const res = await normalRequest.post(
-        `/user//verifyUser/${userID}`,
-        data,
-        { headers: { "Content-Type": "application/json" } }
-      );
-      if(res){
-        navigate("/login");
-      }
+      const res = await normalRequest.post(`/user/verifyUser/${userID}`, data, {
+        headers: { "Content-Type": "application/json" },
+      });
     } catch (error) {
-      console.log(error);
+      throw error;
     }
   };
+
+  const mutation = useMutation({
+    mutationFn: onVerifyMe,
+    onSuccess: () => {
+      navigate("/login");
+    },
+    onError: (error) => {
+      console.log(error);
+    },
+  });
+
+  if(mutation.isPending){
+    return <Loading/>
+  }
 
   return (
     <div className="h-full bg-black w-full text-white flex justify-center items-center jakartha">
@@ -57,7 +65,9 @@ const Verify = () => {
           <span className="text-[#a159e4]">{email}</span>
         </p>
         <form
-          onSubmit={handleSubmit(onVerifyMe)}
+          onSubmit={handleSubmit((data) => {
+            mutation.mutate(data);
+          })}
           className="flex flex-col gap-2 justify-center"
         >
           <div className="text-md flex flex-col">

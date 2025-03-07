@@ -4,6 +4,7 @@ import { Navigate, useLocation } from "react-router";
 import getUser from "./serverDataHooks/getUser.js";
 import MuzoxApp from "./pages/wrapperPages/MuzoxApp.jsx";
 import { queryClient } from "./utils/axiosRequests.config.js";
+import Loading from "./components/Loading.jsx";
 
 const ProtectedRoute = () => {
   const location = useLocation();
@@ -17,7 +18,7 @@ const ProtectedRoute = () => {
   }, []);
 
   if (isPending) {
-    return <p className="text-8xl text-white">loading</p>;
+    return <Loading/>;
   }
 
   if (error) {

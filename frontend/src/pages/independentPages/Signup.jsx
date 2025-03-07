@@ -7,7 +7,8 @@ import Logo from "/Logo.png";
 import { normalRequest } from "../../utils/axiosRequests.config.js";
 import * as z from "zod";
 import getUser from "../../serverDataHooks/getUser";
-
+import { useMutation } from "@tanstack/react-query";
+import Loading from "../../components/Loading.jsx";
 const schema = z.object({
   username: z.string().min(6, "Username must be at least 6 characters"),
   email: z.string().email("Invalid email"),
@@ -23,13 +24,13 @@ const schema = z.object({
 
 const Signup = () => {
   const navigate = useNavigate();
-  const { data: user, onSuccess } = getUser();
+  const { data: user, isSuccess } = getUser();
 
   useEffect(() => {
-    if (onSuccess) {
+    if (isSuccess) {
       navigate("/");
     }
-  }, [onSuccess]);
+  }, [isSuccess]);
 
   const [isVisible, setIsVisible] = useState(false);
   const [selectedFileName, setSelectedFileName] = useState("");
@@ -58,21 +59,36 @@ const Signup = () => {
           "Content-Type": "multipart/form-data",
         },
       });
-      if (res) {
-        console.log(res);
-        const userID = res?.data?.data?._id;
-        const email = res?.data?.data?.email;
-        navigate(`/verify/${userID}`, { state: { email } });
-      }
+      console.log(data)
+      return res?.data?.data;
     } catch (error) {
-      console.log(formData);
-      console.log(error);
+      throw error;
     }
   };
 
   const toggleIsVisible = () => {
     setIsVisible((prev) => !prev);
   };
+
+  const mutation = useMutation({
+    mutationFn: onSignup,
+    onSuccess: (data) => {
+      console.log(data)
+      if (data) {
+        const userID = data?._id;
+        const email = data?.email;
+        navigate(`/verify/${userID}`, { state: { email } });
+      }
+    },
+    onError: (error) => {
+      console.log(error);
+    },
+  });
+
+  if(mutation.isPending){
+    console.log("Signiing up")
+    return <Loading/>
+  }
 
   return (
     <div className="h-full w-full bg-black text-white flex justify-evenly items-center jakartha lg:p-16 gap-5">
@@ -87,7 +103,7 @@ const Signup = () => {
           Sign up to Muzox
         </h1>
         <form
-          onSubmit={handleSubmit(onSignup)}
+          onSubmit={handleSubmit((data)=>{mutation.mutate(data)})}
           className="flex flex-col items-center gap-2"
         >
           <div className="flex flex-col gap-1 lg:grid lg:grid-cols-2 lg:gap-10 w-full">
