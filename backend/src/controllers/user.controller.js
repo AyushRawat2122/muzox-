@@ -98,13 +98,13 @@ const signup = asyncHandler(async (req, res) => {
 
 //verify user
 
-const verifyUser = asyncHandler(async (req, res) => {
+const verifyUser = asyncHandler(async (req, res, next) => {
   const { userId } = req.params;
 
   const { otp } = req.body;
 
   if (!userId || !otp) {
-    throw new ApiError(400, "Please enter to confirm your validations");
+    next(new ApiError(400, "Please enter to confirm your validations"));
   }
 
   const user = await User.findById(userId);
@@ -141,13 +141,13 @@ const verifyUser = asyncHandler(async (req, res) => {
     .json(new ApiResponse(200, "", "User verified successfully"));
 });
 
-const login = asyncHandler(async (req, res) => {
+const login = asyncHandler(async (req, res, next) => {
   const { email, password } = req.body;
 
   console.log(email, password);
 
   if (email === "" || password === "") {
-    throw new ApiError(400, "Please enter your email and password");
+    next(new ApiError(400, "Please enter your email and password"));
   }
 
   const user = await User.findOne({ email }).select(
@@ -157,17 +157,17 @@ const login = asyncHandler(async (req, res) => {
   console.log(user);
 
   if (!user) {
-    throw new ApiError(404, "User not found");
+    next(new ApiError(404, "User not found"));
   }
 
   if (!user.isVerified) {
-    throw new ApiError(400, "Please verify your account first");
+    next(new ApiError(400, "Please verify your account first"));
   }
 
   const isPassWordCorrect = await user.comparePassword(password);
 
   if (!isPassWordCorrect) {
-    throw new ApiError(400, "Invalid Email or password");
+    next(new ApiError(400, "Invalid Email or password"));
   }
 
   const options = {
@@ -196,17 +196,17 @@ const login = asyncHandler(async (req, res) => {
   );
 });
 
-const passwordResetMail = asyncHandler(async (req, res) => {
+const passwordResetMail = asyncHandler(async (req, res, next) => {
   const userId = req.user._id;
 
   if (!userId) {
-    throw new ApiError(404, "User not found");
+    next(new ApiError(404, "User not found"));
   }
 
   const user = await User.findById(userId);
 
   if (!user) {
-    throw new ApiError(404, "User not found");
+    next(new ApiError(404, "User not found"));
   }
 
   const otp = Math.floor(100000 + Math.random() * 900000).toString();
@@ -235,15 +235,15 @@ const passwordResetMail = asyncHandler(async (req, res) => {
     );
 });
 
-const refreshAccessToken = asyncHandler(async (req, res) => {
+const refreshAccessToken = asyncHandler(async (req, res, next) => {
   const currRefreshToken = req.cookies?.refreshToken;
-  if (!currRefreshToken) throw new ApiError(401, "No refresh token provided");
+  if (!currRefreshToken) next(new ApiError(401, "No refresh token provided"));
 
   const user = await User.findOne({ refreshToken: currRefreshToken }).select(
     "-refreshToken"
   );
-  if (!user) throw new ApiError(401, "Invalid refresh token");
-
+  
+  if (!user) next(new ApiError(401, "Invalid refresh token"));
   const { accessToken, refreshToken } = await tokenGenerators(user._id);
 
   const options = {

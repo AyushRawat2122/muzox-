@@ -14,7 +14,7 @@ const PORT = process.env.PORT || 5000;
 
 // Middlewares
 app.use(cors({
-  origin: "http://localhost:5173",
+  origin: "http://localhost:5174",
   credentials: true, // Cookies allow karni ho toh
   methods: ["GET", "POST", "PUT", "DELETE", "PATCH"], // Jo methods allow karni ho
   allowedHeaders: ["Content-Type", "Authorization"], // Jo headers allow karne ho
@@ -56,4 +56,4 @@ app.use("/api/muzox-/songs", SongRouter);
 
 //error in json format :}
 
-// app.use(errorHandler());
+app.use(errorHandler);

@@ -9,6 +9,7 @@
 .muzoxPurple:hover {
   color: #a159e4;
 }
+
 .hiddenScroll {
   scrollbar-width: none; /* For Firefox */
   -ms-overflow-style: none; /* For Internet Explorer and Edge */
@@ -17,6 +18,51 @@
 .hiddenScroll::-webkit-scrollbar {
   display: none; /* For Chrome, Safari, and Opera */
 }
+
 .pageBg {
   background-color: #121212;
+}
+
+/* text */
+
+.heading {
+  @apply text-4xl;
+}
+
+.subheading {
+  @apply text-2xl;
+}
+
+.baseText {
+  @apply text-base;
+}
+
+.smallText {
+  @apply text-sm;
+}
+
+.extraLargeText {
+  @apply text-6xl;
+}
+
+/* colors */
+
+.muzoxPurpleColor {
+  color: #a159e4;
+}
+
+.muzoxPinkColor{
+  color: #ff00ff;
+}
+
+.muzoxBg{
+  background-color:#191919; 
+}
+
+.muzoxSubBg{
+  background-color:#252525;
+}
+
+.muzoxSubBgHover:hover{
+  background-color:#303030;
 }

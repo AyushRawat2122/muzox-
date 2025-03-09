@@ -64,25 +64,27 @@ const Login = () => {
         }
       );
       return res;
-      }
-     catch (error) {
+    } catch (error) {
       throw error;
     }
   };
 
   const mutation = useMutation({
     mutationFn: onLogin,
-    onSuccess: () => { queryClient.invalidateQueries([{ queryKey: "user" }]);},
+    onSuccess: () => {
+      queryClient.invalidateQueries([{ queryKey: "user" }]);
+    },
     onError: (error) => {
-      console.log(error)
+      console.log(error);
     },
   });
 
-  if(mutation.isPending){
-    return <Loading/>
+  if (mutation.isPending) {
+    return <Loading />;
   }
 
-  const toggleIsVisible = () => {
+  const toggleIsVisible = (e) => {
+    e.preventDefault();
     setIsVisible((prev) => !prev);
   };
 
@@ -99,7 +101,9 @@ const Login = () => {
         </h1>
 
         <form
-          onSubmit={handleSubmit((data)=>{mutation.mutate(data)})}
+          onSubmit={handleSubmit((data) => {
+            mutation.mutate(data);
+          })}
           className="flex flex-col gap-2 justify-center w-full"
         >
           <div className="text-md flex flex-col">

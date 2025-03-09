@@ -1,9 +1,9 @@
 import jwt from "jsonwebtoken";
-import  User  from "../models/user.models.js";
+import User from "../models/user.models.js";
 import asyncHandler from "../utils/asyncHandler.js";
 import ApiError from "../utils/ApiError.js";
 
-export const authRequired = asyncHandler(async (req, res , next) => {
+export const authRequired = asyncHandler(async (req, res, next) => {
   const token = req.cookies.accessToken;
 
   if (!token && req.headers.authorization) {
@@ -11,9 +11,9 @@ export const authRequired = asyncHandler(async (req, res , next) => {
   }
 
   if (!token) {
-    throw new ApiError(401, "User not Authorized");
+    next(new ApiError(401, "User not Authorized"));
   }
-  
+
   const decoded = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
 
   const userId = decoded._id;
@@ -21,9 +21,9 @@ export const authRequired = asyncHandler(async (req, res , next) => {
   const user = await User.findById(userId).select("-password -refreshToken");
 
   if (!user) {
-    throw new ApiError(404, "User not found");
+    next(new ApiError(404, "User not found"));
   }
-  req.user=user;
+  req.user = user;
   next();
 });
 
