@@ -9,28 +9,27 @@ import { unlinkSync } from "fs";
 //upload song
 
 const uploadSong = asyncHandler(async (req, res) => {
-  const userId = req.user._id; //this will come from middleware verifyJWT
+  //this will come from middleware verifyJWT
   //where are you excepting it from ?
   //i have given it name authRequired situated in ../middleware/authRequired.middleware.js!
-
-  const { title, artist, genre = "" } = req.body; //extract data from req body
+  const { title, artist, genre = "" } = req.body; //extract data from req body......
   if (!title || !artist) {
     throw new ApiError(400, "title and artist are required");
   } // title and artist shouldnt be empty
+  console.log("haha");
+
   const localSongPath = req.files?.song?.[0]?.path;
-  const localCoverImgPath = req.files?.coverImg?.[0]?.path;
-  const isPresent=await Song.findOne({
-    $and:[
-      {title:title},
-      {artist:artist}
-    ]
-  })
-   if(isPresent){
+  const localCoverImgPath = req.files?.coverImage?.[0]?.path;
+  console.log("tor mai ke burr");
+  const isPresent = await Song.findOne({
+    $and: [{ title: title }, { artist: artist }],
+  });
+  if (isPresent) {
     unlinkSync(localSongPath);
     unlinkSync(localCoverImgPath);
-    throw new ApiError(400,"song already exists");
+    throw new ApiError(400, "song already exists");
   }
-
+  console.log(localCoverImgPath, localSongPath);
   if (!localSongPath || !localCoverImgPath) {
     throw new ApiError(400, "cover and song both are required");
   } // files re mendatory to upload
@@ -45,9 +44,6 @@ const uploadSong = asyncHandler(async (req, res) => {
     throw new ApiError(500, "uploading song req to server failed unexpectedly");
   }
   //check for the successful upload
-
- 
-
   const uploadedSong = await Song.create({
     title: title,
     artist: artist,
@@ -55,7 +51,6 @@ const uploadSong = asyncHandler(async (req, res) => {
     song: { url: song.url, public_id: song.public_id },
     coverImage: { url: coverImg.url, public_id: coverImg.public_id },
     duration: song?.duration,
-    uploadedBy:new  mongoose.Types.ObjectId(userId),
   });
   //creating document
 
@@ -114,7 +109,7 @@ const getLikedSongs = asyncHandler(async (req, res) => {
 
   const likedSongs = await Like.aggregate([
     {
-      $match: { likedBy:new  mongoose.Types.ObjectId(_id) },
+      $match: { likedBy: new mongoose.Types.ObjectId(_id) },
     },
     {
       $lookup: {
@@ -157,7 +152,7 @@ const likeSong = asyncHandler(async (req, res) => {
   const song = await Like.findOne({
     $and: [
       { song: new mongoose.Types.ObjectId(songId) },
-      { likedBy:new  mongoose.Types.ObjectId(_id) },
+      { likedBy: new mongoose.Types.ObjectId(_id) },
     ],
   });
   if (song) {
@@ -165,7 +160,7 @@ const likeSong = asyncHandler(async (req, res) => {
   }
 
   const likedSong = await Like.create({
-    song:new  mongoose.Types.ObjectId(songId),
+    song: new mongoose.Types.ObjectId(songId),
     likedBy: new mongoose.Types.ObjectId(_id),
   });
 
@@ -182,7 +177,7 @@ const unlikeSong = asyncHandler(async (req, res) => {
   const song = await Like.deleteOne({
     $and: [
       { song: new mongoose.Types.ObjectId(songId) },
-      { likedBy:new  mongoose.Types.ObjectId(_id) },
+      { likedBy: new mongoose.Types.ObjectId(_id) },
     ],
   });
 

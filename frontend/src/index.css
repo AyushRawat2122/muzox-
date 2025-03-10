@@ -51,18 +51,148 @@
   color: #a159e4;
 }
 
-.muzoxPinkColor{
+.muzoxPinkColor {
   color: #ff00ff;
 }
 
-.muzoxBg{
-  background-color:#191919; 
+.muzoxPanelBg {
+  background-color: #121212;
 }
 
-.muzoxSubBg{
-  background-color:#252525;
+.muzoxBg {
+  background-color: #191919;
 }
 
-.muzoxSubBgHover:hover{
-  background-color:#303030;
+.muzoxSubBg {
+  background-color: #252525;
+}
+
+.muzoxSubBgHover:hover {
+  background-color: #303030;
+}
+
+/* 🟢 Base Slider */
+.custom-slider {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 6px;
+  border-radius: 5px;
+  background: #606060; /* Default Grey Track */
+  outline: none;
+  cursor: pointer;
+  transition: background 0.3s ease-in-out;
+}
+
+/* 🟢 Track Style (WebKit - Chrome, Safari, Edge) */
+.custom-slider::-webkit-slider-runnable-track {
+  width: 100%;
+  height: 4px;
+  border-radius: 5px;
+  background: linear-gradient(
+    to right,
+    var(--progress-color) var(--progress-width),
+    #606060 var(--progress-width)
+  ); /* Dynamic Progress */
+}
+
+/* 🟣 Hover Effect (WebKit) */
+.custom-slider:hover::-webkit-slider-runnable-track {
+  background: linear-gradient(
+    to right,
+    var(--progress-color) var(--progress-width),
+    #606060 var(--progress-width)
+  );
+}
+
+/* 🟢 Thumb (Chrome, Safari, Edge) */
+.custom-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: white;
+  cursor: pointer;
+  margin-top: -5px;
+}
+
+/* 🟢 Track Style (Firefox) */
+.custom-slider::-moz-range-track {
+  width: 100%;
+  height: 6px;
+  border-radius: 5px;
+  background: linear-gradient(
+    to right,
+    var(--progress-color) var(--progress-width),
+    #ddd var(--progress-width)
+  );
+}
+
+/* 🟣 Hover Effect (Firefox) */
+.custom-slider:hover::-moz-range-track {
+  background: linear-gradient(
+    to right,
+    var(--progress-color) var(--progress-width),
+    #ddd var(--progress-width)
+  );
+}
+
+/* 🟢 Thumb (Firefox) */
+.custom-slider::-moz-range-thumb {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: white;
+  cursor: pointer;
+}
+
+/* Hide Default Progress Bar in Firefox */
+.custom-slider::-moz-range-progress {
+  background: transparent;
+}
+
+/* 🎯 Thumb (Chrome, Safari, Edge) */
+.custom-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: white;
+  cursor: pointer;
+  margin-top: -5px;
+  transform: scale(0);
+  transition: transform;
+}
+
+/* 🔥 Thumb Hover Effect */
+.custom-slider::-webkit-slider-thumb:hover {
+  transform: scale(0.8); /* Slightly increase size */
+}
+
+/* 🎯 Thumb (Firefox) */
+.custom-slider::-moz-range-thumb {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: white;
+  cursor: pointer;
+  transform: scale(0);
+  transition: transform;
+}
+
+/* 🔥 Thumb Hover Effect (Firefox) */
+.custom-slider::-moz-range-thumb:hover {
+  transform: scale(0.8);
+}
+
+.hoverIcon {
+  color: #9c9c9c;
+  transition: transform;
+}
+
+.hoverIcon:hover {
+  color: white;
+  transform: scale(1.3), translate(-50%, -50%);
 }

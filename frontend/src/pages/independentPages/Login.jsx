@@ -4,14 +4,14 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { CircleAlert, Eye, EyeClosed } from "lucide-react";
 import Logo from "/Logo.png";
-import { Link, Navigate, useNavigate } from "react-router";
+import { Link, useNavigate } from "react-router";
 import {
   normalRequest,
   queryClient,
 } from "../../utils/axiosRequests.config.js";
 import getUser from "../../serverDataHooks/getUser.js";
 import { useMutation } from "@tanstack/react-query";
-import Loading from "../../components/Loading.jsx";
+import Loading from "../../components/loaders/Loading.jsx";
 
 const schema = z.object({
   email: z.string().email("Invalid email"),

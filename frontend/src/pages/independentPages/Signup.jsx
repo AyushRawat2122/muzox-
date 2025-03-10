@@ -8,7 +8,7 @@ import { normalRequest } from "../../utils/axiosRequests.config.js";
 import * as z from "zod";
 import getUser from "../../serverDataHooks/getUser";
 import { useMutation } from "@tanstack/react-query";
-import Loading from "../../components/Loading.jsx";
+import Loading from "../../components/loaders/Loading.jsx";
 const schema = z.object({
   username: z.string().min(6, "Username must be at least 6 characters"),
   email: z.string().email("Invalid email"),

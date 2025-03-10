@@ -5,7 +5,7 @@ import * as z from "zod";
 import { CircleAlert } from "lucide-react";
 import { normalRequest } from "../../utils/axiosRequests.config";
 import { useMutation } from "@tanstack/react-query";
-import Loading from "../../components/Loading";
+import Loading from "../../components/loaders/Loading";
 const schema = z.object({
   otp: z
     .string()

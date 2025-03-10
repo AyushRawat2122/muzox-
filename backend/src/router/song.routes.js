@@ -11,9 +11,9 @@ const SongRouter = express.Router();
 SongRouter.route("/uploadMusic").post(
   uploader.fields([
     { name: "song", maxCount: 1 },
-    { name: "coverImg", maxCount: 1 },
+    { name: "coverImage", maxCount: 1 },
   ]),
-  authRequired,
+  // authRequired,
   uploadSong
 );
 SongRouter.route("/")
