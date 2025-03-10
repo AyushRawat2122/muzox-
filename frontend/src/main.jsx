@@ -8,7 +8,7 @@ import { Signup, Login, Verify } from "./pages/independentPages/index.js";
 import { Home } from "./pages/securePages/index.js";
 import { queryClient } from "./utils/axiosRequests.config.js";
 import ProtectedRoute from "./ProtectedRoute.jsx";
-
+import Search from "./pages/securePages/Search.jsx";
 const route = createBrowserRouter([
   {
     path: "/",
@@ -20,7 +20,7 @@ const route = createBrowserRouter([
       {
         path: "/",
         element: <ProtectedRoute />,
-        children: [{ path: "/", element: <Home /> }],
+        children: [{ path: "/", element: <Home /> } , {path:"/search" , element:<Search/>}],
       },
     ],
   },

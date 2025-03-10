@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Outlet } from "react-router";
-import { Navigate, useLocation } from "react-router";
+import { Navigate, useLocation, NavLink } from "react-router";
 import getUser from "./serverDataHooks/getUser.js";
 import MuzoxApp from "./pages/wrapperPages/MuzoxApp.jsx";
 import { queryClient } from "./utils/axiosRequests.config.js";
@@ -8,6 +8,8 @@ import Loading from "./components/loaders/Loading.jsx";
 import useSideBar from "./store/useSideBar.js";
 import useDeviceWidth from "./hooks/useDeviceWidth.js";
 import { Panel, PanelGroup, PanelResizeHandle } from "react-resizable-panels";
+import SearchBar from "./components/bars/SearchBar.jsx";
+import { FaHouse } from "react-icons/fa6";
 
 const ProtectedRoute = () => {
   const location = useLocation();
@@ -40,15 +42,31 @@ const ProtectedRoute = () => {
         {/* Global audio element responsible for playing the music */}
 
         {/* Top bar */}
-        <div>
-          <h1 className="text-2xl">Muzox</h1>
+        <div className="flex py-2 max-lg:justify-between">
+          <div>
+            <h1 className="text-2xl">Muzox</h1>
+          </div>
+          {windowWidth > 1024 && (
+            <div className="flex w-full items-center grow gap-2 justify-center">
+              <NavLink to={"/"} className={({isActive}) => (isActive ? "text-white" : "muzoxSubText")}>
+                <FaHouse
+                  className=" h-[30px] w-[30px] "
+                  strokeWidth={"3px"}
+                />
+              </NavLink>
+              <div className="w-[450px]">
+                <SearchBar></SearchBar>
+              </div>
+            </div>
+          )}
+          <div>User</div>
         </div>
 
         {/* Middle Section icludes Main page left side bar and right side bar resizable */}
 
         <PanelGroup
           direction="horizontal"
-          className="grow bg-transparent p-2 h-full"
+          className="grow bg-transparent h-full"
         >
           {/* ✅ LEFT PANEL (Draggable) */}
           {windowWidth > 1024 && (

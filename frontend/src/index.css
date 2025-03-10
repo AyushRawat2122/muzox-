@@ -46,6 +46,9 @@
 }
 
 /* colors */
+.muzoxSubText {
+  color: #9c9c9c;
+}
 
 .muzoxPurpleColor {
   color: #a159e4;
@@ -61,6 +64,10 @@
 
 .muzoxBg {
   background-color: #191919;
+}
+
+.muzoxLightBg{
+  background-color: #2b2b2b;
 }
 
 .muzoxSubBg {
