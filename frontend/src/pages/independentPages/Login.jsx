@@ -12,7 +12,7 @@ import {
 import getUser from "../../serverDataHooks/getUser.js";
 import { useMutation } from "@tanstack/react-query";
 import Loading from "../../components/loaders/Loading.jsx";
-
+import { loadingPlayIcon } from "../../utils/lottie.js";
 const schema = z.object({
   email: z.string().email("Invalid email"),
   password: z
@@ -34,7 +34,6 @@ const Login = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    console.log("Use Effect triggered", isSuccess);
     if (isSuccess) {
       navigate("/");
     } // if user is logged in then send it back to home
@@ -80,7 +79,7 @@ const Login = () => {
   });
 
   if (mutation.isPending) {
-    return <Loading />;
+    return <Loading src={loadingPlayIcon} />;
   }
 
   const toggleIsVisible = (e) => {

@@ -1,2 +1,3 @@
 import Home from "./Home.jsx";
-export { Home };
+import Search from "./Search.jsx";
+export { Home , Search };

@@ -10,6 +10,7 @@ import useDeviceWidth from "./hooks/useDeviceWidth.js";
 import { Panel, PanelGroup, PanelResizeHandle } from "react-resizable-panels";
 import SearchBar from "./components/bars/SearchBar.jsx";
 import { FaHouse } from "react-icons/fa6";
+import { loadingPlayIcon } from "./utils/lottie.js";
 
 const ProtectedRoute = () => {
   const location = useLocation();
@@ -26,7 +27,7 @@ const ProtectedRoute = () => {
   }, []);
 
   if (isPending) {
-    return <Loading />;
+    return <Loading src={loadingPlayIcon} />;
   }
 
   if (error) {
@@ -48,11 +49,13 @@ const ProtectedRoute = () => {
           </div>
           {windowWidth > 1024 && (
             <div className="flex w-full items-center grow gap-2 justify-center">
-              <NavLink to={"/"} className={({isActive}) => (isActive ? "text-white" : "muzoxSubText")}>
-                <FaHouse
-                  className=" h-[30px] w-[30px] "
-                  strokeWidth={"3px"}
-                />
+              <NavLink
+                to={"/"}
+                className={({ isActive }) =>
+                  isActive ? "text-white" : "muzoxSubText"
+                }
+              >
+                <FaHouse className=" h-[30px] w-[30px] " strokeWidth={"3px"} />
               </NavLink>
               <div className="w-[450px]">
                 <SearchBar></SearchBar>

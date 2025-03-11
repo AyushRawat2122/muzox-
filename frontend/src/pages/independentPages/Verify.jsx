@@ -1,9 +1,12 @@
-import { useParams, useLocation, useNavigate, data } from "react-router";
+import { useParams, useNavigate, useLocation } from "react-router";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { CircleAlert } from "lucide-react";
-import { useParams } from "react-router";
+import { normalRequest } from "../../utils/axiosRequests.config";
+import { useMutation } from "@tanstack/react-query";
+import Loading from "../../components/loaders/Loading";
+import { loadingPlayIcon } from "../../utils/lottie.js";
 const schema = z.object({
   otp: z
     .string()
@@ -12,7 +15,7 @@ const schema = z.object({
 });
 
 const Verify = () => {
-  const {userId}=useParams();//aise milega 
+  const { userID } = useParams(); 
   const {
     register,
     handleSubmit,
@@ -22,6 +25,10 @@ const Verify = () => {
     mode: "onChange",
   });
 
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  const email = location.state?.email || "";
   const onVerifyMe = async (data) => {
     try {
       const res = await normalRequest.post(`/user/verifyUser/${userID}`, data, {
@@ -42,8 +49,8 @@ const Verify = () => {
     },
   });
 
-  if(mutation.isPending){
-    return <Loading/>
+  if (mutation.isPending) {
+    return <Loading src={loadingPlayIcon} />;
   }
 
   return (

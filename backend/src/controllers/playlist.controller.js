@@ -43,15 +43,17 @@ const createPlayList = asyncHandler(async (req, res, next) => {
 
 //delete PlayList
 
-const deletePlayList = asyncHandler(async (req, res) => {
+const deletePlayList = asyncHandler(async (req, res , next) => {
   const { playListID } = req.params;
   const { _id } = req.user;
+
 
   if (playListID === "") {
     next( new ApiError(400, "ID is not found try again later"));
   }
 
   const playList = await Playlist.findById(playListID);
+
 
   if (!playList) {
     next( new ApiError(404, "Playlist not found"));
@@ -60,6 +62,8 @@ const deletePlayList = asyncHandler(async (req, res) => {
   if (_id?.toString() !== playList?.owner?.toString()) {
     next( new ApiError(400, "you are not authorized to delete this playlist"));
   }
+
+  const picToDelete = playList?.playListCover?.public_id;
 
   const picToDelete = playList?.playListCover?.public_id;
   if (picToDelete) {
@@ -106,7 +110,7 @@ const addToPlayList = asyncHandler(async (req, res, next) => {
 });
 
 //remove from PlayList
-const removeFromPlayList = asyncHandler(async (req, res) => {
+const removeFromPlayList = asyncHandler(async (req, res , next) => {
   const { playListID, songId } = req.params;
   const { _id } = req.user;
   const playlist = await Playlist.findById(playListID);

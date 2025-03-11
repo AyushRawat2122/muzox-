@@ -9,6 +9,7 @@ import * as z from "zod";
 import getUser from "../../serverDataHooks/getUser";
 import { useMutation } from "@tanstack/react-query";
 import Loading from "../../components/loaders/Loading.jsx";
+import { loadingPlayIcon } from "../../utils/lottie.js";
 const schema = z.object({
   username: z.string().min(6, "Username must be at least 6 characters"),
   email: z.string().email("Invalid email"),
@@ -59,10 +60,10 @@ const Signup = () => {
           "Content-Type": "multipart/form-data",
         },
       });
-      console.log(data)
+      console.log(data);
       return res?.data?.data;
     } catch (error) {
-     console.log(error);
+      throw error;
     }
   };
 
@@ -73,7 +74,7 @@ const Signup = () => {
   const mutation = useMutation({
     mutationFn: onSignup,
     onSuccess: (data) => {
-      console.log(data)
+      console.log(data);
       if (data) {
         const userID = data?._id;
         const email = data?.email;
@@ -85,9 +86,9 @@ const Signup = () => {
     },
   });
 
-  if(mutation.isPending){
-    console.log("Signiing up")
-    return <Loading/>
+  if (mutation.isPending) {
+    console.log("Signiing up");
+    return <Loading src={loadingPlayIcon} />;
   }
 
   return (
@@ -103,7 +104,9 @@ const Signup = () => {
           Sign up to Muzox
         </h1>
         <form
-          onSubmit={handleSubmit((data)=>{mutation.mutate(data)})}
+          onSubmit={handleSubmit((data) => {
+            mutation.mutate(data);
+          })}
           className="flex flex-col items-center gap-2"
         >
           <div className="flex flex-col gap-1 lg:grid lg:grid-cols-2 lg:gap-10 w-full">
