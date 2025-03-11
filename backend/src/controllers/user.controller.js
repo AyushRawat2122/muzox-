@@ -25,17 +25,17 @@ const tokenGenerators = async (userId) => {
 
     return { accessToken, refreshToken };
   } catch (error) {
-    throw new ApiError(500, "Internal Server Error");
+    next( new ApiError(500, "Internal Server Error"));
   }
 };
 
 //sign up
 
-const signup = asyncHandler(async (req, res) => {
+const signup = asyncHandler(async (req, res,next) => {
   const { username, email, password } = req.body;
 
   if (!username || !email || !password) {
-    throw new ApiError(400, "All fields are required");
+    next( new ApiError(400, "All fields are required"));
   } // check that incoming body isn't empty
 
   const alreadyAUser = await User.findOne({
@@ -43,18 +43,18 @@ const signup = asyncHandler(async (req, res) => {
   });
 
   if (alreadyAUser) {
-    throw new ApiError(400, "User already exists");
+    next( new ApiError(400, "User already exists"));
   }
 
   const profilePicLocal = req.files?.profilePic?.[0]?.path;
 
   console.log(profilePicLocal);
   if (!profilePicLocal) {
-    throw new ApiError(400, "Please upload a profile picture");
+    next( new ApiError(400, "Please upload a profile picture"));
   }
   const profilePic = await uploadOnCloudinary(profilePicLocal);
   if (!profilePic) {
-    throw new ApiError(500, "Internal Serever Error plx try again later");
+    next( new ApiError(500, "Internal Serever Error plx try again later"));
   }
   const salt = await bcryptjs.genSalt(10);
 
@@ -110,15 +110,15 @@ const verifyUser = asyncHandler(async (req, res, next) => {
   const user = await User.findById(userId);
 
   if (!user) {
-    throw new ApiError(404, "User not found");
+    next( new ApiError(404, "User not found"));
   }
 
   if (user.isVerified === true) {
-    throw new ApiError(400, "User already verified");
+    next( new ApiError(400, "User already verified"));
   }
 
   if (user.verifyToken != otp) {
-    throw new ApiError(400, "Invalid OTP");
+    next( new ApiError(400, "Invalid OTP"));
   }
 
   //fucked upon this logic we need to think something about this
@@ -127,7 +127,7 @@ const verifyUser = asyncHandler(async (req, res, next) => {
     await User.findByIdAndDelete(userId);
     await deleteOnCloudinary(user.profilePic);
 
-    throw new ApiError(400, "OTP has expired.You need to signup again");
+    next( new ApiError(400, "OTP has expired.You need to signup again"));
   }
 
   user.isVerified = true;
@@ -271,26 +271,26 @@ const resetPassword = asyncHandler(async (req, res) => {
 
   const { otp, newPassword } = req.body;
   if (!userId) {
-    throw new ApiError(404, "Page  Not Found");
+    next( new ApiError(404, "Page  Not Found"));
   }
 
   if (otp === "" || newPassword === "") {
-    throw new ApiError(400, "OTP and New Password fields are required");
+    next( new ApiError(400, "OTP and New Password fields are required"));
   }
 
   const user = await User.findById(userId);
 
   if (!user) {
-    throw new ApiError(404, "User not found Please try again later");
+    next( new ApiError(404, "User not found Please try again later"));
   }
 
   console.log(typeof user.passwordToken);
   if (user.passwordToken !== otp) {
-    throw new ApiError(404, "Please enter the valid OTP");
+    next( new ApiError(404, "Please enter the valid OTP"));
   }
 
   if (new Date() > user.passwordTokenExpiry) {
-    throw new ApiError(404, "OTP has expired Please try again later");
+    next( new ApiError(404, "OTP has expired Please try again later"));
   }
 
   const salt = await bcryptjs.genSalt(10);
@@ -348,26 +348,26 @@ const updateUserDetails = asyncHandler(async (req, res) => {
   const { username } = req.body;
 
   if (!username || username.trim() === "") {
-    throw new ApiError(400, "Username cannot be empty");
+    next( new ApiError(400, "Username cannot be empty"));
   }
 
   const userId = req.user._id;
 
   const currentUser = await User.findById(userId);
   if (!currentUser) {
-    throw new ApiError(404, "User not found");
+    next( new ApiError(404, "User not found"));
   }
 
   if (currentUser.username === username) {
-    throw new ApiError(
+    next( new ApiError(
       400,
       "New username must be different from the current username"
-    );
+    ));
   }
 
   const isUsernameTaken = await User.findOne({ username });
   if (isUsernameTaken) {
-    throw new ApiError(400, "Username already taken");
+    next( new ApiError(400, "Username already taken"));
   }
 
   const updatedUser = await User.findByIdAndUpdate(
@@ -379,7 +379,7 @@ const updateUserDetails = asyncHandler(async (req, res) => {
   );
 
   if (!updatedUser) {
-    throw new ApiError(500, "User update failed");
+    next( new ApiError(500, "User update failed"));
   }
 
   return res
@@ -394,7 +394,7 @@ const updateProfilePic = asyncHandler(async (req, res) => {
 
   const profilePicLocal = req.files?.profilePic[0]?.path;
   if (!profilePicLocal) {
-    throw new ApiError(400, "Please upload a profile picture");
+    next( new ApiError(400, "Please upload a profile picture"));
   }
   const user = await User.findById(req.user._id).select("profilePic");
   console.log(user);
@@ -426,7 +426,7 @@ const getUserPlaylist = asyncHandler(async (req, res) => {
   const id = req.user._id;
   const playlists = await Playlist.findOne({ owner: id });
   if (!playlists) {
-    throw new ApiError(404, "No playlists found for this user");
+    next( new ApiError(404, "No playlists found for this user"));
   }
   return res
     .status(200)

@@ -3,9 +3,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { CircleAlert } from "lucide-react";
-import { normalRequest } from "../../utils/axiosRequests.config";
-import { useMutation } from "@tanstack/react-query";
-import Loading from "../../components/loaders/Loading";
+import { useParams } from "react-router";
 const schema = z.object({
   otp: z
     .string()
@@ -14,13 +12,7 @@ const schema = z.object({
 });
 
 const Verify = () => {
-  const { userID } = useParams();
-  const location = useLocation();
-  const navigate = useNavigate();
-  const email = location?.state?.email || "";
-
-  console.log(userID);
-
+  const {userId}=useParams();//aise milega 
   const {
     register,
     handleSubmit,

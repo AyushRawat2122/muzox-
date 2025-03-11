@@ -8,21 +8,21 @@ import Song from "../models/song.models.js";
 import User from "../models/user.models.js";
 
 //create PlayList
-const createPlayList = asyncHandler(async (req, res) => {
+const createPlayList = asyncHandler(async (req, res, next) => {
   const { name, description } = req.body;
   const { _id } = req.user;
 
-  if (!name && !description) {
-    throw new ApiError(400, "name and description are required");
+  if (!name || !description) {
+    next(new ApiError(400, "name and description are required"));
   } // title and description about playlist required
 
   const playListCoverLocal = req.file?.playListCover?.[0]?.url;
-  let playListCover = {};
+  let playListCover = undefined;
 
   if (playListCoverLocal) {
     playListCover = await uploadOnCloudinary(playListCoverLocal);
     if (!playListCover) {
-      throw new ApiError(500, "something went wrong while uploading coverImg");
+      next( new ApiError(500, "something went wrong while uploading coverImg"));
     }
   } //we ll upload only if user wants to upload file if he doesnt it's okay
 
@@ -33,27 +33,35 @@ const createPlayList = asyncHandler(async (req, res) => {
       ? { public_id: playListCover.public_id, url: playListCover.url }
       : undefined,
     songs: [],
-    owner: mongoose.Types.ObjectId(_id),
+    owner: new mongoose.Types.ObjectId(_id),
   });
 
   return res
     .status(200)
     .json(new ApiResponse(200, "", "playlist created successfully"));
-});
+}); //ok
 
 //delete PlayList
 
 const deletePlayList = asyncHandler(async (req, res) => {
   const { playListID } = req.params;
   const { _id } = req.user;
+
   if (playListID === "") {
-    return new ApiError(400, "ID is not found try again later");
+    next( new ApiError(400, "ID is not found try again later"));
   }
+
   const playList = await Playlist.findById(playListID);
+
   if (!playList) {
-    throw new ApiError(404, "Playlist not found");
+    next( new ApiError(404, "Playlist not found"));
   }
-  const picToDelete = playList.playListCover.public_id;
+
+  if (_id?.toString() !== playList?.owner?.toString()) {
+    next( new ApiError(400, "you are not authorized to delete this playlist"));
+  }
+
+  const picToDelete = playList?.playListCover?.public_id;
   if (picToDelete) {
     await deleteOnCloudinary(picToDelete);
   }
@@ -64,40 +72,48 @@ const deletePlayList = asyncHandler(async (req, res) => {
 });
 
 //add to PlayList
-const addToPlayList = asyncHandler(async (req, res) => {
+const addToPlayList = asyncHandler(async (req, res, next) => {
+  console.log("hi");
   const { playListID, songId } = req.params;
-  //means i have to add songs to playlist
-  const playlist = await Playlist.findById(playListID);
+  console.log(typeof playListID, songId);
+  const { _id } = req.user;
+
+  const playlist = await Playlist.findOneAndUpdate(
+    {
+      $and: [
+        { _id: new mongoose.Types.ObjectId(playListID) },
+        { owner: new mongoose.Types.ObjectId(_id) },
+      ],
+    }, //samjha nai say propely
+    {
+      $addToSet: {
+        songs: new mongoose.Types.ObjectId(songId),
+      },
+    },
+    {
+      new: true,
+    }
+  );
+
   if (!playlist) {
-    throw new ApiError(404, "Playlist not found");
+    next( new ApiError(404, "Internal Server error "));
   }
-  if (playlist.owner?.toString() !== req.user?._id.toString()) {
-    return new ApiError(400, "You are not the owner of this playlist");
-  }
-  const song = await Song.findById(songId);
-  if (!song) {
-    throw new ApiError(404, "Playlist Not Found");
-  }
-  const songAlreadyInPlaylist = playlist.findOne({ songId });
-  if (songAlreadyInPlaylist) {
-    return new ApiError(400, "Song is already in the playlist");
-  }
-  playlist.songs.push(songId);
-  await playlist.save();
   return res
     .status(201)
-    .json(new ApiResponse(200, "", "song added to playlist successfully"));
-}); // improvement :|
+    .json(
+      new ApiResponse(200, playlist, "Song added to playlist successfully")
+    );
+});
 
 //remove from PlayList
 const removeFromPlayList = asyncHandler(async (req, res) => {
   const { playListID, songId } = req.params;
+  const { _id } = req.user;
   const playlist = await Playlist.findById(playListID);
-  const song = await Song.findById(songId);
-  if (!playlist || !song) {
-    throw new ApiError(404, "Playlist or Song not found");
+  if (!playlist) {
+    next( new ApiError(404, "Playlist or Song not found"));
   }
-  if (playlist.owner?.toString() !== req.user?._id.toString()) {
+  if (playlist.owner?.toString() !== _id.toString()) {
     return new ApiError(400, "You are not the owner of this playlist");
   }
   const updatedPlaylist = await Playlist.findByIdAndUpdate(
@@ -107,14 +123,20 @@ const removeFromPlayList = asyncHandler(async (req, res) => {
   );
   return res
     .status(200)
-    .json(new ApiResponse(200, "", "song removed from playlist successfully"));
+    .json(
+      new ApiResponse(
+        200,
+        updatedPlaylist,
+        "song removed from playlist successfully"
+      )
+    );
 });
 
 //toggle playList publish status
 const togglePlayListStatus = asyncHandler(async (req, res) => {
   const { playListID } = req.params;
   if (!playListID) {
-    throw new ApiError(400, "Playlist id is required to toggle publish status");
+    next( new ApiError(400, "Playlist id is required to toggle publish status"));
   }
   await Playlist.findByIdAndUpdate(
     playListID,
@@ -125,86 +147,64 @@ const togglePlayListStatus = asyncHandler(async (req, res) => {
 });
 
 const searchPlaylist = asyncHandler(async (req, res) => {
-  const { nameOfPlaylist } = req.body;
-  if (!nameOfPlaylist || nameOfPlaylist.trim() === "") {
-    return new ApiError(400, "Playlist name is required");
-  }
-
-  const userId = req.user && req.user._id;
-  if (!userId) {
-    return new ApiError(401, "You are not logged in");
-  }
-
-  const user = await User.findById(userId).populate("playlists");
-  if (!user) {
-    return new ApiError(404, "User not found");
-  }
-  const playlistFound = user.playlists.filter((playlist) =>
-    playlist.name.toLowerCase().includes(nameOfPlaylist.toLowerCase())
-  );
-
-  res.status(200).json({ playlists: playlistFound });
+  const { query } = req.query;
+  const searchedSuggestion = await Playlist.aggregate([
+    {
+      $match: { name: { $regex: query, $options: "i" } },
+    },
+    { $limit: 10 },
+    {
+      $project: {
+        uploadedBy: 0,
+      },
+    },
+  ]);
+  return res
+    .status(200)
+    .json(
+      new ApiResponse(200, searchedSuggestion, "Playlist fetched successfully")
+    );
 }); // umm we need to do regex thingy on this
 
-const getUserPlaylist = asyncHandler(async (req, res) => {
-  const { userId } = req.user._id;
-  const user = await User.findById(userId);
-  const playlists = await Playlist.find({ owner: userId }).populate("songs");
-  if (!playlists) {
-    return new ApiError(404, "Playlist not found");
+// umm okay Idk much about this we ll see this while building frontend : )
+const addThisPlaylist = asyncHandler(async (req, res) => {
+
+  const { playListId } = req.params;
+
+  if (!playListId) {
+    next( new ApiError(400, "Playlist id is required to add to User playlists"));
   }
 
-  const page = parseInt(req.param.page) || 1;
-  const limit = parseInt(req.param.limit) || 10;
-  const sortField = req.query.sortField || "createdAt";
-  const sortOrder = req.query.sortOrder === "asc" ? 1 : -1;
-  const myLabel = {
-    label: `${user.username}'s playlist`,
-    url: `/playlist/${user._id}`,
-    docs: "playlist",
-    limit: "perPage",
-    page: "currentPage",
-    nextPage: "next",
-    prevPage: "prev",
-    hasPrevPage: "hasPrev",
-    hasNextPage: "hasNext",
-    meta: "paginator",
-  };
-  const option = {
-    page,
-    limit,
-    sortField,
-    sortOrder,
-    customLabels: myLabel,
-  };
-  const pipeline = [
-    {
-      $sort: {
-        [sortField]: sortOrder,
-      },
-    },
-    {
-      $lookup: {
-        from: "users",
-        localField: "owner",
-        foreignField: "_id",
-        as: "owner",
-      },
-    },
-    {
-      $unwind: {
-        path: "$owner",
-        preserveNullAndEmptyArrays: true,
-      },
-    },
-  ];
-  const aggregate = Playlist.aggregate(pipeline);
-  const userPlaylist = await Playlist.aggregatePaginate(aggregate, option);
-  return res.status(200).json({
-    status: "success",
-    data: userPlaylist,
-  });
-}); // umm okay Idk much about this we ll see this while building frontend : )
+  const { _id } = req.user;
+  const userUpdatedPlaylist = await User.findByIdAndUpdate(
+    _id,
+    { $addToSet: { playlists: new mongoose.Types.ObjectId(playListId)} }, 
+    { new: true }
+  );
+
+  return res.status(200).json(
+    new ApiResponse(
+      200,
+      userUpdatedPlaylist,
+      "Playlist added to your collection successfully"
+    )
+  );
+});
+const getUserPlaylists=asyncHandler(async(req,res)=>{
+  
+  const {_id}=req.user;
+
+  const populatedPlaylists=await User.findById(_id).populate("playlists").select("playlists");
+
+  const userCreatedPlaylist=await Playlist.find(
+    { owner: new mongoose.Types.ObjectId(_id)},
+  )
+  
+  const data=[...populatedPlaylists,...userCreatedPlaylist];
+  
+  return res.status(200).json(new ApiResponse(200, data, "User playlists"));
+
+})
 
 export {
   createPlayList,
@@ -213,5 +213,4 @@ export {
   deletePlayList,
   togglePlayListStatus,
   searchPlaylist,
-  getUserPlaylist
 };

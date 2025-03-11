@@ -7,6 +7,7 @@ import cookieParser from "cookie-parser";
 import errorHandler from "./src/middlewares/errorHandler.js";
 import userRouter from "./src/router/user.routes.js";
 import SongRouter from "./src/router/song.routes.js";
+import PlaylistRouter from "./src/router/playlist.routes.js"
 dotenv.config({});
 
 const app = express();
@@ -20,7 +21,7 @@ app.use(cors({
   allowedHeaders: ["Content-Type", "Authorization"], // Jo headers allow karne ho
 
 }));
-app.use(express.urlencoded({ extended: true, limit: "16kb" }));
+app.use(express.urlencoded({ extended: true, limit: "20mb" }));
 app.use(express.json());
 app.use(cookieParser());
 app.use(express.static("public"));
@@ -33,8 +34,8 @@ app.get("/welcome-to-my-app", (req, res) => {
 const startServer = async () => {
   try {
     await connect();
-    app.listen(PORT, () => {
-      console.log(`Server is running on port ${PORT}`);
+    app.listen(8000, () => {
+      console.log(`Server is running on port ${8000}`);
     });
   } catch (error) {
     console.error("Failed to connect to the database:", error);
@@ -46,6 +47,7 @@ startServer();
 //Testing
 app.use("/api/muzox-/user", userRouter);
 app.use("/api/muzox-/songs", SongRouter);
+app.use("/api/muzox-/playlist",PlaylistRouter);
 
 
 

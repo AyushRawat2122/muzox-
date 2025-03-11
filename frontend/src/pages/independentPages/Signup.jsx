@@ -62,7 +62,7 @@ const Signup = () => {
       console.log(data)
       return res?.data?.data;
     } catch (error) {
-      throw error;
+     console.log(error);
     }
   };
 

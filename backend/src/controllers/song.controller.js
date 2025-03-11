@@ -8,30 +8,34 @@ import Like from "../models/like.models.js";
 import { unlinkSync } from "fs";
 //upload song
 
-const uploadSong = asyncHandler(async (req, res) => {
-  //this will come from middleware verifyJWT
+const uploadSong = asyncHandler(async (req, res,next) => {
+   //this will come from middleware verifyJWT
   //where are you excepting it from ?
   //i have given it name authRequired situated in ../middleware/authRequired.middleware.js!
-  const { title, artist, genre = "" } = req.body; //extract data from req body......
+  const { title, artist, genre = "" } = req.body; //extract data from req body......  
   if (!title || !artist) {
-    throw new ApiError(400, "title and artist are required");
+    next( new ApiError(400, "title and artist are required"));
   } // title and artist shouldnt be empty
-  console.log("haha");
+ 
 
   const localSongPath = req.files?.song?.[0]?.path;
   const localCoverImgPath = req.files?.coverImage?.[0]?.path;
-  console.log("tor mai ke burr");
-  const isPresent = await Song.findOne({
-    $and: [{ title: title }, { artist: artist }],
-  });
-  if (isPresent) {
+
+
+  const isPresent=await Song.findOne({
+    $and:[
+      {title:title},
+      {artist:artist}
+    ]
+  })
+   if(isPresent){
     unlinkSync(localSongPath);
     unlinkSync(localCoverImgPath);
-    throw new ApiError(400, "song already exists");
+    next( new ApiError(400, "song already exists"));
   }
-  console.log(localCoverImgPath, localSongPath);
+
   if (!localSongPath || !localCoverImgPath) {
-    throw new ApiError(400, "cover and song both are required");
+    next( new ApiError(400, "cover and song both are required"));
   } // files re mendatory to upload
 
   const song = await uploadOnCloudinary(localSongPath);
@@ -41,7 +45,7 @@ const uploadSong = asyncHandler(async (req, res) => {
   if (!song || !coverImg) {
     await deleteOnCloudinary(song?.public_id);
     await deleteOnCloudinary(coverImg?.public_id);
-    throw new ApiError(500, "uploading song req to server failed unexpectedly");
+    next( new ApiError(500, "uploading song req to server failed unexpectedly"));
   }
   //check for the successful upload
   const uploadedSong = await Song.create({
@@ -59,35 +63,14 @@ const uploadSong = asyncHandler(async (req, res) => {
     .json(new ApiResponse(200, uploadedSong, "song uploaded successfully"));
 });
 
-//delete song
-const deleteSong = asyncHandler(async (req, res) => {
-  const { public_id } = req.params; // take the video from params
 
-  if (!public_id) {
-    throw new ApiError(400, "public id is required to delete song");
-  } //check there should be public_id
-
-  const deleteStatus = await deleteOnCloudinary(public_id);
-  //it will return true or false
-
-  if (!deleteStatus) {
-    throw new ApiError(
-      500,
-      "delete operation on song failed due to some unexpected reason"
-    );
-  } // if its false then error that operation is failed
-
-  return res
-    .status(200)
-    .json(new ApiResponse(200, {}, "successfully deleted the video"));
-});
 
 //search Song
 const getSuggestionList = asyncHandler(async (req, res) => {
   const { query = "" } = req.query;
   const searchedSuggestion = await Song.aggregate([
     {
-      $match: { title: { $regex: query } },
+      $match: { title: { $regex: query ,$options:"i"} },
     },
     { $limit: 15 },
     {
@@ -156,7 +139,7 @@ const likeSong = asyncHandler(async (req, res) => {
     ],
   });
   if (song) {
-    throw new ApiError(400, "song is already liked");
+    next( new ApiError(400, "song is already liked"));
   }
 
   const likedSong = await Like.create({
@@ -182,7 +165,7 @@ const unlikeSong = asyncHandler(async (req, res) => {
   });
 
   if (!song.deletedCount) {
-    throw new ApiError(400, "not a liked song");
+    next( new ApiError(400, "not a liked song"));
   }
 
   return res
@@ -193,7 +176,6 @@ const unlikeSong = asyncHandler(async (req, res) => {
 //exports
 export {
   uploadSong,
-  deleteSong,
   getSuggestionList,
   getLikedSongs,
   likeSong,
