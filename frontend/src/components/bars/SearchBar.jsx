@@ -23,7 +23,7 @@ const SearchBar = () => {
 
   return (
     <div
-      className={`flex w-full items-center muzoxSubBg muzoxSubBgHover p-2 rounded-full px-3 ${
+      className={`flex w-full items-center rounded-md muzoxSubBg muzoxSubBgHover p-2 lg:rounded-full px-3 ${
         isFocused ? "border border-white" : ""
       } overflow-hidden`}
     >

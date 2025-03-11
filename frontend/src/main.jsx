@@ -5,7 +5,12 @@ import App from "./App.jsx";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { RouterProvider, createBrowserRouter } from "react-router";
 import { Signup, Login, Verify } from "./pages/independentPages/index.js";
-import { Home, Search } from "./pages/securePages/index.js";
+import {
+  HomePage,
+  LibraryPage,
+  PremiumPage,
+  SearchPage,
+} from "./pages/securePages/index.js";
 import { queryClient } from "./utils/axiosRequests.config.js";
 import ProtectedRoute from "./ProtectedRoute.jsx";
 
@@ -21,8 +26,10 @@ const route = createBrowserRouter([
         path: "/",
         element: <ProtectedRoute />,
         children: [
-          { path: "/", element: <Home /> },
-          { path: "/search", element: <Search /> },
+          { path: "/", element: <HomePage /> },
+          { path: "/search", element: <SearchPage /> },
+          { path: "/library", element: <LibraryPage /> },
+          { path: "/premium", element: <PremiumPage /> },
         ],
       },
     ],

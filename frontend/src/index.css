@@ -1,4 +1,7 @@
 @import "tailwindcss";
+*{
+  font-family: "Plus Jakarta Sans", sans-serif;
+}
 .jakartha {
   font-family: "Plus Jakarta Sans", sans-serif;
 }

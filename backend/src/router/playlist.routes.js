@@ -7,5 +7,5 @@ PlayListRouter.post('/create-playlist',  uploader.fields([{ name: "playListCover
 PlayListRouter.post('/add-to-playlist/:playListID/:songId',authRequired,addToPlayList);
 PlayListRouter.post('/remove-from-playlist/:playListID/:songId',authRequired,removeFromPlayList);
 PlayListRouter.post('/delete-playlist/:playListID',authRequired,deletePlayList);
-PlayListRouter.post('/search-playlist',searchPlaylist);
+PlayListRouter.get('/search-playlist',searchPlaylist);
 export default PlayListRouter;

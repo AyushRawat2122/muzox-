@@ -19,7 +19,6 @@ app.use(cors({
   credentials: true, // Cookies allow karni ho toh
   methods: ["GET", "POST", "PUT", "DELETE", "PATCH"], // Jo methods allow karni ho
   allowedHeaders: ["Content-Type", "Authorization"], // Jo headers allow karne ho
-
 }));
 app.use(express.urlencoded({ extended: true, limit: "20mb" }));
 app.use(express.json());
@@ -34,8 +33,8 @@ app.get("/welcome-to-my-app", (req, res) => {
 const startServer = async () => {
   try {
     await connect();
-    app.listen(8000, () => {
-      console.log(`Server is running on port ${8000}`);
+    app.listen(PORT, () => {
+      console.log(`Server is running on port ${PORT}`);
     });
   } catch (error) {
     console.error("Failed to connect to the database:", error);

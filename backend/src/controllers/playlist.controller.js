@@ -64,8 +64,6 @@ const deletePlayList = asyncHandler(async (req, res , next) => {
   }
 
   const picToDelete = playList?.playListCover?.public_id;
-
-  const picToDelete = playList?.playListCover?.public_id;
   if (picToDelete) {
     await deleteOnCloudinary(picToDelete);
   }

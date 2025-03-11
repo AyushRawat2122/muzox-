@@ -9,10 +9,10 @@ import { unlinkSync } from "fs";
 //upload song
 
 const uploadSong = asyncHandler(async (req, res,next) => {
-   //this will come from middleware verifyJWT
+  //this will come from middleware verifyJWT
   //where are you excepting it from ?
   //i have given it name authRequired situated in ../middleware/authRequired.middleware.js!
-  const { title, artist, genre = "" } = req.body; //extract data from req body......  
+  const { title, artist, genre = "" } = req.body; //extract data from req body......
   if (!title || !artist) {
     next( new ApiError(400, "title and artist are required"));
   } // title and artist shouldnt be empty
