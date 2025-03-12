@@ -10,7 +10,7 @@ const EmptyQueue = () => {
         loop
         className="h-fit"
       />
-      <p className=" text-center absolute top-[70%] text-2xl italic">
+      <p className=" text-center text-2xl italic">
         The stage is empty! <br /> Time to bring
         <br /> the vibes—pick something! ✨
       </p>

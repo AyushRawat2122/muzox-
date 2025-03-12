@@ -2,8 +2,17 @@
 *{
   font-family: "Plus Jakarta Sans", sans-serif;
 }
+button{
+  cursor: pointer;
+}
 .jakartha {
   font-family: "Plus Jakarta Sans", sans-serif;
+}
+.adjustCenter {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
 }
 .gradientButton {
   background: linear-gradient(to right, #8a2be2, #ff00ff);
@@ -81,120 +90,20 @@
   background-color: #303030;
 }
 
-/* 🟢 Base Slider */
-.custom-slider {
-  -webkit-appearance: none;
-  appearance: none;
-  width: 100%;
-  height: 6px;
-  border-radius: 5px;
-  background: #606060; /* Default Grey Track */
-  outline: none;
-  cursor: pointer;
-  transition: background 0.3s ease-in-out;
+::-webkit-scrollbar {
+  width: 10px;
 }
 
-/* 🟢 Track Style (WebKit - Chrome, Safari, Edge) */
-.custom-slider::-webkit-slider-runnable-track {
-  width: 100%;
-  height: 4px;
-  border-radius: 5px;
-  background: linear-gradient(
-    to right,
-    var(--progress-color) var(--progress-width),
-    #606060 var(--progress-width)
-  ); /* Dynamic Progress */
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.3); /* White with low opacity */
 }
 
-/* 🟣 Hover Effect (WebKit) */
-.custom-slider:hover::-webkit-slider-runnable-track {
-  background: linear-gradient(
-    to right,
-    var(--progress-color) var(--progress-width),
-    #606060 var(--progress-width)
-  );
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.5); /* Slightly more visible on hover */
 }
 
-/* 🟢 Thumb (Chrome, Safari, Edge) */
-.custom-slider::-webkit-slider-thumb {
-  -webkit-appearance: none;
-  appearance: none;
-  width: 16px;
-  height: 16px;
-  border-radius: 50%;
-  background: white;
-  cursor: pointer;
-  margin-top: -5px;
-}
-
-/* 🟢 Track Style (Firefox) */
-.custom-slider::-moz-range-track {
-  width: 100%;
-  height: 6px;
-  border-radius: 5px;
-  background: linear-gradient(
-    to right,
-    var(--progress-color) var(--progress-width),
-    #ddd var(--progress-width)
-  );
-}
-
-/* 🟣 Hover Effect (Firefox) */
-.custom-slider:hover::-moz-range-track {
-  background: linear-gradient(
-    to right,
-    var(--progress-color) var(--progress-width),
-    #ddd var(--progress-width)
-  );
-}
-
-/* 🟢 Thumb (Firefox) */
-.custom-slider::-moz-range-thumb {
-  width: 16px;
-  height: 16px;
-  border-radius: 50%;
-  background: white;
-  cursor: pointer;
-}
-
-/* Hide Default Progress Bar in Firefox */
-.custom-slider::-moz-range-progress {
-  background: transparent;
-}
-
-/* 🎯 Thumb (Chrome, Safari, Edge) */
-.custom-slider::-webkit-slider-thumb {
-  -webkit-appearance: none;
-  appearance: none;
-  width: 16px;
-  height: 16px;
-  border-radius: 50%;
-  background: white;
-  cursor: pointer;
-  margin-top: -5px;
-  transform: scale(0);
-  transition: transform;
-}
-
-/* 🔥 Thumb Hover Effect */
-.custom-slider::-webkit-slider-thumb:hover {
-  transform: scale(0.8); /* Slightly increase size */
-}
-
-/* 🎯 Thumb (Firefox) */
-.custom-slider::-moz-range-thumb {
-  width: 16px;
-  height: 16px;
-  border-radius: 50%;
-  background: white;
-  cursor: pointer;
-  transform: scale(0);
-  transition: transform;
-}
-
-/* 🔥 Thumb Hover Effect (Firefox) */
-.custom-slider::-moz-range-thumb:hover {
-  transform: scale(0.8);
+::-webkit-scrollbar-track {
+  background: transparent; /* Fully transparent track */
 }
 
 .hoverIcon {

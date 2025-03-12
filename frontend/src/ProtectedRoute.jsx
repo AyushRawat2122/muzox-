@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Outlet } from "react-router";
 import { Navigate, useLocation, NavLink } from "react-router";
 import getUser from "./serverDataHooks/getUser.js";
@@ -7,11 +7,19 @@ import { queryClient } from "./utils/axiosRequests.config.js";
 import Loading from "./components/loaders/Loading.jsx";
 import useSideBar from "./store/useSideBar.js";
 import { Panel, PanelGroup, PanelResizeHandle } from "react-resizable-panels";
-import SearchBar from "./components/bars/SearchBar.jsx";
+import { EmptyQueue } from "./components/asset components/index.js";
+import {
+  SearchBar,
+  NavBar,
+  RightSideBar,
+  SoundBar,
+  AudioPlayer,
+} from "./components/bars/index.js";
 import { FaHouse } from "react-icons/fa6";
 import { loadingPlayIcon } from "./utils/lottie.js";
-import NavBar from "./components/bars/NavBar.jsx";
 import { useMediaQuery } from "react-responsive";
+import useAudioPlayer from "./store/useAudioPlayer.js";
+import { ChevronLeft } from "lucide-react";
 
 const ProtectedRoute = () => {
   const location = useLocation();
@@ -19,6 +27,8 @@ const ProtectedRoute = () => {
   const { isSideBarOpen, toggleSideBarOpen } = useSideBar();
   const [leftPanelSize, setLeftPanelSize] = useState(4);
   const [rightPanelSize, setRightPanelSize] = useState(22);
+  const audioRef = useRef(null);
+  const { queue } = useAudioPlayer();
 
   const isDesktopOrLaptop = useMediaQuery({
     query: "(min-width: 1224px)",
@@ -47,7 +57,7 @@ const ProtectedRoute = () => {
       {/* Muzox App is the Wrapper which will have our player and Sidebar or NavBar*/}
       <div className="bg-black text-white h-screen w-screen flex flex-col">
         {/* Global audio element responsible for playing the music */}
-
+        <AudioPlayer ref={audioRef} />
         {/* Top bar */}
         {((isTabletOrMobile && location.pathname === "/") ||
           isDesktopOrLaptop) && (
@@ -123,7 +133,10 @@ const ProtectedRoute = () => {
               maxSize={25}
               defaultSize={rightPanelSize} // Maintain size
               onResize={(size) => setRightPanelSize(size)} // Save size on change
-            ></Panel>
+            >
+              {queue?.length > 0 && <RightSideBar />}
+              {!queue?.length && <EmptyQueue />}
+            </Panel>
           )}
 
           {!isSideBarOpen && (
@@ -137,7 +150,7 @@ const ProtectedRoute = () => {
         </PanelGroup>
 
         {/* Sound Bar for large screen devices and navBar for mobile layouts */}
-
+        {isDesktopOrLaptop && <SoundBar ref={audioRef} />}
         {/* navigation bar which will only render on tablets screen sizes */}
         {isTabletOrMobile && <NavBar />}
       </div>
