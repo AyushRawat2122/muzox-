@@ -32,10 +32,12 @@ const CurrentSongAbout = () => {
         className="rounded-md aspect-square w-full"
         alt="coverImage"
       />
-      <div className="w-full text-clip">
+      <hr className="text-[#ffffff51]"/>
+      <div className="w-full text-clip capitalize">
         <h1 className="text-2xl font-bold">{currentSong?.title}</h1>
         <h2 className="text-lg text-[#c9c9c9]">{currentSong?.artist}</h2>
       </div>
+      <hr className="text-[#ffffff51]"/>
       <div>
         <div className="flex justify-between mb-3">
           <h3 className="text-base capitalize font-bold">next in Queue</h3>

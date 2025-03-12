@@ -74,7 +74,7 @@ const SearchPage = () => {
   return (
     <div className="h-full w-full overflow-y-scroll relative">
       {isTabletOrMobile && (
-        <div className="sticky w-full top-0 p-2 bg-black/70 z-10 rounded-b-md">
+        <div className="sticky w-full top-0 p-2 bg-black/40 z-10 rounded-b-md">
           <div>
             {/* Search bar for mobile users :} */}
             <SearchBar />

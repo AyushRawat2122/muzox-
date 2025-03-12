@@ -15,11 +15,10 @@ import {
   SoundBar,
   AudioPlayer,
 } from "./components/bars/index.js";
-import { FaHouse } from "react-icons/fa6";
 import { loadingPlayIcon } from "./utils/lottie.js";
 import { useMediaQuery } from "react-responsive";
 import useAudioPlayer from "./store/useAudioPlayer.js";
-import { ChevronLeft } from "lucide-react";
+import { ChevronLeft, Home } from "lucide-react";
 
 const ProtectedRoute = () => {
   const location = useLocation();
@@ -55,18 +54,18 @@ const ProtectedRoute = () => {
   return (
     <MuzoxApp className={"max-sm:px-[1px]"}>
       {/* Muzox App is the Wrapper which will have our player and Sidebar or NavBar*/}
-      <div className="bg-black text-white h-screen w-screen flex flex-col">
+      <div className="text-white h-screen w-screen flex flex-col">
         {/* Global audio element responsible for playing the music */}
         <AudioPlayer ref={audioRef} />
         {/* Top bar */}
         {((isTabletOrMobile && location.pathname === "/") ||
           isDesktopOrLaptop) && (
-          <div className="flex py-2 max-lg:justify-between">
+          <div className="flex py-2 max-lg:justify-between  bg-black/50">
             <div>
               <img
-                src="/textLogo.png"
+                src="/MUZOX.png"
                 alt=""
-                className="w-[100px] sm:w-[150px] py-2"
+                className="w-[100px] sm:w-[150px] px-1 py-2"
               />
             </div>
             {isDesktopOrLaptop && (
@@ -74,15 +73,14 @@ const ProtectedRoute = () => {
                 <NavLink
                   to={"/"}
                   className={({ isActive }) =>
-                    isActive ? "text-white" : "muzoxSubText"
+                    isActive ? "text-white" : "text-gray-300"
                   }
                 >
-                  <FaHouse
-                    className=" h-[30px] w-[30px] "
-                    strokeWidth={"3px"}
+                  <Home
+                    className=" h-[35px] w-[35px] "
                   />
                 </NavLink>
-                <div className="w-[450px]">
+                <div className="w-[500px]">
                   <SearchBar></SearchBar>
                 </div>
               </div>
@@ -100,7 +98,7 @@ const ProtectedRoute = () => {
           {/* ✅ LEFT PANEL (Draggable) */}
           {isDesktopOrLaptop && (
             <Panel
-              className="muzoxPanelBg rounded-lg"
+              className="bg-black/40"
               minSize={4}
               maxSize={20}
               defaultSize={leftPanelSize} // Maintain size
@@ -112,23 +110,23 @@ const ProtectedRoute = () => {
 
           {/* ✅ FIRST RESIZE HANDLE */}
           {isDesktopOrLaptop && (
-            <PanelResizeHandle className="w-[1px] m-1 bg-[#393939] cursor-ew-resize" />
+            <PanelResizeHandle className="w-[1px]  bg-gray-300/60 cursor-ew-resize" />
           )}
 
           {/* ✅ MIDDLE PANEL (Auto-Adjust) */}
-          <Panel className="muzoxPanelBg rounded-lg">
+          <Panel className="bg-black/30">
             <Outlet />
           </Panel>
 
           {/* ✅ LAST RESIZE HANDLE */}
           {isDesktopOrLaptop && isSideBarOpen && (
-            <PanelResizeHandle className="w-[1px] m-1 bg-[#393939] cursor-ew-resize" />
+            <PanelResizeHandle className="w-[1px] bg-gray-300/60 cursor-ew-resize" />
           )}
 
           {/* ✅ RIGHT PANEL (Draggable) */}
           {isDesktopOrLaptop && isSideBarOpen && (
             <Panel
-              className="muzoxPanelBg rounded-lg"
+              className=" bg-black/40"
               minSize={15}
               maxSize={25}
               defaultSize={rightPanelSize} // Maintain size
@@ -141,7 +139,7 @@ const ProtectedRoute = () => {
 
           {!isSideBarOpen && (
             <button
-              className="h-full w-[30px] cursor-pointer ml-2 muzoxPanelBg hover:bg-[#1d1d1dc9] text-[#5f5f5f] hover:text-white rounded-l-lg"
+              className="h-full w-[30px] cursor-pointer bg-black/40 hover:bg-black/60 text-[#ececec] hover:text-white"
               onClick={toggleSideBarOpen}
             >
               <ChevronLeft strokeWidth={1.75} />

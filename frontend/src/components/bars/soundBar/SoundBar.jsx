@@ -1,15 +1,15 @@
 import React, { useState, useEffect, useRef, forwardRef } from "react";
 import { IoPlaySkipBackSharp, IoPlaySkipForwardSharp } from "react-icons/io5";
-import { IoIosPause, IoIosPlay } from "react-icons/io";
 import { PiRepeat } from "react-icons/pi";
 import { RxShuffle } from "react-icons/rx";
 import { LiaMicrophoneAltSolid } from "react-icons/lia";
-import { Volume, Volume1, Volume2, VolumeOff, VolumeX } from "lucide-react";
+import { Volume, Volume1, Volume2, VolumeOff, VolumeX ,PlayIcon ,Pause } from "lucide-react";
 import useAudioPlayer from "../../../store/useAudioPlayer.js";
 import SeekBar from "./sound-bar-components/SeekBar";
 import { HiOutlineQueueList } from "react-icons/hi2";
 import TrackDisplay from "./sound-bar-components/TrackDisplay";
 import useSideBar from "../../../store/useSideBar.js";
+
 const SoundBar = forwardRef((props, ref) => {
   const [currentPosition, setCurrentPosition] = useState(0);
   const [duration, setDuration] = useState(0);
@@ -106,7 +106,7 @@ const SoundBar = forwardRef((props, ref) => {
 
   const toggleLoop = () => {
     if (!audio) return;
-
+    console.log(isLoop)
     if (audio.loop) {
       audio.loop = false;
       setIsLoop(false);
@@ -127,8 +127,8 @@ const SoundBar = forwardRef((props, ref) => {
   }; //toggle the shuffle functionality
 
   return (
-    <div className={`${className} w-full bg-black text-white`}>
-      <div className="flex w-full flex-col lg:flex-row gap-2.5 px-2.5 pt-2">
+    <div className={`${className} w-full bg-black/60 text-white`}>
+      <div className="flex w-full flex-col lg:flex-row gap-2.5 px-2.5">
         {/* Current song information */}
         <div className="w-full lg:w-[20%]">
           <TrackDisplay />
@@ -137,7 +137,7 @@ const SoundBar = forwardRef((props, ref) => {
         {/* Current song seek + control */}
         <div className="flex flex-col-reverse lg:flex-col w-full lg:w-[60%]">
           {/* Song Controls */}
-          <div className="flex justify-between lg:justify-center items-center px-2 gap-2 bg-transparent">
+          <div className="flex justify-between lg:justify-center items-center px-2 pt-2 gap-2 bg-transparent">
             {/* Shuffle */}
             <button className="h-8 w-8 rounded-full relative" onClick={toggleShuffle}>
               <RxShuffle
@@ -155,13 +155,13 @@ const SoundBar = forwardRef((props, ref) => {
               </button>
               {/* Play || Pause */}
               <button
-                className="h-10 w-10 rounded-full relative bg-white text-2xl hover:scale-110 hover:text-3xl transition-transform duration-0"
+                className=" w-10 text-white rounded-full relative text-3xl"
                 onClick={togglePlay}
               >
                 {isPlaying ? (
-                  <IoIosPause title="pause" className="adjustCenter text-black" />
+                  <Pause title="pause " className="adjustCenter" size={30}/>
                 ) : (
-                  <IoIosPlay title="play" className="adjustCenter  ml-[2px] text-black" />
+                  <PlayIcon title="play" className="adjustCenter" size={30}/>
                 )}
               </button>
               {/* PlayNext */}
@@ -176,7 +176,7 @@ const SoundBar = forwardRef((props, ref) => {
             <button className="h-8 w-8 rounded-full relative" onClick={toggleLoop}>
               <PiRepeat
                 title="repeat"
-                className={(isLoop ? "text-[#ff00ff]" : "hoverIcon") + " adjustCenter text-xl"}
+                className={`${isLoop ? "text-[#ff00ff]" : "text-gray-300"} adjustCenter text-xl`}
               />
             </button>
           </div>

@@ -11,7 +11,7 @@ const SearchListSongCard = ({ song }) => {
   };
   const { initializeQueue } = useAudioPlayer();
   const { artist, coverImage, title, duration } = song;
-  console.log(song);
+  
   const handleClick = (e) => {
     e.stopPropagation();
     initializeQueue([song]);
@@ -25,7 +25,7 @@ const SearchListSongCard = ({ song }) => {
   };
   return (
     <div
-      className="w-full p-2 muzoxSubBgHover flex rounded-sm overflow-hidden gap-2"
+      className="w-full p-2 hover:bg-black/20 flex rounded-sm overflow-hidden gap-2 items-center"
       onMouseEnter={displayPlayIcon}
       onMouseLeave={hidePlayIcon}
       onClick={handleClick}
@@ -43,12 +43,12 @@ const SearchListSongCard = ({ song }) => {
           className="h-full w-full aspect-square"
         />
       </div>
-      <div className="grow flex justify-between">
+      <div className="grow flex justify-between items-center">
         <div>
-          <h1>{title}</h1>
-          <p className="muzoxSubText">{artist}</p>
+          <h1 className="capitalize">{title}</h1>
+          <p className="text-gray-300">{artist}</p>
         </div>
-        <p className="text-sm muzoxSubText">{convertToMinSecFormat(duration)}</p>
+        <p className="text-sm text-gray-300">{convertToMinSecFormat(duration)}</p>
       </div>
       <button className="hoverIcon">
         <Ellipsis />

@@ -15,7 +15,7 @@ const TrackDisplay = () => {
       {/* Image of the current song playing */}
       <div className="">
         <img
-          src={currentSong?.coverImage?.url || "/tempTrackCover.jpg"}
+          src={currentSong?.coverImage?.url || "/tempTrackCover.png"}
           className="max-h-12 lg:max-h-14 max-w-12 lg:max-w-14 rounded-sm"
           alt="song Image"
         />
@@ -23,7 +23,7 @@ const TrackDisplay = () => {
       {currentSong ? (
         <div className="flex w-full h-full justify-between lg:justify-normal items-center gap-2.5">
           {" "}
-          <div>
+          <div className=" capitalize">
             <p className="cursor-pointer  hover:underline underline-offset-2">
               {currentSong.title}
             </p>
@@ -33,7 +33,7 @@ const TrackDisplay = () => {
           </div>
           <button onClick={handleLikeChange}>
             {liked ? (
-              <GoHeartFill className="text-[#ff00ff]" />
+              <GoHeartFill className="text-[#07ffd7]" />
             ) : (
               <GoHeart className="hoverIcon" />
             )}

@@ -23,11 +23,11 @@ const SearchBar = () => {
 
   return (
     <div
-      className={`flex w-full items-center rounded-md muzoxSubBg muzoxSubBgHover p-2 lg:rounded-full px-3 ${
-        isFocused ? "border border-white" : ""
+      className={`flex w-full items-center rounded-md bg-black/20 active:bg-black/30 p-2 lg:rounded-full px-3 ${
+        isFocused ? "border-3 border-[#07ffd69d]" : ""
       } overflow-hidden`}
     >
-      <Search className="muzoxSubText" />
+      <Search className="text-gray-300" />
       <input
         className="outline-none grow text-lg px-2"
         onFocus={handleFocus}
