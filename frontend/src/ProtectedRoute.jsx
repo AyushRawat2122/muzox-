@@ -60,11 +60,11 @@ const ProtectedRoute = () => {
         {/* Top bar */}
         {((isTabletOrMobile && location.pathname === "/") ||
           isDesktopOrLaptop) && (
-          <div className="flex py-2 max-lg:justify-between  bg-black/50">
+          <div className="flex py-2 max-lg:justify-between bg-black/50">
             <div>
               <img
                 src="/MUZOX.png"
-                alt=""
+                alt="logo"
                 className="w-[100px] sm:w-[150px] px-1 py-2"
               />
             </div>
@@ -76,16 +76,23 @@ const ProtectedRoute = () => {
                     isActive ? "text-white" : "text-gray-300"
                   }
                 >
-                  <Home
-                    className=" h-[35px] w-[35px] "
-                  />
+                  <Home className=" h-[35px] w-[35px] " />
                 </NavLink>
                 <div className="w-[500px]">
                   <SearchBar></SearchBar>
                 </div>
               </div>
             )}
-            <div>User</div>
+            <div className="flex gap-2 px-2">
+              <NavLink to={"/premium"}>
+                <button className="gradient-btn w-[200px] h-[40px]">
+                  Explore Premium
+                </button>
+              </NavLink>
+              <button className="bg-white h-[40px] w-[40px] text-2xl text-center text-black rounded-full">
+                A
+              </button>
+            </div>
           </div>
         )}
 
@@ -103,6 +110,7 @@ const ProtectedRoute = () => {
               maxSize={20}
               defaultSize={leftPanelSize} // Maintain size
               onResize={(size) => setLeftPanelSize(size)} // Save size on change
+              id="left-panel"
             >
               <div>Hey</div>
             </Panel>
@@ -110,17 +118,17 @@ const ProtectedRoute = () => {
 
           {/* ✅ FIRST RESIZE HANDLE */}
           {isDesktopOrLaptop && (
-            <PanelResizeHandle className="w-[1px]  bg-gray-300/60 cursor-ew-resize" />
+            <PanelResizeHandle className="w-[1px]  bg-gray-300/60 cursor-ew-resize" id={"left-panel-handle"} />
           )}
 
           {/* ✅ MIDDLE PANEL (Auto-Adjust) */}
-          <Panel className="bg-black/30">
+          <Panel className="bg-black/30" id="middle-panel">
             <Outlet />
           </Panel>
 
           {/* ✅ LAST RESIZE HANDLE */}
           {isDesktopOrLaptop && isSideBarOpen && (
-            <PanelResizeHandle className="w-[1px] bg-gray-300/60 cursor-ew-resize" />
+            <PanelResizeHandle className="w-[1px] bg-gray-300/60 cursor-ew-resize"  id={"right-panel-handle"}/>
           )}
 
           {/* ✅ RIGHT PANEL (Draggable) */}
@@ -131,6 +139,7 @@ const ProtectedRoute = () => {
               maxSize={25}
               defaultSize={rightPanelSize} // Maintain size
               onResize={(size) => setRightPanelSize(size)} // Save size on change
+              id="right-panel"
             >
               {queue?.length > 0 && <RightSideBar />}
               {!queue?.length && <EmptyQueue />}
@@ -139,7 +148,7 @@ const ProtectedRoute = () => {
 
           {!isSideBarOpen && (
             <button
-              className="h-full w-[30px] cursor-pointer bg-black/40 hover:bg-black/60 text-[#ececec] hover:text-white"
+              className="h-full w-[30px] cursor-pointer bg-white/2 hover:bg-white/5 text-[#ececec] hover:text-white"
               onClick={toggleSideBarOpen}
             >
               <ChevronLeft strokeWidth={1.75} />

@@ -7,7 +7,7 @@ const loadingMic =
 const floatingMusicIcons =
   "https://lottie.host/6d00caa2-9327-4910-8721-54a6e4979078/p9kM7TwmbD.lottie";
 const loadingDots =
-  "https://lottie.host/788f49d3-483c-4e5e-8220-2cc1f7c4d901/VB99PJDldB.lottie";
+  "https://lottie.host/344e03a7-c69d-4ef8-b8a7-b220633f16bd/WDe1AH2Dso.json";
 export {
   loadingVibrations,
   loadingPlayIcon,

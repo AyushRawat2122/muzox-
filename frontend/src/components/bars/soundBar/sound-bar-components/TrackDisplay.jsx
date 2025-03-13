@@ -2,21 +2,21 @@ import React, { useState } from "react";
 import { GoHeart, GoHeartFill } from "react-icons/go";
 import "../soundBar.css";
 import useAudioPlayer from "../../../../store/useAudioPlayer.js";
-import useSideBar from "../../../../store/useSideBar.js";
+
 const TrackDisplay = () => {
   const { currentSong } = useAudioPlayer();
   const [liked, setLiked] = useState(false);
   const handleLikeChange = () => {
     setLiked((prev) => !prev);
   };
-  const { isSideBarOpen, toggleSideBarOpen } = useSideBar();
+
   return (
     <div className="h-full w-full flex items-center gap-2 py-1 lg:p-0">
       {/* Image of the current song playing */}
-      <div className="">
+      <div className="h-[50px] w-[50px] aspect-square">
         <img
           src={currentSong?.coverImage?.url || "/tempTrackCover.png"}
-          className="max-h-12 lg:max-h-14 max-w-12 lg:max-w-14 rounded-sm"
+          className="h-full w-full rounded-sm object-cover"
           alt="song Image"
         />
       </div>
@@ -33,7 +33,7 @@ const TrackDisplay = () => {
           </div>
           <button onClick={handleLikeChange}>
             {liked ? (
-              <GoHeartFill className="text-[#07ffd7]" />
+              <GoHeartFill className="text-[#fe7641]" />
             ) : (
               <GoHeart className="hoverIcon" />
             )}

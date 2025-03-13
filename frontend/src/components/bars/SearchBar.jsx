@@ -24,7 +24,7 @@ const SearchBar = () => {
   return (
     <div
       className={`flex w-full items-center rounded-md bg-black/20 active:bg-black/30 p-2 lg:rounded-full px-3 ${
-        isFocused ? "border-3 border-[#07ffd69d]" : ""
+        isFocused ? "border-3 border-[#fe7641]" : ""
       } overflow-hidden`}
     >
       <Search className="text-gray-300" />
@@ -33,6 +33,8 @@ const SearchBar = () => {
         onFocus={handleFocus}
         onBlur={() => {
           setIsFocused(false);
+          updateSearchQuery("");
+          setQuery("")
         }}
         onChange={handleChange}
         type="text"

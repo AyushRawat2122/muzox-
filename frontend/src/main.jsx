@@ -10,6 +10,7 @@ import {
   LibraryPage,
   PremiumPage,
   SearchPage,
+  LyricsPage,
 } from "./pages/securePages/index.js";
 import { queryClient } from "./utils/axiosRequests.config.js";
 import ProtectedRoute from "./ProtectedRoute.jsx";
@@ -30,6 +31,7 @@ const route = createBrowserRouter([
           { path: "/search", element: <SearchPage /> },
           { path: "/library", element: <LibraryPage /> },
           { path: "/premium", element: <PremiumPage /> },
+          { path: "/lyrics", element: <LyricsPage /> },
         ],
       },
     ],

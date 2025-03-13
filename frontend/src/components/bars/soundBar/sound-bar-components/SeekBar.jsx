@@ -29,7 +29,7 @@ const SeekBar = ({
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
       style={{
-        "--progress-color": isHovered ? "#07ffd69d" : "white",
+        "--progress-color": isHovered ? "#fe7641" : "#ffff",
         "--progress-width": `${progress}%`,
       }}
     />

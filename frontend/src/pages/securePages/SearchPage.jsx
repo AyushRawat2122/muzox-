@@ -4,17 +4,12 @@ import { normalRequest } from "../../utils/axiosRequests.config.js";
 import useSearchQuery from "../../store/useSearchQuery.js";
 import { debounce } from "lodash";
 import { Search } from "lucide-react";
-import Loading from "../../components/loaders/Loading.jsx";
-import { loadingDots } from "../../utils/lottie.js";
 import { useMediaQuery } from "react-responsive";
 import { SearchListSongCard } from "../../components/asset components/index.js";
 import { SearchBar } from "../../components/bars";
-
+import { DotLottieReact } from "@lottiefiles/dotlottie-react";
 const SearchPage = () => {
   const { searchQuery } = useSearchQuery();
-  const isDesktopOrLaptop = useMediaQuery({
-    query: "(min-width: 1224px)",
-  });
   const isTabletOrMobile = useMediaQuery({ query: "(max-width: 1224px)" });
   const abortController = useRef(null);
   const [playlists, setPlaylists] = useState([]);
@@ -67,9 +62,18 @@ const SearchPage = () => {
     }
   }, [searchQuery]);
 
-  // if(loading){
-  //   return <Loading src={"loadingDots"} />
-  // }
+  if (loading) {
+    return (
+      <div className="h-full w-full flex justify-center items-center">
+        {" "}
+        <DotLottieReact
+          src="https://lottie.host/b6ed7211-8749-45d9-8ed6-a50acf95d33f/m7v5QYV6qA.lottie"
+          loop
+          autoplay
+        />
+      </div>
+    );
+  }
 
   return (
     <div className="h-full w-full overflow-y-scroll relative">
@@ -83,7 +87,7 @@ const SearchPage = () => {
       )}
       {playlists.length === 0 && songs.length === 0 && searchQuery === "" && (
         <div className="h-full w-full flex justify-center items-center underline decoration-1 underline-offset-8 decoration-white">
-          <p className="text-white text-lg sm:text-2xl italic px-3 text-center">
+          <p className="text-white text-base italic px-3 text-center">
             <Search className="inline" />
             Looking for something? Type a song name to begin your search!{" "}
           </p>
@@ -91,9 +95,20 @@ const SearchPage = () => {
       )}
       {playlists.length === 0 && songs.length === 0 && searchQuery !== "" && (
         <div className="h-full w-full flex justify-center items-center underline decoration-1 underline-offset-8 decoration-white">
-          <p className="text-white text-lg sm:text-2xl italic px-3 text-center">
+          <p className="text-white text-base italic px-3 text-center">
             No results found !!
           </p>
+        </div>
+      )}
+
+      {loading && (
+        <div className="h-full w-full flex justify-center items-center">
+          {" "}
+          <DotLottieReact
+            src="https://lottie.host/b6ed7211-8749-45d9-8ed6-a50acf95d33f/m7v5QYV6qA.lottie"
+            loop
+            autoplay
+          />
         </div>
       )}
 

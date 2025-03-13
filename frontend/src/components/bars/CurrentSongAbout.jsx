@@ -29,7 +29,7 @@ const CurrentSongAbout = () => {
     <div className="h-full w-full p-2 flex flex-col gap-5 relative">
       <img
         src={currentSong?.coverImage?.url || null}
-        className="rounded-md aspect-square w-full"
+        className="rounded-md aspect-square w-full object-cover"
         alt="coverImage"
       />
       <hr className="text-[#ffffff51]"/>

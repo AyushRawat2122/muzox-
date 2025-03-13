@@ -9,7 +9,7 @@ const QueueBar = ({ className, isRecentTabOpen }) => {
         <div className="h-full w-full flex flex-col gap-5 py-3 text-sm font-bold capitalize">
           <div>
             <h1 className="py-2">Now playing</h1>
-            <SideBarMusicCards className={"text-[#07ffd69d]"} Song={currentSong} />
+            <SideBarMusicCards className={"text-[#fe7641]"} Song={currentSong} />
           </div>
           <div>
             <h1 className="py-2">Up Next</h1>
@@ -28,7 +28,7 @@ const QueueBar = ({ className, isRecentTabOpen }) => {
                 }
               })}
               {currentSongIdx === queue.length-1 && 
-              <p className="font-normal text-base italic text-center underline-offset-8 underline decoration-white decoration-1">
+              <p className="font-normal text-sm italic text-center underline-offset-8 underline decoration-white decoration-1">
               The playlist has ended. Pick another vibe!
               </p>}
             </div>

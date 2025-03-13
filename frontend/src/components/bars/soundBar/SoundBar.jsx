@@ -3,12 +3,21 @@ import { IoPlaySkipBackSharp, IoPlaySkipForwardSharp } from "react-icons/io5";
 import { PiRepeat } from "react-icons/pi";
 import { RxShuffle } from "react-icons/rx";
 import { LiaMicrophoneAltSolid } from "react-icons/lia";
-import { Volume, Volume1, Volume2, VolumeOff, VolumeX ,PlayIcon ,Pause } from "lucide-react";
+import {
+  Volume,
+  Volume1,
+  Volume2,
+  VolumeOff,
+  VolumeX,
+  PlayIcon,
+  Pause,
+} from "lucide-react";
 import useAudioPlayer from "../../../store/useAudioPlayer.js";
 import SeekBar from "./sound-bar-components/SeekBar";
 import { HiOutlineQueueList } from "react-icons/hi2";
 import TrackDisplay from "./sound-bar-components/TrackDisplay";
 import useSideBar from "../../../store/useSideBar.js";
+import { NavLink } from "react-router";
 
 const SoundBar = forwardRef((props, ref) => {
   const [currentPosition, setCurrentPosition] = useState(0);
@@ -18,11 +27,19 @@ const SoundBar = forwardRef((props, ref) => {
   const [isMuted, setIsMuted] = useState(false);
   const [isLoop, setIsLoop] = useState(false);
 
-  const { isShuffled, shuffleQueue, shuffleBack, isPlaying, playNext, playPrev, togglePlayPause } =
-    useAudioPlayer();
+  const {
+    isShuffled,
+    shuffleQueue,
+    shuffleBack,
+    isPlaying,
+    playNext,
+    playPrev,
+    togglePlayPause,
+  } = useAudioPlayer();
   const { isQueueDisplayed, toggleQueueDisplay } = useSideBar();
   const audio = ref?.current?.getAudioElement(); // this will bring us the audio ref
   const className = props?.className;
+
   useEffect(() => {
     if (!audio) {
       return;
@@ -57,7 +74,8 @@ const SoundBar = forwardRef((props, ref) => {
   const convertToMinSecFormat = (number) => {
     const min = Math.floor(number / 60); //get min
     const sec = Math.floor(number % 60); //get seconds
-    const convertedStr = String(min).padStart(1, "0") + ":" + String(sec).padStart(1, "0");
+    const convertedStr =
+      String(min).padStart(1, "0") + ":" + String(sec).padStart(1, "0");
     return convertedStr;
   };
 
@@ -106,7 +124,7 @@ const SoundBar = forwardRef((props, ref) => {
 
   const toggleLoop = () => {
     if (!audio) return;
-    console.log(isLoop)
+    console.log(isLoop);
     if (audio.loop) {
       audio.loop = false;
       setIsLoop(false);
@@ -139,15 +157,24 @@ const SoundBar = forwardRef((props, ref) => {
           {/* Song Controls */}
           <div className="flex justify-between lg:justify-center items-center px-2 pt-2 gap-2 bg-transparent">
             {/* Shuffle */}
-            <button className="h-8 w-8 rounded-full relative" onClick={toggleShuffle}>
+            <button
+              className="h-8 w-8 rounded-full relative"
+              onClick={toggleShuffle}
+            >
               <RxShuffle
                 title="shuffle"
-                className={(isShuffled ? "text-[#ff00ff]" : "hoverIcon") + " adjustCenter text-xl"}
+                className={
+                  (isShuffled ? "text-[#fe7641]" : "hoverIcon") +
+                  " adjustCenter text-xl"
+                }
               />
             </button>
             <div className="flex justify-center items-center gap-2">
               {/* PlayPrevious */}
-              <button className="h-8 w-8 rounded-full relative" onClick={playPrevSong}>
+              <button
+                className="h-8 w-8 rounded-full relative"
+                onClick={playPrevSong}
+              >
                 <IoPlaySkipBackSharp
                   title="play next"
                   className="adjustCenter hoverIcon text-2xl"
@@ -159,13 +186,16 @@ const SoundBar = forwardRef((props, ref) => {
                 onClick={togglePlay}
               >
                 {isPlaying ? (
-                  <Pause title="pause " className="adjustCenter" size={30}/>
+                  <Pause title="pause " className="adjustCenter" size={30} />
                 ) : (
-                  <PlayIcon title="play" className="adjustCenter" size={30}/>
+                  <PlayIcon title="play" className="adjustCenter" size={30} />
                 )}
               </button>
               {/* PlayNext */}
-              <button className="h-8 w-8 rounded-full relative " onClick={playNextSong}>
+              <button
+                className="h-8 w-8 rounded-full relative "
+                onClick={playNextSong}
+              >
                 <IoPlaySkipForwardSharp
                   title="play next"
                   className="adjustCenter hoverIcon text-2xl"
@@ -173,10 +203,15 @@ const SoundBar = forwardRef((props, ref) => {
               </button>
             </div>
             {/* Repeat */}
-            <button className="h-8 w-8 rounded-full relative" onClick={toggleLoop}>
+            <button
+              className="h-8 w-8 rounded-full relative"
+              onClick={toggleLoop}
+            >
               <PiRepeat
                 title="repeat"
-                className={`${isLoop ? "text-[#ff00ff]" : "text-gray-300"} adjustCenter text-xl`}
+                className={`${
+                  isLoop ? "text-[#fe7641]" : "text-gray-300"
+                } adjustCenter text-xl`}
               />
             </button>
           </div>
@@ -208,9 +243,19 @@ const SoundBar = forwardRef((props, ref) => {
         {/* Playback controls like volume + lyrics + queue */}
         <div className="hidden lg:flex flex-wrap gap-3  w-[20%] justify-end px-2.5">
           {/* Lyrics */}
-          <button>
-            <LiaMicrophoneAltSolid title="lyrics" className="hoverIcon text-2xl" />
-          </button>
+
+          <NavLink
+            to={"/lyrics"}
+            className={({ isActive }) =>
+              isActive ? "text-[#fe7641] flex justify-center items-center" : "text-gray-300 flex justify-center items-center"
+            }
+          >
+            <LiaMicrophoneAltSolid
+              title="lyrics"
+              className="text-2xl"
+            />
+          </NavLink>
+
           {/* Queue */}
           <button
             onClick={() => {
@@ -219,7 +264,9 @@ const SoundBar = forwardRef((props, ref) => {
           >
             <HiOutlineQueueList
               title="queue"
-              className={`${isQueueDisplayed ? "text-white" : "hoverIcon"} text-2xl`}
+              className={`${
+                isQueueDisplayed ? "text-[#fe7641]" : "hoverIcon"
+              } text-2xl`}
             />
           </button>
           {/* Sound Seek */}
@@ -239,7 +286,12 @@ const SoundBar = forwardRef((props, ref) => {
               )}
             </button>
             {/* Set Sound In Range */}
-            <SeekBar min={0} max={100} value={volume} onChange={handleVolumeChange} />
+            <SeekBar
+              min={0}
+              max={100}
+              value={volume}
+              onChange={handleVolumeChange}
+            />
           </div>
         </div>
       </div>

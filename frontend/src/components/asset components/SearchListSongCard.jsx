@@ -25,12 +25,12 @@ const SearchListSongCard = ({ song }) => {
   };
   return (
     <div
-      className="w-full p-2 hover:bg-black/20 flex rounded-sm overflow-hidden gap-2 items-center"
+      className="w-full p-2 hover:bg-white/5 flex rounded-sm overflow-hidden gap-2 items-center"
       onMouseEnter={displayPlayIcon}
       onMouseLeave={hidePlayIcon}
       onClick={handleClick}
     >
-      <div className="relative h-[50px] w-[50px] rounded-md overflow-hidden">
+      <div className="relative h-[50px] w-[50px] rounded-md overflow-hidden aspect-square object-cover">
         {playIcon && (
           <Play
             className="absolute bg-black/50 h-full w-full p-3"
