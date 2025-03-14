@@ -1,11 +1,23 @@
-import React from 'react';
+import React from "react";
+import usePopUp from "../../store/usePopUp";
 
-const Home = () => {
-    return (
-        <div className='text-white text-5xl'>
-            This is home :{'}'}
-        </div>
-    );
-}
+const HomePage = () => {
+  const { toggleAddPopUp } = usePopUp();
+  return (
+    <div className="text-white text-5xl">
+      This is home :{"}"}
+      <button
+        className="p-2 border border-amber-700"
+        onClick={() => {
+          console.log("clicked");
+          toggleAddPopUp();
+        }}
+      >
+        {" "}
+        open popup{" "}
+      </button>
+    </div>
+  );
+};
 
-export default Home;
+export default HomePage;

@@ -2,7 +2,10 @@
 
 * {
   font-family: "Plus Jakarta Sans", sans-serif;
-  transition: all ease-in-out 0.2s;
+}
+
+.apply-transition {
+  transition: all ease-in-out 0.1s;
 }
 
 body {
@@ -37,11 +40,30 @@ button {
   cursor: pointer;
   transition: all 0.3s ease-in-out;
 }
+.gradientBg {
+  background: rgb(0, 0, 0);
+  background: -moz-linear-gradient(
+    149deg,
+    rgba(0, 0, 0, 1) 46%,
+    rgba(77, 77, 77, 1) 100%
+  );
+  background: -webkit-linear-gradient(
+    149deg,
+    rgba(0, 0, 0, 1) 46%,
+    rgba(77, 77, 77, 1) 100%
+  );
+  background: linear-gradient(
+    149deg,
+    rgba(0, 0, 0, 1) 46%,
+    rgba(77, 77, 77, 1) 100%
+  );
+  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr="#000000",endColorstr="#4d4d4d",GradientType=1);
+}
 
 .gradient-btn:hover {
-  color:white;
+  color: white;
   font-weight: 900;
-  font:bolder;
+  font: bolder;
   background: linear-gradient(
     to right,
     #ff4800,
@@ -137,7 +159,6 @@ button {
   -webkit-user-select: none; /* Safari */
   -ms-user-select: none; /* Older Edge */
 }
-
 
 /* Epic css shit */
 

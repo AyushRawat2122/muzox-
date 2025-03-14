@@ -5,7 +5,7 @@ import { Search, X } from "lucide-react";
 const SearchBar = () => {
   const location = useLocation();
   const navigate = useNavigate();
-  const { updateSearchQuery, searchQuery } = useSearchQuery();
+  const { updateSearchQuery } = useSearchQuery();
   const [isFocused, setIsFocused] = useState(false);
   const [query, setQuery] = useState("");
   const handleChange = (e) => {
@@ -25,7 +25,7 @@ const SearchBar = () => {
     <div
       className={`flex w-full items-center rounded-md bg-black/20 active:bg-black/30 p-2 lg:rounded-full px-3 ${
         isFocused ? "border-3 border-[#fe7641]" : ""
-      } overflow-hidden`}
+      } overflow-hidden apply-transition`}
     >
       <Search className="text-gray-300" />
       <input
@@ -34,7 +34,7 @@ const SearchBar = () => {
         onBlur={() => {
           setIsFocused(false);
           updateSearchQuery("");
-          setQuery("")
+          setQuery("");
         }}
         onChange={handleChange}
         type="text"
