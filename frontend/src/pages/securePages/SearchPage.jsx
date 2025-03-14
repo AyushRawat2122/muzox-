@@ -104,11 +104,13 @@ const SearchPage = () => {
       {loading && (
         <div className="h-full w-full flex justify-center items-center">
           {" "}
-          <DotLottieReact
-            src="https://lottie.host/b6ed7211-8749-45d9-8ed6-a50acf95d33f/m7v5QYV6qA.lottie"
-            loop
-            autoplay
-          />
+          <div className="h-[100px] w-[200px]">
+            <DotLottieReact
+              src="https://lottie.host/b6ed7211-8749-45d9-8ed6-a50acf95d33f/m7v5QYV6qA.lottie"
+              loop
+              autoplay
+            />
+          </div>
         </div>
       )}
 

@@ -22,7 +22,7 @@ const createPlayList = asyncHandler(async (req, res, next) => {
   if (playListCoverLocal) {
     playListCover = await uploadOnCloudinary(playListCoverLocal);
     if (!playListCover) {
-      next( new ApiError(500, "something went wrong while uploading coverImg"));
+      next(new ApiError(500, "something went wrong while uploading coverImg"));
     }
   } //we ll upload only if user wants to upload file if he doesnt it's okay
 
@@ -43,24 +43,22 @@ const createPlayList = asyncHandler(async (req, res, next) => {
 
 //delete PlayList
 
-const deletePlayList = asyncHandler(async (req, res , next) => {
+const deletePlayList = asyncHandler(async (req, res, next) => {
   const { playListID } = req.params;
   const { _id } = req.user;
 
-
   if (playListID === "") {
-    next( new ApiError(400, "ID is not found try again later"));
+    next(new ApiError(400, "ID is not found try again later"));
   }
 
   const playList = await Playlist.findById(playListID);
 
-
   if (!playList) {
-    next( new ApiError(404, "Playlist not found"));
+    next(new ApiError(404, "Playlist not found"));
   }
 
   if (_id?.toString() !== playList?.owner?.toString()) {
-    next( new ApiError(400, "you are not authorized to delete this playlist"));
+    next(new ApiError(400, "you are not authorized to delete this playlist"));
   }
 
   const picToDelete = playList?.playListCover?.public_id;
@@ -75,9 +73,7 @@ const deletePlayList = asyncHandler(async (req, res , next) => {
 
 //add to PlayList
 const addToPlayList = asyncHandler(async (req, res, next) => {
-  console.log("hi");
   const { playListID, songId } = req.params;
-  console.log(typeof playListID, songId);
   const { _id } = req.user;
 
   const playlist = await Playlist.findOneAndUpdate(
@@ -86,7 +82,7 @@ const addToPlayList = asyncHandler(async (req, res, next) => {
         { _id: new mongoose.Types.ObjectId(playListID) },
         { owner: new mongoose.Types.ObjectId(_id) },
       ],
-    }, //samjha nai say propely
+    },
     {
       $addToSet: {
         songs: new mongoose.Types.ObjectId(songId),
@@ -98,7 +94,7 @@ const addToPlayList = asyncHandler(async (req, res, next) => {
   );
 
   if (!playlist) {
-    next( new ApiError(404, "Internal Server error "));
+    next(new ApiError(404, "Internal Server error "));
   }
   return res
     .status(201)
@@ -108,12 +104,12 @@ const addToPlayList = asyncHandler(async (req, res, next) => {
 });
 
 //remove from PlayList
-const removeFromPlayList = asyncHandler(async (req, res , next) => {
+const removeFromPlayList = asyncHandler(async (req, res, next) => {
   const { playListID, songId } = req.params;
   const { _id } = req.user;
   const playlist = await Playlist.findById(playListID);
   if (!playlist) {
-    next( new ApiError(404, "Playlist or Song not found"));
+    next(new ApiError(404, "Playlist or Song not found"));
   }
   if (playlist.owner?.toString() !== _id.toString()) {
     return new ApiError(400, "You are not the owner of this playlist");
@@ -138,7 +134,7 @@ const removeFromPlayList = asyncHandler(async (req, res , next) => {
 const togglePlayListStatus = asyncHandler(async (req, res) => {
   const { playListID } = req.params;
   if (!playListID) {
-    next( new ApiError(400, "Playlist id is required to toggle publish status"));
+    next(new ApiError(400, "Playlist id is required to toggle publish status"));
   }
   await Playlist.findByIdAndUpdate(
     playListID,
@@ -170,44 +166,80 @@ const searchPlaylist = asyncHandler(async (req, res) => {
 
 // umm okay Idk much about this we ll see this while building frontend : )
 const addThisPlaylist = asyncHandler(async (req, res) => {
-
   const { playListId } = req.params;
 
   if (!playListId) {
-    next( new ApiError(400, "Playlist id is required to add to User playlists"));
+    next(new ApiError(400, "Playlist id is required to add to User playlists"));
   }
 
   const { _id } = req.user;
   const userUpdatedPlaylist = await User.findByIdAndUpdate(
     _id,
-    { $addToSet: { playlists: new mongoose.Types.ObjectId(playListId)} }, 
+    { $addToSet: { playlists: new mongoose.Types.ObjectId(playListId) } },
     { new: true }
   );
 
-  return res.status(200).json(
-    new ApiResponse(
-      200,
-      userUpdatedPlaylist,
-      "Playlist added to your collection successfully"
-    )
-  );
+  return res
+    .status(200)
+    .json(
+      new ApiResponse(
+        200,
+        userUpdatedPlaylist,
+        "Playlist added to your collection successfully"
+      )
+    );
 });
-const getUserPlaylists=asyncHandler(async(req,res)=>{
-  
-  const {_id}=req.user;
+const removeFromLibrary = asyncHandler(async (req,res,next) => {
+  const { playListId } = req.params;
 
-  const populatedPlaylists=await User.findById(_id).populate("playlists").select("playlists");
+  if (!playListId) {
+    next(new ApiError(400, "Playlist id is required to remove from User playlists"));
+  }
 
-  const userCreatedPlaylist=await Playlist.find(
-    { owner: new mongoose.Types.ObjectId(_id)},
-  )
-  
-  const data=[...populatedPlaylists,...userCreatedPlaylist];
-  
-  return res.status(200).json(new ApiResponse(200, data, "User playlists"));
+  const { _id } = req.user;
+  const userUpdatedPlaylist = await User.findByIdAndUpdate(
+    _id,
+    { $pull: { playlists: new mongoose.Types.ObjectId(playListId) } }, // 🔥 Remove playlist
+    { new: true }
+  );
 
+  if(!userUpdatedPlaylist){
+    next(new ApiError(400 , "no playlist found associated with this id"));
+  }
+
+  return res.status(200).json(new ApiResponse(200 , {} , "removed successfully"))
+  
 })
 
+const getUserPlaylists = asyncHandler(async (req, res) => {
+  const { _id } = req.user;
+
+  const populatedPlaylists = await User.findById(_id)
+    .populate("playlists")
+    .select("playlists");
+
+  const userCreatedPlaylist = await Playlist.find({
+    owner: new mongoose.Types.ObjectId(_id),
+  });
+
+  const data = [...populatedPlaylists, ...userCreatedPlaylist];
+
+  return res.status(200).json(new ApiResponse(200, data, "User playlists"));
+});
+
+const getPlaylistSongs = asyncHandler(async (req, res, next) => {
+  const { playListID } = req.params;
+  if (!playListID) {
+    next(new ApiError(400, "playlistID required"));
+  }
+  const playlist = await Playlist.findById(playListID).populate("songs");
+  if (!playlist) {
+    next(new ApiError(404, "playlist not found"));
+  }
+  return res
+    .status(200)
+    .json(new ApiResponse(200, playlist, "playlist fetched Successfully"));
+});
 export {
   createPlayList,
   addToPlayList,
@@ -215,4 +247,8 @@ export {
   deletePlayList,
   togglePlayListStatus,
   searchPlaylist,
+  getUserPlaylists,
+  addThisPlaylist,
+  getPlaylistSongs,
+  removeFromLibrary
 };

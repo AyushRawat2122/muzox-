@@ -16,12 +16,9 @@ SongRouter.route("/uploadMusic").post(
   // authRequired,
   uploadSong
 );
-SongRouter.route("/")
-
-
 SongRouter.get('/suggestionList',getSuggestionList);
 SongRouter.post('/like-a-song/:songId',authRequired,likeSong);
 SongRouter.get('/getLikedSong',authRequired,getLikedSongs);
-SongRouter.post('/unlike/:songId',authRequired,unlikeSong);
+SongRouter.delete('/unlike/:songId',authRequired,unlikeSong);
 
 export default SongRouter;

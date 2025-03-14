@@ -14,11 +14,11 @@ import {
   resetPassword,
   updateUserDetails,
   updateProfilePic,
-  getUserPlaylist,
-  userSongs,
-  likedSong,
   refreshAccessToken,
 } from "../controllers/user.controller.js";
+
+import { getUserPlaylists } from "../controllers/playlist.controller.js";
+
 const userRouter = express.Router();
 
 userRouter.post(
@@ -35,20 +35,21 @@ userRouter.get("/userDetails", authRequired, getCurrentUser);
 
 userRouter.post("/logout", authRequired, logout);
 
-userRouter.post("/PasswordResetMail",authRequired, passwordResetMail);
+userRouter.post("/PasswordResetMail", authRequired, passwordResetMail);
 
-userRouter.post("/resetPassword", authRequired,resetPassword);
+userRouter.post("/resetPassword", authRequired, resetPassword);
 
-userRouter.get('/generateAccessToken',refreshAccessToken)
+userRouter.get("/generateAccessToken", refreshAccessToken);
 
 userRouter.post("/updateUserDetails", authRequired, updateUserDetails);
 
-userRouter.post("/updateProfilePic", uploader.fields([{ name: "profilePic", maxCount: 1 }]),authRequired, updateProfilePic);
+userRouter.post(
+  "/updateProfilePic",
+  uploader.fields([{ name: "profilePic", maxCount: 1 }]),
+  authRequired,
+  updateProfilePic
+);
 
-userRouter.get('/getPlaylist',authRequired,getUserPlaylist);
-
-userRouter.get('/getMySongs',authRequired,userSongs);
-
-userRouter.get('/myLikedSongs',authRequired,likedSong);
+userRouter.get("/get-playlists", authRequired, getUserPlaylists);
 
 export default userRouter;

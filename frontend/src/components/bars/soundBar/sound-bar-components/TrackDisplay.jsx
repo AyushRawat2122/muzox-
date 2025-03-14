@@ -15,7 +15,7 @@ const TrackDisplay = () => {
       {/* Image of the current song playing */}
       <div className="h-[50px] w-[50px] aspect-square">
         <img
-          src={currentSong?.coverImage?.url || "/tempTrackCover.png"}
+          src={currentSong?.coverImage?.url || "/tempTrackCover.jpeg"}
           className="h-full w-full rounded-sm object-cover"
           alt="song Image"
         />

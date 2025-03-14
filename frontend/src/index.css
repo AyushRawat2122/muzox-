@@ -137,3 +137,36 @@ button {
   -webkit-user-select: none; /* Safari */
   -ms-user-select: none; /* Older Edge */
 }
+
+
+/* Epic css shit */
+
+/* Define your container as a query container */
+.container {
+  container-type: inline-size; /* enables container queries for horizontal sizing */
+  container-name: myContainer;
+  width: 100%;
+  border: 1px solid #ccc;
+  padding: 10px;
+}
+
+/* Default text style */
+.responsive-text {
+  font-size: 20px;
+  transition: font-size 0.2s ease, opacity 0.2s ease;
+  opacity: 1;
+}
+
+/* When container is less than 300px wide, shrink the text */
+@container myContainer (max-width: 100px) {
+  .responsive-text {
+    font-size: 16px;
+  }
+}
+
+/* When container is less than 200px wide, hide the text */
+@container myContainer (max-width: 50px) {
+  .responsive-text {
+    opacity: 0; /* Or use display: none; if you want it removed from layout */
+  }
+}

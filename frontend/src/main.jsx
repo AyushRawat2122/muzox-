@@ -3,7 +3,7 @@ import { createRoot } from "react-dom/client";
 import "./index.css";
 import App from "./App.jsx";
 import { QueryClientProvider } from "@tanstack/react-query";
-import { RouterProvider, createBrowserRouter } from "react-router";
+import { RouterProvider, createBrowserRouter, Navigate } from "react-router";
 import { Signup, Login, Verify } from "./pages/independentPages/index.js";
 import {
   HomePage,
@@ -12,6 +12,8 @@ import {
   SearchPage,
   LyricsPage,
 } from "./pages/securePages/index.js";
+import { LikedSongsPage, PlaylistsPage } from "./pages/subPages/index.js";
+
 import { queryClient } from "./utils/axiosRequests.config.js";
 import ProtectedRoute from "./ProtectedRoute.jsx";
 
@@ -22,14 +24,39 @@ const route = createBrowserRouter([
     children: [
       { path: "/login", element: <Login /> },
       { path: "/signup", element: <Signup /> },
-      { path: "/verify/:userID", element: <Verify /> },
+      {
+        path: "/verify",
+        children: [
+          { index: true, element: <Navigate to="/login" replace /> },
+          { path: ":userID", element: <Verify /> },
+        ],
+      },
       {
         path: "/",
         element: <ProtectedRoute />,
         children: [
           { path: "/", element: <HomePage /> },
           { path: "/search", element: <SearchPage /> },
-          { path: "/library", element: <LibraryPage /> },
+          {
+            path: "/library",
+            element: <LibraryPage />,
+            children: [
+              {
+                path: "likedSongs",
+                children: [
+                  { index: true, element: <Navigate to="/library" replace /> },
+                  { path: ":userID", element: <LikedSongsPage /> },
+                ],
+              },
+              {
+                path: "playlists",
+                children: [
+                  { index: true, element: <Navigate to="/library" replace /> },
+                  { path: ":userID", element: <PlaylistsPage /> },
+                ],
+              },
+            ],
+          },
           { path: "/premium", element: <PremiumPage /> },
           { path: "/lyrics", element: <LyricsPage /> },
         ],

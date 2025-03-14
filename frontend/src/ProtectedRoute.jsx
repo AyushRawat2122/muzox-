@@ -18,11 +18,11 @@ import {
 import { loadingPlayIcon } from "./utils/lottie.js";
 import { useMediaQuery } from "react-responsive";
 import useAudioPlayer from "./store/useAudioPlayer.js";
-import { ChevronLeft, Home } from "lucide-react";
-
+import { ChevronLeft, Home, Heart, ListMusic } from "lucide-react";
+import { MdLibraryMusic } from "react-icons/md";
 const ProtectedRoute = () => {
   const location = useLocation();
-  const { data: user, isPending, error } = getUser();
+  const { data: user, isPending, error, isSuccess } = getUser();
   const { isSideBarOpen, toggleSideBarOpen } = useSideBar();
   const [leftPanelSize, setLeftPanelSize] = useState(4);
   const [rightPanelSize, setRightPanelSize] = useState(22);
@@ -50,7 +50,9 @@ const ProtectedRoute = () => {
       <Navigate to={"/login"} replace state={{ from: location.pathname }} />
     );
   }
-
+  if (isSuccess) {
+    console.log(user);
+  }
   return (
     <MuzoxApp className={"max-sm:px-[1px]"}>
       {/* Muzox App is the Wrapper which will have our player and Sidebar or NavBar*/}
@@ -105,20 +107,80 @@ const ProtectedRoute = () => {
           {/* ✅ LEFT PANEL (Draggable) */}
           {isDesktopOrLaptop && (
             <Panel
-              className="bg-black/40"
+              className="bg-black/40 no-copy"
               minSize={4}
-              maxSize={20}
+              maxSize={13}
               defaultSize={leftPanelSize} // Maintain size
               onResize={(size) => setLeftPanelSize(size)} // Save size on change
               id="left-panel"
             >
-              <div>Hey</div>
+              <div className="flex flex-col gap-4 p-2 myContainer">
+                <NavLink
+                  to={`/library`}
+                  className={({ isActive }) =>
+                    isActive ? "text-[#fe7641]" : "text-gray-300"
+                  }
+                >
+                  <div className="flex gap-2">
+                    <MdLibraryMusic size={35} />
+                    {leftPanelSize > 10 && (
+                      <h2 className="capitalize responsive-text font-semibold text-lg">
+                        {" "}
+                        Library
+                      </h2>
+                    )}
+                  </div>
+                  <hr className="text-[#fafafa46] mt-2" />
+                </NavLink>
+
+                <NavLink
+                  to={`/library/likedSongs/${user?._id}`}
+                  className={({ isActive }) =>
+                    isActive ? "text-[#fe7641]" : "text-gray-300"
+                  }
+                >
+                  <div className="flex gap-2 hover:bg-white/10 py-2 rounded-md">
+                    <Heart size={30} />
+                    {leftPanelSize > 10 && (
+                      <h2
+                        className="capitalize responsive-text font-semibold"
+                        style={{ fontSize: "15px" }}
+                      >
+                        {" "}
+                        Liked songs
+                      </h2>
+                    )}
+                  </div>
+                </NavLink>
+
+                <NavLink
+                  to={`/library/playlists/${user?._id}`}
+                  className={({ isActive }) =>
+                    isActive ? "text-[#fe7641]" : "text-gray-300"
+                  }
+                >
+                  <div className="flex gap-2 hover:bg-white/10 py-2 rounded-md">
+                    <ListMusic size={30} />
+                    {leftPanelSize > 10 && (
+                      <h2
+                        className="capitalize responsive-text font-semibold"
+                        style={{ fontSize: "15px" }}
+                      >
+                        Playlists
+                      </h2>
+                    )}
+                  </div>
+                </NavLink>
+              </div>
             </Panel>
           )}
 
           {/* ✅ FIRST RESIZE HANDLE */}
           {isDesktopOrLaptop && (
-            <PanelResizeHandle className="w-[1px]  bg-gray-300/60 cursor-ew-resize" id={"left-panel-handle"} />
+            <PanelResizeHandle
+              className="w-[1px]  bg-gray-300/60 cursor-ew-resize"
+              id={"left-panel-handle"}
+            />
           )}
 
           {/* ✅ MIDDLE PANEL (Auto-Adjust) */}
@@ -128,7 +190,10 @@ const ProtectedRoute = () => {
 
           {/* ✅ LAST RESIZE HANDLE */}
           {isDesktopOrLaptop && isSideBarOpen && (
-            <PanelResizeHandle className="w-[1px] bg-gray-300/60 cursor-ew-resize"  id={"right-panel-handle"}/>
+            <PanelResizeHandle
+              className="w-[1px] bg-gray-300/60 cursor-ew-resize"
+              id={"right-panel-handle"}
+            />
           )}
 
           {/* ✅ RIGHT PANEL (Draggable) */}
