@@ -189,11 +189,13 @@ const addThisPlaylist = asyncHandler(async (req, res) => {
       )
     );
 });
-const removeFromLibrary = asyncHandler(async (req,res,next) => {
+const removeFromLibrary = asyncHandler(async (req, res, next) => {
   const { playListId } = req.params;
 
   if (!playListId) {
-    next(new ApiError(400, "Playlist id is required to remove from User playlists"));
+    next(
+      new ApiError(400, "Playlist id is required to remove from User playlists")
+    );
   }
 
   const { _id } = req.user;
@@ -203,13 +205,12 @@ const removeFromLibrary = asyncHandler(async (req,res,next) => {
     { new: true }
   );
 
-  if(!userUpdatedPlaylist){
-    next(new ApiError(400 , "no playlist found associated with this id"));
+  if (!userUpdatedPlaylist) {
+    next(new ApiError(400, "no playlist found associated with this id"));
   }
 
-  return res.status(200).json(new ApiResponse(200 , {} , "removed successfully"))
-  
-})
+  return res.status(200).json(new ApiResponse(200, {}, "removed successfully"));
+});
 
 const getUserPlaylists = asyncHandler(async (req, res) => {
   const { _id } = req.user;
@@ -222,7 +223,10 @@ const getUserPlaylists = asyncHandler(async (req, res) => {
     owner: new mongoose.Types.ObjectId(_id),
   });
 
-  const data = [...populatedPlaylists, ...userCreatedPlaylist];
+  const data = [
+    ...(populatedPlaylists.playLists || []),
+    ...userCreatedPlaylist,
+  ];
 
   return res.status(200).json(new ApiResponse(200, data, "User playlists"));
 });
@@ -250,5 +254,5 @@ export {
   getUserPlaylists,
   addThisPlaylist,
   getPlaylistSongs,
-  removeFromLibrary
+  removeFromLibrary,
 };

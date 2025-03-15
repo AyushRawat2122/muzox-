@@ -8,14 +8,14 @@ import { useMediaQuery } from "react-responsive";
 import { SearchListSongCard } from "../../components/asset components/index.js";
 import { SearchBar } from "../../components/bars";
 import { DotLottieReact } from "@lottiefiles/dotlottie-react";
-const SearchPage = () => {
+
+const SearchResult = React.memo(() => {
   const { searchQuery } = useSearchQuery();
   const isTabletOrMobile = useMediaQuery({ query: "(max-width: 1224px)" });
   const abortController = useRef(null);
   const [playlists, setPlaylists] = useState([]);
   const [songs, setSongs] = useState([]);
   const [loading, setLoading] = useState(false);
-
   const fetchSearchQuery = async (query) => {
     if (abortController.current) {
       abortController.current.abort();
@@ -74,17 +74,8 @@ const SearchPage = () => {
       </div>
     );
   }
-
   return (
-    <div className="h-full w-full overflow-y-scroll relative">
-      {isTabletOrMobile && (
-        <div className="sticky w-full top-0 p-2 bg-black/40 z-10 rounded-b-md">
-          <div>
-            {/* Search bar for mobile users :} */}
-            <SearchBar />
-          </div>
-        </div>
-      )}
+    <div className="h-full w-full">
       {playlists.length === 0 && songs.length === 0 && searchQuery === "" && (
         <div className="h-full w-full flex justify-center items-center underline decoration-1 underline-offset-8 decoration-white">
           <p className="text-white text-base italic px-3 text-center">
@@ -125,6 +116,23 @@ const SearchPage = () => {
           </div>
         )}
       </div>
+    </div>
+  );
+});
+
+const SearchPage = () => {
+  const isTabletOrMobile = useMediaQuery({ query: "(max-width: 1224px)" });
+  return (
+    <div className="h-full w-full overflow-y-scroll relative">
+      {isTabletOrMobile && (
+        <div className="sticky w-full top-0 p-2 bg-black/40 z-10 rounded-b-md">
+          <div>
+            {/* Search bar for mobile users :} */}
+            <SearchBar />
+          </div>
+        </div>
+      )}
+      <SearchResult></SearchResult>
     </div>
   );
 };

@@ -2,29 +2,106 @@ import usePopUp from "../../store/usePopUp";
 import Notify from "./Notify";
 import React, { useState, useEffect, useRef } from "react";
 import { AnimatePresence, motion } from "framer-motion";
+import getUserLikedSong from "../../serverDataHooks/getUserLikedSong.js";
+import getUserPlaylists from "../../serverDataHooks/getUserPlaylists.js";
+import getUser from "../../serverDataHooks/getUser.js";
+import { useMediaQuery } from "react-responsive";
+import PlaylistCarousel from "../carousel/PlaylistCarousel.jsx";
+import { useLikeSong } from "../../serverDataHooks/songMutations.js";
+
+//liked song component
+const LikedSong = React.memo(({ setError, setSuccessMsg }) => {
+  const { context } = usePopUp();
+  const { data: likedSong, isPending: likedSongNot } = getUserLikedSong();
+  const mutation = useLikeSong();
+
+  const handleClick = () => {
+    if (
+      likedSong?.data?.some((song) => song?._id === context?._id)
+    ) {
+      setError("song already exists in liked songs");
+      return;
+    }
+    if (!context) {
+      setError("no context provided");
+      return;
+    }
+    mutation.mutate(context?._id);
+  };
+
+  useEffect(() => {
+    if (mutation.isSuccess) {
+      setSuccessMsg("saved to liked songs");
+    }
+    if (mutation.isError) {
+      setError("failed to save in liked songs");
+    }
+  }, [mutation.isSuccess, mutation.isError]);
+
+  if (likedSongNot) {
+    return <p> loading... </p>;
+  }
+
+  return (
+    <div
+      onClick={handleClick}
+      className="border-1 border-gray-400 p-2 rounded-md w-[200px] hover:bg-white/3 no-copy cursor-pointer"
+    >
+      <img
+        src="/LikedSong.png"
+        alt=""
+        className="w-full aspect-square rounded-md"
+      />
+      <p className="text-sm pt-2 capitalize text-gray-400">
+        liked songs : {likedSong?.data?.length} tracks
+      </p>
+    </div>
+  );
+});
+
+//user playlist component
+const PlaylistCard = () => {
+  return <div></div>;
+};
+
 const AddToLibrary = () => {
-  const { toggleAddPopUp } = usePopUp();
+  const { toggleAddPopUp, setContext, context } = usePopUp();
   const [error, setError] = useState("");
   const [successMsg, setSuccessMsg] = useState("");
   const popUp = useRef(null);
+  const isTabletOrMobile = useMediaQuery({ query: "(max-width: 1224px)" });
+  const [userPlaylist, setUserPlaylist] = useState([]);
+  const [carouselDrag, setCarouselDrag] = useState(false);
+  const { data: user, isSuccess: userSuccess, isPending: userNot } = getUser();
+  const {
+    data: playlist,
+    isSuccess: playlistSuccess,
+    isPending: playlistNot,
+  } = getUserPlaylists();
 
-  // Demo: set an error message on mount
   useEffect(() => {
-    setError("booyah");
+    console.log(context);
+    return () => {};
   }, []);
+
+  useEffect(() => {
+    if (isTabletOrMobile) {
+      setCarouselDrag(true);
+    } else {
+      setCarouselDrag(false);
+    }
+    console.log(carouselDrag);
+  }, [isTabletOrMobile]);
+  useEffect(() => {
+    console.log("isTabletOrMobile:", isTabletOrMobile);
+  }, [isTabletOrMobile]);
 
   const handleBackdropClick = (e) => {
     if (popUp.current && e.target === e.currentTarget) {
+      setContext(undefined);
       toggleAddPopUp();
     }
   };
-  
-  //liked song component
-  const LikedSong = () => {
-    return <div></div>;
-  };
-
-  //user playlist component
 
   return (
     <AnimatePresence mode="wait">
@@ -80,12 +157,22 @@ const AddToLibrary = () => {
             </svg>
           </button>
 
-          <h1 className="text-2xl font-bold mb-4">Save To :</h1>
-          <h2>Liked Songs</h2>
-
-          <div className="mt-4 flex items-center gap-4">
-            {/* Confirm Button */}
-          </div>
+          <h1 className="text-2xl font-bold">Save To :</h1>
+          <h2 className="text-lg pt-2">Liked Songs</h2>
+          <hr className="text-[#ffffff4b] mb-2" />
+          <LikedSong setError={setError} setSuccessMsg={setSuccessMsg} />
+          <h2 className="text-lg pt-2">Playlists</h2>
+          <hr className="text-[#ffffff4b] mb-2" />
+          {userPlaylist.length > 0 ? (
+            <PlaylistCarousel
+              drag={carouselDrag}
+              click={!carouselDrag}
+            ></PlaylistCarousel>
+          ) : (
+            <p className="text-gray-300">
+              No created playlist found, create playlist first
+            </p>
+          )}
         </motion.div>
       </motion.div>
     </AnimatePresence>

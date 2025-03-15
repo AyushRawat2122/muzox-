@@ -1,5 +1,6 @@
 import React, { useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { CircleAlert, CircleCheckBig } from "lucide-react";
 
 const Notify = ({ error, setError, successMsg, setSuccessMsg }) => {
   const message = error || successMsg;
@@ -30,7 +31,18 @@ const Notify = ({ error, setError, successMsg, setSuccessMsg }) => {
             setSuccessMsg("");
           }}
         >
-          {message}
+          {error && (
+            <p className="flex items-center gap-1 text-base">
+              <CircleAlert className="text-red-600" size={18} />
+              <span>{error}</span>
+            </p>
+          )}
+          {successMsg && (
+            <p className="flex items-center gap-1 text-base">
+              <CircleCheckBig className="text-lime-400" size={18} />{" "}
+              <span>{successMsg}</span>
+            </p>
+          )}
         </motion.div>
       )}
     </AnimatePresence>
@@ -38,6 +50,3 @@ const Notify = ({ error, setError, successMsg, setSuccessMsg }) => {
 };
 
 export default Notify;
-
-
-

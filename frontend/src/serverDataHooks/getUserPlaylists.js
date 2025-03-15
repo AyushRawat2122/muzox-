@@ -8,15 +8,17 @@ const fetchPlaylists = async () => {
     });
     return playlists.data;
   } catch (error) {
+    console.log(error);
     throw error;
   }
 };
 
-const getUserPlaylists = useQuery({
-  queryKey: "playlists",
-  queryFn: fetchPlaylists,
-  staleTime: Infinity,
-  retry: 2,
-});
+const getUserPlaylists = () =>
+  useQuery({
+    queryKey: ["playlists"],
+    queryFn: fetchPlaylists,
+    staleTime: Infinity,
+    retry: 2,
+  });
 
 export default getUserPlaylists;

@@ -4,6 +4,7 @@ const useAudioPlayer = create((set, get) => ({
   currentSong: null,
   currentSongIdx: 0,
   queue: [],
+  queueID: undefined,
   isPlaying: false,
   isLooped: false,
   isShuffled: false,
@@ -58,11 +59,19 @@ const useAudioPlayer = create((set, get) => ({
     })); //change the current index and current song state
   },
   //Initialize the queue
-  initializeQueue: (queue) => {
+  initializeQueue: (queue, queueRef) => {
     if (queue?.length === 0) {
       return;
     } // if its empty array then return
-    set({ queue: [...queue], currentSong: queue[0], isPlaying: true }); // initialize the queue
+    set({
+      queue: [...queue],
+      queueID: queueRef,
+      isLooped: false,
+      isShuffled: false,
+      currentSong: queue[0],
+      currentSongIdx: 0,
+      isPlaying: true,
+    }); // initialize the queue
   },
   //shuffling the queue
   shuffleQueue: () => {
@@ -96,7 +105,11 @@ const useAudioPlayer = create((set, get) => ({
     const { originalQueue, isShuffled, currentSong } = get();
     if (!isShuffled || !originalQueue.length) return;
     const currentIdx = originalQueue.findIndex((song) => song === currentSong);
-    set({ queue: [...originalQueue], isShuffled: false, currentSongIdx: currentIdx });
+    set({
+      queue: [...originalQueue],
+      isShuffled: false,
+      currentSongIdx: currentIdx,
+    });
   },
   //toggle the play and pause in order to stop or play
   togglePlayPause: () => {

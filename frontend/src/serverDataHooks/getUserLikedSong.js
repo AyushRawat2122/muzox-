@@ -8,15 +8,17 @@ const fetchLikedSongs = async () => {
     });
     return likedSongs.data;
   } catch (error) {
+    console.log(error);
     throw error;
   }
 };
 
-const getUserLikedSong = useQuery({
-  queryKey: "likedSongs",
-  queryFn: fetchLikedSongs,
-  staleTime: Infinity,
-  retry: 2,
-});
+const getUserLikedSong = () =>
+  useQuery({
+    queryKey: ["likedSongs"],
+    queryFn: fetchLikedSongs,
+    staleTime: Infinity,
+    retry: 2,
+  });
 
 export default getUserLikedSong;

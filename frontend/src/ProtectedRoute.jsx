@@ -102,7 +102,9 @@ const ProtectedRoute = () => {
 
         <PanelGroup
           direction="horizontal"
-          className="grow bg-transparent h-full"
+          className={`grow bg-transparent h-full ${
+            isTabletOrMobile ? "pb-[30px]" : "pb-0"
+          }`}
         >
           {/* ✅ LEFT PANEL (Draggable) */}
           {isDesktopOrLaptop && (
@@ -121,7 +123,7 @@ const ProtectedRoute = () => {
                     isActive ? "text-[#fe7641]" : "text-gray-300"
                   }
                 >
-                  <div className="flex gap-2">
+                  <div className="flex gap-2 items-center">
                     <MdLibraryMusic size={35} />
                     {leftPanelSize > 10 && (
                       <h2 className="capitalize responsive-text font-semibold text-lg">
@@ -139,11 +141,11 @@ const ProtectedRoute = () => {
                     isActive ? "text-[#fe7641]" : "text-gray-300"
                   }
                 >
-                  <div className="flex gap-2 hover:bg-white/10 py-2 rounded-md">
+                  <div className="flex gap-2 items-center hover:bg-white/10 py-2 rounded-md">
                     <Heart size={30} />
                     {leftPanelSize > 10 && (
                       <h2
-                        className="capitalize responsive-text font-semibold"
+                        className="capitalize text-white responsive-text font-semibold"
                         style={{ fontSize: "15px" }}
                       >
                         {" "}
@@ -159,11 +161,11 @@ const ProtectedRoute = () => {
                     isActive ? "text-[#fe7641]" : "text-gray-300"
                   }
                 >
-                  <div className="flex gap-2 hover:bg-white/10 py-2 rounded-md">
+                  <div className="flex gap-2 items-center hover:bg-white/10 py-2 rounded-md">
                     <ListMusic size={30} />
                     {leftPanelSize > 10 && (
                       <h2
-                        className="capitalize responsive-text font-semibold"
+                        className="capitalize text-white responsive-text font-semibold"
                         style={{ fontSize: "15px" }}
                       >
                         Playlists

@@ -4,7 +4,7 @@ import { useLocation, Outlet } from "react-router";
 const Library = () => {
   const location = useLocation();
   return (
-    <div>
+    <div className="h-full w-full">
       {location.pathname === "/library" && (
         <div className="text-white p-2">
           <div>
@@ -18,7 +18,7 @@ const Library = () => {
           <div></div>
         </div>
       )}
-      <div>
+      <div className="h-full w-full">
         <Outlet />
       </div>
     </div>

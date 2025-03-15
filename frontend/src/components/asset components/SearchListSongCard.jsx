@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Ellipsis, Play } from "lucide-react";
 import useAudioPlayer from "../../store/useAudioPlayer.js";
+import usePopUp from "../../store/usePopUp.js";
 const SearchListSongCard = ({ song }) => {
   const [playIcon, setPlayIcon] = useState(false);
   const displayPlayIcon = () => {
@@ -11,10 +12,10 @@ const SearchListSongCard = ({ song }) => {
   };
   const { initializeQueue } = useAudioPlayer();
   const { artist, coverImage, title, duration } = song;
-  
+  const {toggleAddPopUp,setContext,context,addPopUp} = usePopUp();
   const handleClick = (e) => {
     e.stopPropagation();
-    initializeQueue([song]);
+    initializeQueue([song] , "song");
   };
   const convertToMinSecFormat = (number) => {
     const min = Math.floor(number / 60); //get min
@@ -23,6 +24,16 @@ const SearchListSongCard = ({ song }) => {
       String(min).padStart(1, "0") + ":" + String(sec).padStart(1, "0");
     return convertedStr;
   };
+
+  const handleAddToLibraryClick = (e) =>{
+    e.stopPropagation();
+    if(addPopUp){
+      return;
+    }
+    setContext(song);
+    toggleAddPopUp();
+  }
+
   return (
     <div
       className="w-full p-2 hover:bg-white/5 flex rounded-sm overflow-hidden gap-2 items-center"
@@ -40,7 +51,7 @@ const SearchListSongCard = ({ song }) => {
         <img
           src={coverImage?.url || null}
           alt="cover"
-          className="h-full w-full aspect-square"
+          className="h-full w-full aspect-square object-cover"
         />
       </div>
       <div className="grow flex justify-between items-center">
@@ -50,7 +61,7 @@ const SearchListSongCard = ({ song }) => {
         </div>
         <p className="text-sm text-gray-300">{convertToMinSecFormat(duration)}</p>
       </div>
-      <button className="hoverIcon">
+      <button className="hoverIcon" onClick={handleAddToLibraryClick}>
         <Ellipsis />
       </button>
     </div>

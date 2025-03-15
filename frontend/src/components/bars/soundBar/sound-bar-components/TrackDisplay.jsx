@@ -31,13 +31,6 @@ const TrackDisplay = () => {
               {currentSong.artist}
             </p>
           </div>
-          <button onClick={handleLikeChange}>
-            {liked ? (
-              <GoHeartFill className="text-[#fe7641]" />
-            ) : (
-              <GoHeart className="hoverIcon" />
-            )}
-          </button>
         </div>
       ) : (
         <></>

@@ -59,7 +59,7 @@ const uploadSong = asyncHandler(async (req, res, next) => {
 });
 
 //search Song
-const getSuggestionList = asyncHandler(async (req, res) => {
+const getSuggestionList = asyncHandler(async (req, res , next) => {
   const { query = "" } = req.query;
   const searchedSuggestion = await Song.aggregate([
     {
@@ -85,7 +85,7 @@ const getSuggestionList = asyncHandler(async (req, res) => {
 });
 
 //get liked Songs
-const getLikedSongs = asyncHandler(async (req, res) => {
+const getLikedSongs = asyncHandler(async (req, res , next) => {
   const { _id } = req.user; //extracting id from user request
 
   const likedSongs = await Like.aggregate([
@@ -100,6 +100,11 @@ const getLikedSongs = asyncHandler(async (req, res) => {
         as: "songDetailsArray",
         pipeline: [
           {
+            $addFields:{
+              isLiked:true,
+            }
+          },
+          {
             $project: {
               uploadedBy: 0,
             },
@@ -110,15 +115,17 @@ const getLikedSongs = asyncHandler(async (req, res) => {
     {
       $addFields: {
         songDetail: { $first: "$songDetailsArray" },
-        isLiked: true,
       },
     },
     {
       $project: {
         songDetail: 1,
-        isLiked: 1,
+        _id:0
       },
     },
+    {
+      $replaceRoot: { newRoot: "$songDetail" }
+    }
   ]); //aggregation PipeLine to get Liked Song
 
   return res
@@ -127,7 +134,7 @@ const getLikedSongs = asyncHandler(async (req, res) => {
 });
 
 //like a song
-const likeSong = asyncHandler(async (req, res) => {
+const likeSong = asyncHandler(async (req, res , next) => {
   const { songId } = req.params; //extract incoming song id
   const { _id } = req.user; //extract incoming user _id
   const song = await Like.findOne({
@@ -151,7 +158,7 @@ const likeSong = asyncHandler(async (req, res) => {
 });
 
 //dislike song
-const unlikeSong = asyncHandler(async (req, res) => {
+const unlikeSong = asyncHandler(async (req, res, next) => {
   const { songId } = req.params;
   const { _id } = req.user;
 
