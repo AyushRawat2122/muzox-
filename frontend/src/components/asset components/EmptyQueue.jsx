@@ -18,4 +18,4 @@ const EmptyQueue = () => {
   );
 };
 
-export default EmptyQueue;
+export default React.memo(EmptyQueue);

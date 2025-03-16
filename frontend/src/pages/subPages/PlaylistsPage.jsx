@@ -8,4 +8,4 @@ const PlaylistsPage = () => {
     );
 }
 
-export default PlaylistsPage;
+export default React.memo(PlaylistsPage);

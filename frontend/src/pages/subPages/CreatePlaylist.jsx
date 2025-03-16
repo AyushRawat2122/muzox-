@@ -119,4 +119,4 @@ function CreatePlaylist() {
   );
 }
 
-export default CreatePlaylist;
+export default React.memo(CreatePlaylist);

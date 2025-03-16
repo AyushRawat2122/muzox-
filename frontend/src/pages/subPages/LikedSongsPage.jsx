@@ -1,8 +1,8 @@
 import React, { useEffect, useRef, useState } from "react";
-import { Play, Repeat2, Pause } from "lucide-react";
+import { Play, Repeat2, Pause, BookmarkMinus } from "lucide-react";
 import useAudioPlayer from "../../store/useAudioPlayer.js";
 import getUserLikedSong from "../../serverDataHooks/getUserLikedSong.js";
-
+import { useUnlikeSong } from "../../serverDataHooks/songMutations.js";
 const LikedSongsPage = () => {
   const {
     queueID,
@@ -13,27 +13,20 @@ const LikedSongsPage = () => {
     toggleLooping,
   } = useAudioPlayer(); //audio players methods
   const { data: likedSongs, isSuccess } = getUserLikedSong();
-  const [songs, setSongs] = useState([]);
 
-  useEffect(() => {
-    if (isSuccess) {
-      console.log(likedSongs);
-      setSongs(likedSongs.data);
-    }
-  }, [isSuccess]);
   const handlePlayButtonClick = () => {
-    if (songs.length <= 0) {
+    if (likedSongs?.data?.length <= 0) {
       return;
     }
     if (queueID !== "likedSongs") {
-      initializeQueue(songs, "likedSongs");
+      initializeQueue(likedSongs?.data, "likedSongs");
       return;
     } else {
       togglePlayPause();
     }
   };
   const handleQueueLooping = () => {
-    if (songs.length <= 0 || queueID !== "likedSongs") {
+    if (likedSongs?.data?.length <= 0 || queueID !== "likedSongs") {
       return;
     } else {
       toggleLooping();
@@ -59,7 +52,7 @@ const LikedSongsPage = () => {
           <h4 className="text-sm text-gray-400">Playlist</h4>
           <h1 className="text-6xl font-bold">Liked Songs</h1>
           <p className="text-sm text-gray-400">
-            Your Library • {songs.length} songs
+            Your Library • {likedSongs?.data?.length} songs
           </p>
         </div>
       </div>
@@ -99,24 +92,35 @@ const LikedSongsPage = () => {
           <div className="text-right">Duration</div>
         </div>
         {/* Songs */}
-        {songs.map((song, index) => (
-          <SongItem key={index} song={song} index={index} queueRef={"likedSongs"} />
+        {likedSongs?.data?.map((song, index) => (
+          <SongItem
+            key={index}
+            song={song}
+            index={index}
+            queueRef={"likedSongs"}
+          />
         ))}
       </div>
     </main>
   );
 };
 
-const SongItem = ({ song, index , queueRef}) => {
+const SongItem = ({ song, index, queueRef }) => {
   const { setCurrentSong, queueID } = useAudioPlayer();
   const changeCurrentSongOfQueue = (e) => {
     e.stopPropagation();
-    if(queueID!==queueRef){
+    if (queueID !== queueRef) {
       return;
-    }else{
+    } else {
       setCurrentSong(index);
     }
   };
+  const mutation = useUnlikeSong();
+  const handleRemoveSong = (e) => {
+    e.stopPropagation();
+    mutation.mutate(song?._id);
+  };
+
   const convertToMinSecFormat = (number) => {
     const min = Math.floor(number / 60); //get min
     const sec = Math.floor(number % 60); //get seconds
@@ -125,7 +129,10 @@ const SongItem = ({ song, index , queueRef}) => {
     return convertedStr;
   };
   return (
-    <div className="grid gap-5 sm:gap-10 grid-cols-[auto_1fr_auto] items-center px-4 py-2 transition-colors hover:bg-gray-800" onClick={changeCurrentSongOfQueue}>
+    <div
+      className="grid gap-5 sm:gap-10 grid-cols-[auto_1fr_auto] items-center px-4 py-2 transition-colors hover:bg-gray-800"
+      onClick={changeCurrentSongOfQueue}
+    >
       <div className="flex items-center justify-center">
         <span>{index + 1}</span>
       </div>
@@ -140,11 +147,17 @@ const SongItem = ({ song, index , queueRef}) => {
           <div className="text-xs text-gray-400">{song.artist}</div>
         </div>
       </div>
-      <div className="text-xs text-gray-400 text-right">
+      <div className="text-xs text-gray-400 text-right flex gap-2 items-center">
         {convertToMinSecFormat(song?.duration)}
+        <span title="remove from liked songs">
+          <BookmarkMinus
+            className="hover:text-red-500"
+            onClick={handleRemoveSong}
+          />
+        </span>
       </div>
     </div>
   );
 };
 
-export default LikedSongsPage;
+export default React.memo(LikedSongsPage);

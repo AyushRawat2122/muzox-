@@ -16,9 +16,7 @@ const LikedSong = React.memo(({ setError, setSuccessMsg }) => {
   const mutation = useLikeSong();
 
   const handleClick = () => {
-    if (
-      likedSong?.data?.some((song) => song?._id === context?._id)
-    ) {
+    if (likedSong?.data?.some((song) => song?._id === context?._id)) {
       setError("song already exists in liked songs");
       return;
     }
@@ -80,11 +78,6 @@ const AddToLibrary = () => {
   } = getUserPlaylists();
 
   useEffect(() => {
-    console.log(context);
-    return () => {};
-  }, []);
-
-  useEffect(() => {
     if (isTabletOrMobile) {
       setCarouselDrag(true);
     } else {
@@ -104,7 +97,7 @@ const AddToLibrary = () => {
   };
 
   return (
-    <AnimatePresence mode="wait">
+    <div>
       {/* Background Overlay */}
       <motion.div
         key="backdrop"
@@ -116,6 +109,7 @@ const AddToLibrary = () => {
       >
         {/* Notification */}
         <Notify
+          key={"notification"}
           error={error}
           setError={setError}
           successMsg={successMsg}
@@ -175,7 +169,7 @@ const AddToLibrary = () => {
           )}
         </motion.div>
       </motion.div>
-    </AnimatePresence>
+    </div>
   );
 };
 

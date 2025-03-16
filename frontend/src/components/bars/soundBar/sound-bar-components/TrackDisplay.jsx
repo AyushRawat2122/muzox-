@@ -1,15 +1,20 @@
 import React, { useState } from "react";
-import { GoHeart, GoHeartFill } from "react-icons/go";
 import "../soundBar.css";
 import useAudioPlayer from "../../../../store/useAudioPlayer.js";
-
+import { useMediaQuery } from "react-responsive";
+import usePopUp from "../../../../store/usePopUp.js";
+import { CirclePlus } from "lucide-react";
 const TrackDisplay = () => {
   const { currentSong } = useAudioPlayer();
-  const [liked, setLiked] = useState(false);
-  const handleLikeChange = () => {
-    setLiked((prev) => !prev);
-  };
+  const { setContext, addPopUp, toggleAddPopUp } = usePopUp();
 
+  const isTabletOrMobile = useMediaQuery({ query: "(max-width: 1224px)" });
+  const handleAddToLibrary = () =>{
+    if(addPopUp === false){
+      setContext(currentSong);
+      toggleAddPopUp();
+    }
+  }
   return (
     <div className="h-full w-full flex items-center gap-2 py-1 lg:p-0">
       {/* Image of the current song playing */}
@@ -31,6 +36,11 @@ const TrackDisplay = () => {
               {currentSong.artist}
             </p>
           </div>
+          {isTabletOrMobile && (
+            <button onClick={handleAddToLibrary}>
+              <CirclePlus />
+            </button>
+          )}
         </div>
       ) : (
         <></>

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, forwardRef } from "react";
+import React, { useState, useEffect } from "react";
 import { IoPlaySkipBackSharp, IoPlaySkipForwardSharp } from "react-icons/io5";
 import { PiRepeat } from "react-icons/pi";
 import { RxShuffle } from "react-icons/rx";
@@ -19,13 +19,14 @@ import TrackDisplay from "./sound-bar-components/TrackDisplay";
 import useSideBar from "../../../store/useSideBar.js";
 import { NavLink } from "react-router";
 
-const SoundBar = forwardRef((props, ref) => {
-  const [currentPosition, setCurrentPosition] = useState(0);
-  const [duration, setDuration] = useState(0);
+const SoundBar = ({ audioElement, className }) => {
+  const audio = audioElement;
+  const [currentPosition, setCurrentPosition] = useState( audio.currentTime || 0);
+  const [duration, setDuration] = useState(audio.duration || 0 );
   const [isSeeking, setIsSeeking] = useState(false);
-  const [volume, setVolume] = useState(100);
+  const [volume, setVolume] = useState(Math.floor(parseInt(audio.volume * 100)) || 100);
   const [isMuted, setIsMuted] = useState(false);
-  const [isLoop, setIsLoop] = useState(false);
+  const [isLoop, setIsLoop] = useState(audio.loop||false);
 
   const {
     isShuffled,
@@ -37,15 +38,13 @@ const SoundBar = forwardRef((props, ref) => {
     togglePlayPause,
   } = useAudioPlayer();
   const { isQueueDisplayed, toggleQueueDisplay } = useSideBar();
-  const audio = ref?.current?.getAudioElement(); // this will bring us the audio ref
-  const className = props?.className;
+
+  // Use the passed audioElement directly
 
   useEffect(() => {
-    if (!audio) {
-      return;
-    }
+    if (!audio) return;
 
-    const onMetaDataLoaded = (e) => {
+    const onMetaDataLoaded = () => {
       setDuration(audio.duration);
     };
     const onCurrentDurationChange = () => {
@@ -54,8 +53,8 @@ const SoundBar = forwardRef((props, ref) => {
       }
     };
 
-    audio.addEventListener("loadedmetadata", onMetaDataLoaded); //this will allow you to access all props of the audio after its loaded like duration or so otherwise they ll be undefined or null
-    audio.addEventListener("timeupdate", onCurrentDurationChange); //this will update the seek
+    audio.addEventListener("loadedmetadata", onMetaDataLoaded);
+    audio.addEventListener("timeupdate", onCurrentDurationChange);
     return () => {
       audio.removeEventListener("loadedmetadata", onMetaDataLoaded);
       audio.removeEventListener("timeupdate", onCurrentDurationChange);
@@ -64,40 +63,38 @@ const SoundBar = forwardRef((props, ref) => {
 
   const togglePlay = () => {
     togglePlayPause();
-  }; //play pause functionality
+  };
   const playNextSong = () => {
     playNext();
-  }; //plays next Song
+  };
   const playPrevSong = () => {
     playPrev();
-  }; //plays prev Song
+  };
   const convertToMinSecFormat = (number) => {
-    const min = Math.floor(number / 60); //get min
-    const sec = Math.floor(number % 60); //get seconds
-    const convertedStr =
-      String(min).padStart(1, "0") + ":" + String(sec).padStart(1, "0");
-    return convertedStr;
+    const min = Math.floor(number / 60);
+    const sec = Math.floor(number % 60);
+    return String(min).padStart(1, "0") + ":" + String(sec).padStart(1, "0");
   };
 
   const curr_time = convertToMinSecFormat(currentPosition);
-  const Totalduration = convertToMinSecFormat(duration); // converting to display format
+  const Totalduration = convertToMinSecFormat(duration);
 
   const handleSeek = (e) => {
     const newPosition = parseFloat(e.target.value);
     setCurrentPosition(newPosition);
-  }; // update current time and current postion of seekBar
+  };
 
   const handleSeekStart = () => {
-    setIsSeeking(true); // ⏳ Seeking start
-  }; // set seeking to true
+    setIsSeeking(true);
+  };
 
   const handleSeekEnd = (e) => {
     if (audio) {
       const newPosition = parseFloat(e.target.value);
-      audio.currentTime = newPosition; // ✅ Direct audio time update karo
+      audio.currentTime = newPosition;
     }
-    setIsSeeking(false); // 🔥 Resume auto update only when user releases seek bar
-  }; // set seeking to false
+    setIsSeeking(false);
+  };
 
   const handleVolumeChange = (e) => {
     const volumeChange = e.target.value;
@@ -105,7 +102,7 @@ const SoundBar = forwardRef((props, ref) => {
       audio.volume = parseFloat(volumeChange) / 100;
       setVolume(parseInt(volumeChange));
     }
-  }; //set volume
+  };
 
   const toggleMute = () => {
     if (audio) {
@@ -120,7 +117,7 @@ const SoundBar = forwardRef((props, ref) => {
         setVolume(0);
       }
     }
-  }; //toggle the mute functionality
+  };
 
   const toggleLoop = () => {
     if (!audio) return;
@@ -132,7 +129,7 @@ const SoundBar = forwardRef((props, ref) => {
       audio.loop = true;
       setIsLoop(true);
     }
-  }; //toggle the loop functionality
+  };
 
   const toggleShuffle = () => {
     console.log(isShuffled);
@@ -142,7 +139,7 @@ const SoundBar = forwardRef((props, ref) => {
     } else {
       shuffleQueue();
     }
-  }; //toggle the shuffle functionality
+  };
 
   return (
     <div className={`${className} w-full bg-black/60 text-white`}>
@@ -182,18 +179,18 @@ const SoundBar = forwardRef((props, ref) => {
               </button>
               {/* Play || Pause */}
               <button
-                className=" w-10 text-white rounded-full relative text-3xl"
+                className="w-10 text-white rounded-full relative text-3xl"
                 onClick={togglePlay}
               >
                 {isPlaying ? (
-                  <Pause title="pause " className="adjustCenter" size={30} />
+                  <Pause title="pause" className="adjustCenter" size={30} />
                 ) : (
                   <PlayIcon title="play" className="adjustCenter" size={30} />
                 )}
               </button>
               {/* PlayNext */}
               <button
-                className="h-8 w-8 rounded-full relative "
+                className="h-8 w-8 rounded-full relative"
                 onClick={playNextSong}
               >
                 <IoPlaySkipForwardSharp
@@ -218,7 +215,6 @@ const SoundBar = forwardRef((props, ref) => {
 
           {/* Seek Bar */}
           <div className="flex justify-center lg:pb-2">
-            {/* Combined Seek Bar */}
             <div className="text-sm flex lg:max-w-[60vw] items-center justify-center grow gap-2">
               {/* Current Time */}
               <span>{curr_time}</span>
@@ -229,10 +225,10 @@ const SoundBar = forwardRef((props, ref) => {
                 max={duration}
                 className="grow"
                 onChange={handleSeek}
-                onMouseDown={handleSeekStart} // ⏳ Seeking start
-                onMouseUp={handleSeekEnd} // ✅ Seeking end
-                onTouchStart={handleSeekStart} // 📱 Mobile support
-                onTouchEnd={handleSeekEnd} // 📱 Mobile support
+                onMouseDown={handleSeekStart}
+                onMouseUp={handleSeekEnd}
+                onTouchStart={handleSeekStart}
+                onTouchEnd={handleSeekEnd}
               />
               {/* Total Time */}
               <span>{Totalduration}</span>
@@ -240,28 +236,22 @@ const SoundBar = forwardRef((props, ref) => {
           </div>
         </div>
 
-        {/* Playback controls like volume + lyrics + queue */}
-        <div className="hidden lg:flex flex-wrap gap-3  w-[20%] justify-end px-2.5">
+        {/* Playback controls like volume, lyrics, and queue */}
+        <div className="hidden lg:flex flex-wrap gap-3 w-[20%] justify-end px-2.5">
           {/* Lyrics */}
-
           <NavLink
             to={"/lyrics"}
             className={({ isActive }) =>
-              isActive ? "text-[#fe7641] flex justify-center items-center" : "text-gray-300 flex justify-center items-center"
+              isActive
+                ? "text-[#fe7641] flex justify-center items-center"
+                : "text-gray-300 flex justify-center items-center"
             }
           >
-            <LiaMicrophoneAltSolid
-              title="lyrics"
-              className="text-2xl"
-            />
+            <LiaMicrophoneAltSolid title="lyrics" className="text-2xl" />
           </NavLink>
 
           {/* Queue */}
-          <button
-            onClick={() => {
-              toggleQueueDisplay();
-            }}
-          >
+          <button onClick={toggleQueueDisplay}>
             <HiOutlineQueueList
               title="queue"
               className={`${
@@ -271,21 +261,21 @@ const SoundBar = forwardRef((props, ref) => {
           </button>
           {/* Sound Seek */}
           <div className="flex items-center gap-1">
-            {/* mute unmute */}
+            {/* Mute/Unmute */}
             <button onClick={toggleMute}>
               {isMuted ? (
-                <VolumeOff title="mute" className="hoverIcon" /> // 🔇 Mute icon
+                <VolumeOff title="mute" className="hoverIcon" />
               ) : volume === 0 ? (
-                <VolumeX className="hoverIcon" /> // ❌ Volume off (muted nahi but 0 hai)
+                <VolumeX className="hoverIcon" />
               ) : volume > 0 && volume < 50 ? (
-                <Volume title="unmute" className="hoverIcon" /> // 🔊 Low Volume
+                <Volume title="unmute" className="hoverIcon" />
               ) : volume >= 50 && volume < 100 ? (
-                <Volume1 title="unmute" className="hoverIcon" /> // 🔉 Medium Volume
+                <Volume1 title="unmute" className="hoverIcon" />
               ) : (
-                <Volume2 title="unmute" className="hoverIcon" /> // 🔊 Max Volume
+                <Volume2 title="unmute" className="hoverIcon" />
               )}
             </button>
-            {/* Set Sound In Range */}
+            {/* Volume Seek */}
             <SeekBar
               min={0}
               max={100}
@@ -297,6 +287,6 @@ const SoundBar = forwardRef((props, ref) => {
       </div>
     </div>
   );
-});
+};
 
-export default SoundBar;
+export default React.memo(SoundBar);

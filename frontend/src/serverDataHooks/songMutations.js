@@ -5,33 +5,9 @@ const useLikeSong = () => {
   return useMutation({
     mutationFn: async (songID) => {
       try {
-        await normalRequest.post(
-          `/songs/like-a-song/${songID}`,
-          {
-            headers: { "Content-Type": "application/json" },
-          }
-        );
-      } catch (error) {
-        throw error;
-      }
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries(["likedSongs"])
-    },
-    onError:(error) =>{
-      throw error;
-    }
-  });
-};
-
-const useUnlikeSong = () => {
-  return useMutation({
-    mutationFn: async (songID) => {
-      try {
-        await normalRequest.delete(
-          `/songs/unlike/${songID}`,
-          { headers: { "Content-Type": "application/json" } }
-        );
+        await normalRequest.post(`/songs/like-a-song/${songID}`, {
+          headers: { "Content-Type": "application/json" },
+        });
       } catch (error) {
         throw error;
       }
@@ -39,9 +15,34 @@ const useUnlikeSong = () => {
     onSuccess: () => {
       queryClient.invalidateQueries(["likedSongs"]);
     },
-    onError:(error) =>{
+    onError: (error) => {
       throw error;
-    }
+    },
+  });
+};
+
+const useUnlikeSong = () => {
+  return useMutation({
+    mutationFn: async (songID) => {
+      try {
+        await normalRequest.delete(`/songs/unlike/${songID}`, {
+          headers: { "Content-Type": "application/json" },
+        });
+        return songID;
+      } catch (error) {
+        throw error;
+      }
+    },
+    onSuccess: (songID) => {
+      queryClient.setQueryData(["likedSongs"], (oldData) => {
+        if (!oldData) return oldData;
+        const songs = oldData.data.filter((song) => song?._id !== songID);
+        return { ...oldData, data: songs };
+      });
+    },
+    onError: (error) => {
+      throw error;
+    },
   });
 };
 

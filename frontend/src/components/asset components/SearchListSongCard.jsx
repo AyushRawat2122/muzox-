@@ -57,7 +57,7 @@ const SearchListSongCard = ({ song }) => {
       <div className="grow flex justify-between items-center">
         <div>
           <h1 className="capitalize">{title}</h1>
-          <p className="text-gray-300">{artist}</p>
+          <p className="text-gray-300 capitalize">{artist}</p>
         </div>
         <p className="text-sm text-gray-300">{convertToMinSecFormat(duration)}</p>
       </div>

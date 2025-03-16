@@ -123,4 +123,4 @@ function PremiumPage() {
   );
 }
 
-export default PremiumPage;
+export default React.memo(PremiumPage);

@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState , useCallback } from "react";
 import { Outlet } from "react-router";
 import { Navigate, useLocation, NavLink } from "react-router";
 import getUser from "./serverDataHooks/getUser.js";
@@ -20,23 +20,52 @@ import { useMediaQuery } from "react-responsive";
 import useAudioPlayer from "./store/useAudioPlayer.js";
 import { ChevronLeft, Home, Heart, ListMusic } from "lucide-react";
 import { MdLibraryMusic } from "react-icons/md";
+import usePopUp from "./store/usePopUp.js";
+import MobileTabletsView from "./components/pop-ups/MobileTabletsView.jsx";
+import MobileSoundBarDisplay from "./components/bars/MobileSoundBarDisplay.jsx";
+import { AnimatePresence } from "framer-motion";
 const ProtectedRoute = () => {
   const location = useLocation();
   const { data: user, isPending, error, isSuccess } = getUser();
   const { isSideBarOpen, toggleSideBarOpen } = useSideBar();
   const [leftPanelSize, setLeftPanelSize] = useState(4);
   const [rightPanelSize, setRightPanelSize] = useState(22);
-  const audioRef = useRef(null);
+
+  // Use a single ref for AudioPlayer
+  const audioPlayerRef = useRef(null);
+
   const { queue } = useAudioPlayer();
+  const { soundBarPopUp } = usePopUp();
 
   const isDesktopOrLaptop = useMediaQuery({
     query: "(min-width: 1224px)",
   });
-
   const isTabletOrMobile = useMediaQuery({ query: "(max-width: 1224px)" });
 
+  // Helper to get the audio element
+  const getAudio = () => {
+    return audioPlayerRef.current
+      ? audioPlayerRef.current.getAudioElement()
+      : null;
+  };
+  const [audioReady, setAudioReady] = useState(false);
+
+  const leftHandleDrag = useCallback(() => {
+    console.log(getResizeHandleElement("right-panel-handle"), "hey");
+  }, []);
+  const rightHandleDrag = useCallback(() => {
+    console.log(getResizeHandleElement("right-panel-handle"), "hey");
+  }, []);
+
   useEffect(() => {
+    const interval = setInterval(() => {
+      if (audioPlayerRef.current && audioPlayerRef.current.getAudioElement()) {
+        setAudioReady(true);
+        clearInterval(interval);
+      }
+    }, 100);
     return () => {
+      clearInterval(interval);
       queryClient.clear();
     };
   }, []);
@@ -50,19 +79,23 @@ const ProtectedRoute = () => {
       <Navigate to={"/login"} replace state={{ from: location.pathname }} />
     );
   }
-  if (isSuccess) {
-    console.log(user);
-  }
+
   return (
-    <MuzoxApp className={"max-sm:px-[1px]"}>
-      {/* Muzox App is the Wrapper which will have our player and Sidebar or NavBar*/}
+    <MuzoxApp className={"max-sm:px-[1px] relative"}>
+      {/* Mobile popup gets the audio element via prop instead of ref */}
+      <AnimatePresence mode="wait">
+        {soundBarPopUp && isTabletOrMobile && audioReady && (
+          <MobileTabletsView key="mobileView" audioElement={getAudio()} />
+        )}
+      </AnimatePresence>
       <div className="text-white h-screen w-screen flex flex-col">
-        {/* Global audio element responsible for playing the music */}
-        <AudioPlayer ref={audioRef} />
+        {/* AudioPlayer holds the actual audio element and gets the ref */}
+        <AudioPlayer ref={audioPlayerRef} />
+
         {/* Top bar */}
-        {((isTabletOrMobile && location.pathname === "/") ||
+        {((isTabletOrMobile && location.pathname !== "/search") ||
           isDesktopOrLaptop) && (
-          <div className="flex py-2 max-lg:justify-between bg-black/50">
+          <div className="flex py-2  max-sm:px-2 justify-between bg-black/50">
             <div>
               <img
                 src="/MUZOX.png"
@@ -81,16 +114,18 @@ const ProtectedRoute = () => {
                   <Home className=" h-[35px] w-[35px] " />
                 </NavLink>
                 <div className="w-[500px]">
-                  <SearchBar></SearchBar>
+                  <SearchBar />
                 </div>
               </div>
             )}
             <div className="flex gap-2 px-2">
-              <NavLink to={"/premium"}>
-                <button className="gradient-btn w-[200px] h-[40px]">
-                  Explore Premium
-                </button>
-              </NavLink>
+              {isDesktopOrLaptop && (
+                <NavLink to={"/premium"}>
+                  <button className="gradient-btn w-[200px] h-[40px]">
+                    Explore Premium
+                  </button>
+                </NavLink>
+              )}
               <button className="bg-white h-[40px] w-[40px] text-2xl text-center text-black rounded-full">
                 A
               </button>
@@ -98,22 +133,20 @@ const ProtectedRoute = () => {
           </div>
         )}
 
-        {/* Middle Section icludes Main page left side bar and right side bar resizable */}
-
+        {/* Middle Section includes Main page left sidebar and right sidebar resizable */}
         <PanelGroup
           direction="horizontal"
-          className={`grow bg-transparent h-full ${
-            isTabletOrMobile ? "pb-[30px]" : "pb-0"
-          }`}
+          className="grow bg-transparent h-full"
         >
-          {/* ✅ LEFT PANEL (Draggable) */}
+          {/* LEFT PANEL (Draggable) */}
           {isDesktopOrLaptop && (
             <Panel
               className="bg-black/40 no-copy"
               minSize={4}
               maxSize={13}
-              defaultSize={leftPanelSize} // Maintain size
-              onResize={(size) => setLeftPanelSize(size)} // Save size on change
+              order={1}
+              defaultSize={leftPanelSize}
+              onResize={(size) => setLeftPanelSize(size)}
               id="left-panel"
             >
               <div className="flex flex-col gap-4 p-2 myContainer">
@@ -127,14 +160,12 @@ const ProtectedRoute = () => {
                     <MdLibraryMusic size={35} />
                     {leftPanelSize > 10 && (
                       <h2 className="capitalize responsive-text font-semibold text-lg">
-                        {" "}
                         Library
                       </h2>
                     )}
                   </div>
                   <hr className="text-[#fafafa46] mt-2" />
                 </NavLink>
-
                 <NavLink
                   to={`/library/likedSongs/${user?._id}`}
                   className={({ isActive }) =>
@@ -148,13 +179,11 @@ const ProtectedRoute = () => {
                         className="capitalize text-white responsive-text font-semibold"
                         style={{ fontSize: "15px" }}
                       >
-                        {" "}
                         Liked songs
                       </h2>
                     )}
                   </div>
                 </NavLink>
-
                 <NavLink
                   to={`/library/playlists/${user?._id}`}
                   className={({ isActive }) =>
@@ -177,39 +206,41 @@ const ProtectedRoute = () => {
             </Panel>
           )}
 
-          {/* ✅ FIRST RESIZE HANDLE */}
+          {/* FIRST RESIZE HANDLE */}
           {isDesktopOrLaptop && (
             <PanelResizeHandle
-              className="w-[1px]  bg-gray-300/60 cursor-ew-resize"
-              id={"left-panel-handle"}
+              className="w-[1px] bg-gray-300/60 cursor-ew-resize"
+              id="left-panel-handle"
+              onDrag={leftHandleDrag}
             />
           )}
 
-          {/* ✅ MIDDLE PANEL (Auto-Adjust) */}
-          <Panel className="bg-black/30" id="middle-panel">
+          {/* MIDDLE PANEL (Auto-Adjust) */}
+          <Panel className="bg-black/30" id="middle-panel" order={2}>
             <Outlet />
           </Panel>
 
-          {/* ✅ LAST RESIZE HANDLE */}
+          {/* LAST RESIZE HANDLE */}
           {isDesktopOrLaptop && isSideBarOpen && (
             <PanelResizeHandle
               className="w-[1px] bg-gray-300/60 cursor-ew-resize"
-              id={"right-panel-handle"}
+              id="right-panel-handle"
+              onDrag={rightHandleDrag}
             />
           )}
 
-          {/* ✅ RIGHT PANEL (Draggable) */}
+          {/* RIGHT PANEL (Draggable) */}
           {isDesktopOrLaptop && isSideBarOpen && (
             <Panel
-              className=" bg-black/40"
+              className="bg-black/40"
               minSize={15}
               maxSize={25}
-              defaultSize={rightPanelSize} // Maintain size
-              onResize={(size) => setRightPanelSize(size)} // Save size on change
+              order={3}
+              defaultSize={rightPanelSize}
+              onResize={(size) => setRightPanelSize(size)}
               id="right-panel"
             >
-              {queue?.length > 0 && <RightSideBar />}
-              {!queue?.length && <EmptyQueue />}
+              {queue?.length > 0 ? <RightSideBar /> : <EmptyQueue />}
             </Panel>
           )}
 
@@ -223,9 +254,13 @@ const ProtectedRoute = () => {
           )}
         </PanelGroup>
 
-        {/* Sound Bar for large screen devices and navBar for mobile layouts */}
-        {isDesktopOrLaptop && <SoundBar ref={audioRef} />}
-        {/* navigation bar which will only render on tablets screen sizes */}
+        {/* SoundBar for large screen devices gets the audio element via prop */}
+        {isDesktopOrLaptop && audioReady && (
+          <SoundBar audioElement={getAudio()} />
+        )}
+        {/* Mobile SoundBar Display */}
+        {isTabletOrMobile && queue.length > 0 && <MobileSoundBarDisplay />}
+        {/* NavBar for tablet/mobile */}
         {isTabletOrMobile && <NavBar />}
       </div>
     </MuzoxApp>

@@ -14,6 +14,10 @@ const LyricsPage = () => {
   ];
   const fetchLyrics = useCallback(async () => {
     try {
+      if(!currentSong){
+        setError("It seems there's no melody playing right now! Your lyrics page is whispering in the wind.");
+        return;
+      }
       const res = await axios.get(
         `https://api.lyrics.ovh/v1/${currentSong.artist}/${currentSong.title}`,
         { headers: { "Content-Type": "application/json" } }
@@ -26,16 +30,14 @@ const LyricsPage = () => {
     }
   }, []);
   useEffect(() => {
-    if (currentSong && currentSong?.artist && currentSong?.title) {
       fetchLyrics();
-    }
   }, [currentSong]);
 
   return (
     <div className="h-full w-full overflow-y-scroll flex flex-col relative pb-2">
-      <h1 className="text-2xl font-bold text-white sticky top-0 pb-1 backdrop-blur-md shadow-md shadow-[#00000031] px-2">
-        Lyrics{" "}
-        <span className="text-sm px-4 font-light text-gray-300">
+      <h1 className="text-2xl sm:gap-4 font-bold text-white flex max-sm:flex-col sticky top-0 pb-1 backdrop-blur-md shadow-md shadow-[#00000031] px-2">
+        Lyrics
+        <span className="text-sm font-light text-gray-300">
           {"["} lyrics re not synced with the song yet {"]"}
         </span>
       </h1>
