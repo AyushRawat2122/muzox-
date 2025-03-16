@@ -50,7 +50,7 @@ const LikedSongsPage = () => {
         />
         <div className="max-sm:px-2">
           <h4 className="text-sm text-gray-400">Playlist</h4>
-          <h1 className="text-6xl font-bold">Liked Songs</h1>
+          <h1 className="text-4xl sm:text-6xl font-bold">Liked Songs</h1>
           <p className="text-sm text-gray-400">
             Your Library • {likedSongs?.data?.length} songs
           </p>

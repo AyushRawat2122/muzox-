@@ -50,13 +50,7 @@ const ProtectedRoute = () => {
   };
   const [audioReady, setAudioReady] = useState(false);
 
-  const leftHandleDrag = useCallback(() => {
-    console.log(getResizeHandleElement("right-panel-handle"), "hey");
-  }, []);
-  const rightHandleDrag = useCallback(() => {
-    console.log(getResizeHandleElement("right-panel-handle"), "hey");
-  }, []);
-
+  console.log("renders")
   useEffect(() => {
     const interval = setInterval(() => {
       if (audioPlayerRef.current && audioPlayerRef.current.getAudioElement()) {
@@ -211,7 +205,6 @@ const ProtectedRoute = () => {
             <PanelResizeHandle
               className="w-[1px] bg-gray-300/60 cursor-ew-resize"
               id="left-panel-handle"
-              onDrag={leftHandleDrag}
             />
           )}
 
@@ -225,7 +218,6 @@ const ProtectedRoute = () => {
             <PanelResizeHandle
               className="w-[1px] bg-gray-300/60 cursor-ew-resize"
               id="right-panel-handle"
-              onDrag={rightHandleDrag}
             />
           )}
 

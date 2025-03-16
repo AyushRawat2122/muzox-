@@ -10,11 +10,11 @@ const SideBarMusicCards = ({ className, onClick, Song }) => {
             className="h-[50px] w-[50px] rounded-md aspect-square object-cover"
             alt="next song in queue"
           />
-          <div className="flex flex-col items-start capitalize">
-            <h3 className={`text-base font-semibold  h-5 ${className}`}>
+          <div className="flex flex-col items-start capitalize overflow-hidden">
+            <h3 className={`text-base font-semibold  h-5 whitespace-nowrap overflow-hidden text-ellipsis ${className}`}>
               {Song?.title}
             </h3>
-            <p className="text-sm text-[#c9c9c9] h-5  font-medium ">
+            <p className="text-sm text-[#c9c9c9] h-5 whitespace-nowrap overflow-hidden text-ellipsis  font-medium ">
               {Song?.artist}
             </p>
           </div>

@@ -43,6 +43,7 @@ const MobileTabletsView = (props) => {
               </span>
             </div>
           </div>
+          <hr className="text-[#ffffff89] mx-[10%]" />
           <div className="grow pointer-events-none"></div>
           <motion.div
             animate={soundBarPopUp ? { y: 0 } : { y: "100%" }}
