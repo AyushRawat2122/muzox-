@@ -98,7 +98,7 @@ const Library = () => {
 
   // Render nested routes if not on the main /library route
   return (
-    <div className="h-full w-full bg-black text-white">
+    <div className="h-full w-full bg-black text-white overflow-y-scroll">
       <Outlet />
     </div>
   );

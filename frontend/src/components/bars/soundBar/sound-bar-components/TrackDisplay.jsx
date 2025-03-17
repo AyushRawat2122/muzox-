@@ -28,11 +28,11 @@ const TrackDisplay = () => {
       {currentSong ? (
         <div className="flex w-full h-full justify-between lg:justify-normal items-center gap-2.5">
           {" "}
-          <div className=" capitalize">
-            <p className="cursor-pointer  hover:underline underline-offset-2">
+          <div className=" capitalize pr-4 overflow-hidden max-w-[90%]">
+            <p className="cursor-pointer  hover:underline underline-offset-2 whitespace-nowrap overflow-hidden text-ellipsis">
               {currentSong.title}
             </p>
-            <p className="text-sm hoverIcon cursor-pointer hover:underline underline-offset-2">
+            <p className="text-sm hoverIcon cursor-pointer hover:underline underline-offset-2 whitespace-nowrap overflow-hidden text-ellipsis">
               {currentSong.artist}
             </p>
           </div>

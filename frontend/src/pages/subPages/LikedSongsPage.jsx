@@ -106,12 +106,15 @@ const LikedSongsPage = () => {
 };
 
 const SongItem = ({ song, index, queueRef }) => {
-  const { setCurrentSong, queueID } = useAudioPlayer();
+  const { setCurrentSong, queueID , isShuffled ,shuffleBack} = useAudioPlayer();
   const changeCurrentSongOfQueue = (e) => {
     e.stopPropagation();
     if (queueID !== queueRef) {
       return;
     } else {
+      if(isShuffled){
+        shuffleBack();
+      }
       setCurrentSong(index);
     }
   };

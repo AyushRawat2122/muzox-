@@ -3,5 +3,12 @@ import SearchPage from "./SearchPage.jsx";
 import LibraryPage from "./LibraryPage.jsx";
 import PremiumPage from "./PremiumPage.jsx";
 import LyricsPage from "./LyricsPage.jsx";
-
-export { HomePage, SearchPage, LibraryPage, PremiumPage , LyricsPage };
+import CreatePlaylist from "./CreatePlaylist.jsx";
+export {
+  HomePage,
+  SearchPage,
+  LibraryPage,
+  PremiumPage,
+  LyricsPage,
+  CreatePlaylist,
+};

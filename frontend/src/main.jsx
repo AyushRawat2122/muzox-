@@ -11,6 +11,7 @@ import {
   PremiumPage,
   SearchPage,
   LyricsPage,
+  CreatePlaylist,
 } from "./pages/securePages/index.js";
 import { LikedSongsPage, PlaylistsPage } from "./pages/subPages/index.js";
 
@@ -55,6 +56,9 @@ const route = createBrowserRouter([
                   { path: ":userID", element: <PlaylistsPage /> },
                 ],
               },
+              {
+                path:"create-playlist" , element : <CreatePlaylist/>
+              }
             ],
           },
           { path: "/premium", element: <PremiumPage /> },

@@ -18,7 +18,10 @@ const createPlayList = asyncHandler(async (req, res, next) => {
 
   const playListCoverLocal = req.file?.playListCover?.[0]?.url;
   let playListCover = undefined;
-
+  const playlistSearch = await Playlist.findOne({ name: name });
+  if (playlistSearch) {
+    next(new ApiError(400, "Playlist with this name already exists"));
+  }
   if (playListCoverLocal) {
     playListCover = await uploadOnCloudinary(playListCoverLocal);
     if (!playListCover) {
@@ -26,7 +29,7 @@ const createPlayList = asyncHandler(async (req, res, next) => {
     }
   } //we ll upload only if user wants to upload file if he doesnt it's okay
 
-  await Playlist.create({
+  const playlist = await Playlist.create({
     name: name,
     description: description,
     playListCover: playListCover
@@ -38,7 +41,7 @@ const createPlayList = asyncHandler(async (req, res, next) => {
 
   return res
     .status(200)
-    .json(new ApiResponse(200, "", "playlist created successfully"));
+    .json(new ApiResponse(200, playlist, "playlist created successfully"));
 }); //ok
 
 //delete PlayList
@@ -244,6 +247,7 @@ const getPlaylistSongs = asyncHandler(async (req, res, next) => {
     .status(200)
     .json(new ApiResponse(200, playlist, "playlist fetched Successfully"));
 });
+
 export {
   createPlayList,
   addToPlayList,

@@ -1,38 +1,41 @@
 import usePopUp from "../../store/usePopUp";
-import Notify from "./Notify";
 import React, { useState, useEffect, useRef } from "react";
-import { AnimatePresence, motion } from "framer-motion";
+import { motion } from "framer-motion";
 import getUserLikedSong from "../../serverDataHooks/getUserLikedSong.js";
 import getUserPlaylists from "../../serverDataHooks/getUserPlaylists.js";
 import getUser from "../../serverDataHooks/getUser.js";
 import { useMediaQuery } from "react-responsive";
 import PlaylistCarousel from "../carousel/PlaylistCarousel.jsx";
 import { useLikeSong } from "../../serverDataHooks/songMutations.js";
-
+import {
+  notifyError,
+  notifySuccess,
+  notifyWarning,
+} from "../../store/useNotification.js";
 //liked song component
-const LikedSong = React.memo(({ setError, setSuccessMsg }) => {
+const LikedSong = React.memo(() => {
   const { context } = usePopUp();
   const { data: likedSong, isPending: likedSongNot } = getUserLikedSong();
   const mutation = useLikeSong();
 
   const handleClick = () => {
     if (likedSong?.data?.some((song) => song?._id === context?._id)) {
-      setError("song already exists in liked songs");
+      notifyWarning("song already exists in liked songs");
       return;
     }
     if (!context) {
-      setError("no context provided");
+      notifyWarning("no context provided");
       return;
     }
-    mutation.mutate(context?._id);
+    mutation.mutate(context);
   };
 
   useEffect(() => {
     if (mutation.isSuccess) {
-      setSuccessMsg("saved to liked songs");
+      notifySuccess("saved to liked songs");
     }
     if (mutation.isError) {
-      setError("failed to save in liked songs");
+      notifyError("failed to save in liked songs");
     }
   }, [mutation.isSuccess, mutation.isError]);
 
@@ -63,9 +66,7 @@ const PlaylistCard = () => {
 };
 
 const AddToLibrary = () => {
-  const { toggleAddPopUp, setContext, context } = usePopUp();
-  const [error, setError] = useState("");
-  const [successMsg, setSuccessMsg] = useState("");
+  const { toggleAddPopUp, setContext } = usePopUp();
   const popUp = useRef(null);
   const isTabletOrMobile = useMediaQuery({ query: "(max-width: 1224px)" });
   const [userPlaylist, setUserPlaylist] = useState([]);
@@ -107,15 +108,6 @@ const AddToLibrary = () => {
         animate={{ opacity: 1 }}
         exit={{ opacity: 0, transition: { duration: 0.2 } }}
       >
-        {/* Notification */}
-        <Notify
-          key={"notification"}
-          error={error}
-          setError={setError}
-          successMsg={successMsg}
-          setSuccessMsg={setSuccessMsg}
-        />
-
         {/* Modal Box */}
         <motion.div
           ref={popUp}
@@ -154,7 +146,7 @@ const AddToLibrary = () => {
           <h1 className="text-2xl font-bold">Save To :</h1>
           <h2 className="text-lg pt-2">Liked Songs</h2>
           <hr className="text-[#ffffff4b] mb-2" />
-          <LikedSong setError={setError} setSuccessMsg={setSuccessMsg} />
+          <LikedSong />
           <h2 className="text-lg pt-2">Playlists</h2>
           <hr className="text-[#ffffff4b] mb-2" />
           {userPlaylist.length > 0 ? (

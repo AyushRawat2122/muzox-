@@ -5,7 +5,7 @@ import { GiLoveSong } from "react-icons/gi";
 import useSideBar from "../../store/useSideBar.js";
 
 const CurrentSongAbout = () => {
-  const { currentSong, queue, currentSongIdx, playNext, isLooped } =
+  const { currentSong, queue, currentSongIdx, playNext, isLooped, isShuffled } =
     useAudioPlayer();
   const { toggleQueueDisplay } = useSideBar();
   const [nextSong, setNextSong] = useState({});
@@ -19,7 +19,7 @@ const CurrentSongAbout = () => {
     } else {
       setNextSong(false);
     }
-  }, [currentSong, isLooped]);
+  }, [currentSong, isLooped, isShuffled]);
 
   if (!currentSong) {
     return <EmptyQueue />; // this is displayed when there is no currentSong Playing
@@ -32,12 +32,12 @@ const CurrentSongAbout = () => {
         className="rounded-md aspect-square w-full object-cover"
         alt="coverImage"
       />
-      <hr className="text-[#ffffff51]"/>
+      <hr className="text-[#ffffff51]" />
       <div className="w-full text-clip capitalize">
-        <h1 className="text-2xl font-bold">{currentSong?.title}</h1>
-        <h2 className="text-lg text-[#c9c9c9]">{currentSong?.artist}</h2>
+        <h1 className="text-2xl font-bold whitespace-nowrap overflow-hidden text-ellipsis">{currentSong?.title}</h1>
+        <h2 className="text-lg text-[#c9c9c9] whitespace-nowrap overflow-hidden text-ellipsis">{currentSong?.artist}</h2>
       </div>
-      <hr className="text-[#ffffff51]"/>
+      <hr className="text-[#ffffff51]" />
       <div>
         <div className="flex justify-between mb-3">
           <h3 className="text-base capitalize font-bold">next in Queue</h3>

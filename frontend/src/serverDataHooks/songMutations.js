@@ -3,17 +3,23 @@ import { useMutation } from "@tanstack/react-query";
 
 const useLikeSong = () => {
   return useMutation({
-    mutationFn: async (songID) => {
+    mutationFn: async (song) => {
       try {
-        await normalRequest.post(`/songs/like-a-song/${songID}`, {
+        await normalRequest.post(`/songs/like-a-song/${song?._id}`, {
           headers: { "Content-Type": "application/json" },
         });
+        return song;
       } catch (error) {
         throw error;
       }
     },
-    onSuccess: () => {
+    onSuccess: (song) => {
       queryClient.invalidateQueries(["likedSongs"]);
+      queryClient.setQueryData(["likedSongs"], (oldData) => {
+        const data = oldData?.data;
+        data.push(song);
+        return { ...oldData, data: data };
+      });
     },
     onError: (error) => {
       throw error;

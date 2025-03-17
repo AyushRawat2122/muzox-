@@ -51,7 +51,7 @@ const MobileTabletsView = (props) => {
           >
             <SoundBar
               audioElement={audioElement}
-              className="px-1 py-2 rounded-top-md bg-transparent"
+              className="px-1 py-2 rounded-top-md bg-transparent mb-4"
             />
           </motion.div>
         </div>
