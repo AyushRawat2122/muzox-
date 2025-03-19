@@ -70,25 +70,12 @@ const AddToLibrary = () => {
   const popUp = useRef(null);
   const isTabletOrMobile = useMediaQuery({ query: "(max-width: 1224px)" });
   const [userPlaylist, setUserPlaylist] = useState([]);
-  const [carouselDrag, setCarouselDrag] = useState(false);
   const { data: user, isSuccess: userSuccess, isPending: userNot } = getUser();
   const {
     data: playlist,
     isSuccess: playlistSuccess,
     isPending: playlistNot,
   } = getUserPlaylists();
-
-  useEffect(() => {
-    if (isTabletOrMobile) {
-      setCarouselDrag(true);
-    } else {
-      setCarouselDrag(false);
-    }
-    console.log(carouselDrag);
-  }, [isTabletOrMobile]);
-  useEffect(() => {
-    console.log("isTabletOrMobile:", isTabletOrMobile);
-  }, [isTabletOrMobile]);
 
   const handleBackdropClick = (e) => {
     if (popUp.current && e.target === e.currentTarget) {
@@ -151,8 +138,6 @@ const AddToLibrary = () => {
           <hr className="text-[#ffffff4b] mb-2" />
           {userPlaylist.length > 0 ? (
             <PlaylistCarousel
-              drag={carouselDrag}
-              click={!carouselDrag}
             ></PlaylistCarousel>
           ) : (
             <p className="text-gray-300">

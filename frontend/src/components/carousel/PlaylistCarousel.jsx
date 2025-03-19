@@ -4,9 +4,10 @@ import "swiper/css";
 import "swiper/css/pagination";
 import "./playlistCarousel.css";
 import { CircleChevronLeft, CircleChevronRight } from "lucide-react";
+import { useMediaQuery } from "react-responsive";
 const PlaylistCarousel = ({ drag = true, click = true, children }) => {
   const [swiperInstance, setSwiperInstance] = useState(null);
-
+  const isTabletOrMobile = useMediaQuery({ query: "(max-width: 1224px)" });
   const handleNext = () => {
     if (swiperInstance) {
       swiperInstance.slideNext();
@@ -20,7 +21,7 @@ const PlaylistCarousel = ({ drag = true, click = true, children }) => {
   };
   return (
     <div className="carousel-container relative">
-      {click && (
+      {!isTabletOrMobile && (
         <button
           onClick={handlePrev}
           className="rounded-full absolute z-999 top-[40%] left-1 bg-black/40 p-1"
@@ -29,10 +30,10 @@ const PlaylistCarousel = ({ drag = true, click = true, children }) => {
         </button>
       )}
       <Swiper
-        key={`${drag ? "drag" : "nodrag"}-${click ? "click" : "noclick"}`}
+        key={`${isTabletOrMobile ? "drag" : "nodrag"}-${!isTabletOrMobile ? "click" : "noclick"}`}
         onSwiper={(swiper) => setSwiperInstance(swiper)}
-        allowTouchMove={drag}
-        slideToClickedSlide={click}
+        allowTouchMove={isTabletOrMobile}
+        slideToClickedSlide={!isTabletOrMobile}
         slidesPerView="auto"
         spaceBetween={10}
         className="mySwiper swiper"
@@ -46,7 +47,7 @@ const PlaylistCarousel = ({ drag = true, click = true, children }) => {
           ))}
       </Swiper>
 
-      {click && (
+      {!isTabletOrMobile && (
         <button
           onClick={handleNext}
           className="rounded-full absolute z-999 top-[40%] right-1 bg-black/40 p-1"

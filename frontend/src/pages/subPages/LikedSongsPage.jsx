@@ -3,6 +3,8 @@ import { Play, Repeat2, Pause, BookmarkMinus } from "lucide-react";
 import useAudioPlayer from "../../store/useAudioPlayer.js";
 import getUserLikedSong from "../../serverDataHooks/getUserLikedSong.js";
 import { useUnlikeSong } from "../../serverDataHooks/songMutations.js";
+import { loadingPlayIcon } from "../../utils/lottie.js";
+import Loading from "../../components/loaders/Loading.jsx"
 const LikedSongsPage = () => {
   const {
     queueID,
@@ -12,7 +14,7 @@ const LikedSongsPage = () => {
     togglePlayPause,
     toggleLooping,
   } = useAudioPlayer(); //audio players methods
-  const { data: likedSongs, isSuccess } = getUserLikedSong();
+  const { data: likedSongs, isPending } = getUserLikedSong();
 
   const handlePlayButtonClick = () => {
     if (likedSongs?.data?.length <= 0) {
@@ -36,6 +38,11 @@ const LikedSongsPage = () => {
   const customGradient = {
     background: `linear-gradient(to bottom, #ff8c2d 10%, black)`, // #ff8c2d → Custom color (Orange)
   }; // custom gradient for cover
+
+  if(isPending){
+    return <Loading src={loadingPlayIcon}/>
+  }
+
   return (
     <main className="h-full w-full overflow-y-auto bg-black text-white">
       {/* Section 1: Playlist Info */}

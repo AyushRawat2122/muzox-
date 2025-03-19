@@ -54,7 +54,6 @@ const storeDataWithExpiry = (key, value, ttl) => {
   const mutation = useMutation({
     mutationKey: "createPlaylist",
     mutationFn: async (formData) => {
-      console.log("dhdhhd",formData)
       try {
         const res = await normalRequest.post(
           "/playlist/create-playlist",
@@ -97,7 +96,7 @@ const storeDataWithExpiry = (key, value, ttl) => {
     const formData = new FormData();
     formData.append("name", data.title);
     formData.append("description", data.description);
-    formData.append("playListCover", data.playlistCover);
+    formData.append("playListCover", data?.playListCover?.[0]);
 
     mutation.mutate(formData);
   };
@@ -158,8 +157,8 @@ const storeDataWithExpiry = (key, value, ttl) => {
             required: "Title is required",
             minLength: { value: 5, message: "Title is required" },
             maxLength: {
-              value: 12,
-              message: "Title must be at most 12 characters",
+              value: 50,
+              message: "Title must be at most 50 characters",
             },
           })}
           className="border p-2 rounded-md w-full bg-white/10 text-white placeholder-gray-500"
