@@ -73,7 +73,7 @@ function Card({ name, tagline }) {
       </ul>
 
       <button
-        className="w-full bg-[#fe7641] text-white font-bold py-2 rounded-md transition-all hover:text-[#fe7641]"
+        className="w-full bg-[#fe7641] text-white font-bold py-2 rounded-md transition-all hover:text-[#ffffff]"
       >
         Select {name}
       </button>

@@ -1,11 +1,12 @@
-import React from 'react';
-
+import React, { useEffect } from "react";
+import getUserPlaylists from "../../serverDataHooks/getUserPlaylists.js";
+import {} from "../../utils/lottie.js"
 const PlaylistsPage = () => {
-    return (
-        <div>
-            
-        </div>
-    );
-}
+  const { data: playlists, isPending } = getUserPlaylists();
+  if(isPending){
+    return
+  }
+  return <div></div>;
+};
 
-export default React.memo(PlaylistsPage);
+export default PlaylistsPage;

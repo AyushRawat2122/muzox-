@@ -21,12 +21,12 @@ import { NavLink } from "react-router";
 
 const SoundBar = ({ audioElement, className }) => {
   const audio = audioElement;
-  const [currentPosition, setCurrentPosition] = useState( audio.currentTime || 0);
-  const [duration, setDuration] = useState(audio.duration || 0 );
+  const [currentPosition, setCurrentPosition] = useState( audio?.currentTime || 0);
+  const [duration, setDuration] = useState(audio?.duration || 0 );
   const [isSeeking, setIsSeeking] = useState(false);
-  const [volume, setVolume] = useState(Math.floor(parseInt(audio.volume * 100)) || 100);
+  const [volume, setVolume] = useState(Math.floor(parseInt(audio?.volume * 100)) || 100);
   const [isMuted, setIsMuted] = useState(false);
-  const [isLoop, setIsLoop] = useState(audio.loop||false);
+  const [isLoop, setIsLoop] = useState(audio?.loop||false);
 
   const {
     isShuffled,

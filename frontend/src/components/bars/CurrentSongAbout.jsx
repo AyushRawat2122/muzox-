@@ -63,7 +63,7 @@ const CurrentSongAbout = () => {
           <p className="italic text-[#c9c9c9] p-3">
             "Whoa, you just played through the entire setlist! Want an encore or
             should we smash the guitar?{" "}
-            <GiLoveSong className="text-purple-500 text-2xl inline" />"
+            <GiLoveSong className="bg-orange-500 text-2xl inline" />"
           </p>
         )}
 

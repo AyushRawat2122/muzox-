@@ -57,8 +57,9 @@ const route = createBrowserRouter([
                 ],
               },
               {
-                path:"create-playlist" , element : <CreatePlaylist/>
-              }
+                path: "create-playlist",
+                element: <CreatePlaylist />,
+              },
             ],
           },
           { path: "/premium", element: <PremiumPage /> },
@@ -90,9 +91,9 @@ the route / where whole application is going to render is App
 */
 
 createRoot(document.getElementById("root")).render(
-  <StrictMode>
-    <QueryClientProvider client={queryClient}>
-      <RouterProvider router={route} />
-    </QueryClientProvider>
-  </StrictMode>
+  // <StrictMode>
+  <QueryClientProvider client={queryClient}>
+    <RouterProvider router={route} />
+  </QueryClientProvider>
+  // </StrictMode>
 );

@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState , useCallback } from "react";
+import React, { useEffect, useRef, useState, useCallback } from "react";
 import { Outlet } from "react-router";
 import { Navigate, useLocation, NavLink } from "react-router";
 import getUser from "./serverDataHooks/getUser.js";
@@ -24,6 +24,7 @@ import usePopUp from "./store/usePopUp.js";
 import MobileTabletsView from "./components/pop-ups/MobileTabletsView.jsx";
 import MobileSoundBarDisplay from "./components/bars/MobileSoundBarDisplay.jsx";
 import { AnimatePresence } from "framer-motion";
+import { debounce } from "lodash";
 const ProtectedRoute = () => {
   const location = useLocation();
   const { data: user, isPending, error, isSuccess } = getUser();
@@ -49,8 +50,20 @@ const ProtectedRoute = () => {
       : null;
   };
   const [audioReady, setAudioReady] = useState(false);
+  const leftResize = useCallback(
+    debounce((size) => {
+      setLeftPanelSize(size);
+    }, 500),
+    []
+  );
+  const rightResize = useCallback(
+    debounce((size) => {
+      setRightPanelSize(size);
+    }, 500),
+    []
+  );
 
-  console.log("renders")
+  console.log("renders");
   useEffect(() => {
     const interval = setInterval(() => {
       if (audioPlayerRef.current && audioPlayerRef.current.getAudioElement()) {
@@ -140,7 +153,7 @@ const ProtectedRoute = () => {
               maxSize={13}
               order={1}
               defaultSize={leftPanelSize}
-              onResize={(size) => setLeftPanelSize(size)}
+              onResize={leftResize}
               id="left-panel"
             >
               <div className="flex flex-col gap-4 p-2 myContainer">
@@ -229,7 +242,7 @@ const ProtectedRoute = () => {
               maxSize={25}
               order={3}
               defaultSize={rightPanelSize}
-              onResize={(size) => setRightPanelSize(size)}
+              onResize={rightResize}
               id="right-panel"
             >
               {queue?.length > 0 ? <RightSideBar /> : <EmptyQueue />}

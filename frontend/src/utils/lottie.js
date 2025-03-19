@@ -1,17 +1,11 @@
-const loadingVibrations =
-  "https://lottie.host/cb76c1e5-1347-4240-aed6-8221d10d987e/dfabDrvthz.lottie";
 const loadingPlayIcon =
-  "https://lottie.host/ba4d9e9d-f0e1-452d-aa4f-e9a81586f1d6/8rOgJqaz37.lottie";
-const loadingMic =
-  "https://lottie.host/cce11d47-c338-43c1-bd1c-d4db4ca7b43a/KSqiDdsQRw.lottie";
+  "https://lottie.host/16a4afb0-9c69-49b6-8400-a99b05d89db2/bLQcrwIq0N.lottie";
 const floatingMusicIcons =
   "https://lottie.host/6d00caa2-9327-4910-8721-54a6e4979078/p9kM7TwmbD.lottie";
 const loadingDots =
   "https://lottie.host/344e03a7-c69d-4ef8-b8a7-b220633f16bd/WDe1AH2Dso.json";
 export {
-  loadingVibrations,
   loadingPlayIcon,
-  loadingMic,
   floatingMusicIcons,
   loadingDots,
 };
