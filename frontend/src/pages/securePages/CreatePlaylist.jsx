@@ -14,7 +14,6 @@ function CreatePlaylist() {
     mode: "onChange",
     defaultValues: { playListCover: [] },
   });
-
   const [coverPreview, setCoverPreview] = useState(null);
 const storeDataWithExpiry = (key, value, ttl) => {
   const now = new Date();
@@ -24,7 +23,7 @@ const storeDataWithExpiry = (key, value, ttl) => {
   };
   localStorage.setItem(key, JSON.stringify(item));
 };
-  // Extract the file input props from register for playListCover.
+
   const {
     ref: fileInputRef,
     onChange: fileInputOnChange,
@@ -55,6 +54,7 @@ const storeDataWithExpiry = (key, value, ttl) => {
   const mutation = useMutation({
     mutationKey: "createPlaylist",
     mutationFn: async (formData) => {
+      console.log("dhdhhd",formData)
       try {
         const res = await normalRequest.post(
           "/playlist/create-playlist",

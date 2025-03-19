@@ -10,7 +10,7 @@ import User from "../models/user.models.js";
 //create PlayList
 const createPlayList = asyncHandler(async (req, res, next) => {
   const { name, description } = req.body;
-
+  
   const { _id } = req.user;
 
   if (!name || !description) {
@@ -25,7 +25,9 @@ const createPlayList = asyncHandler(async (req, res, next) => {
     next(new ApiError(400, "Playlist with this name already exists"));
   }
   if (playListCoverLocal) {
+    console.log("Fssffs")
     playListCover = await uploadOnCloudinary(playListCoverLocal);
+    console.log(playListCover)
     if (!playListCover) {
       next(new ApiError(500, "something went wrong while uploading coverImg"));
     }
