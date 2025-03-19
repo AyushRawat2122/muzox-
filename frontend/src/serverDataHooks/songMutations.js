@@ -1,6 +1,15 @@
 import { queryClient, normalRequest } from "../utils/axiosRequests.config";
 import { useMutation } from "@tanstack/react-query";
 
+const storeInLocal = (key, value, ttl) => {
+  const now = new Date();
+  const item = {
+    value,
+    expiry: now.getTime() + ttl,
+  };
+  localStorage.setItem(key, JSON.stringify(item));
+};
+
 const useLikeSong = () => {
   return useMutation({
     mutationFn: async (song) => {
@@ -9,6 +18,7 @@ const useLikeSong = () => {
           headers: { "Content-Type": "application/json" },
         });
         return song;
+        
       } catch (error) {
         throw error;
       }
@@ -19,6 +29,7 @@ const useLikeSong = () => {
         const data = oldData?.data;
         data.push(song);
         return { ...oldData, data: data };
+        storeInLocal("recent",data,172800000 );
       });
     },
     onError: (error) => {

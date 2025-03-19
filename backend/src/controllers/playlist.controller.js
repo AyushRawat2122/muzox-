@@ -10,13 +10,15 @@ import User from "../models/user.models.js";
 //create PlayList
 const createPlayList = asyncHandler(async (req, res, next) => {
   const { name, description } = req.body;
+
   const { _id } = req.user;
 
   if (!name || !description) {
     next(new ApiError(400, "name and description are required"));
-  } // title and description about playlist required
+  } 
 
-  const playListCoverLocal = req.file?.playListCover?.[0]?.url;
+  const playListCoverLocal = req.files?.playListCover?.[0]?.path;
+  console.log(playListCoverLocal);
   let playListCover = undefined;
   const playlistSearch = await Playlist.findOne({ name: name });
   if (playlistSearch) {

@@ -16,7 +16,14 @@ function CreatePlaylist() {
   });
 
   const [coverPreview, setCoverPreview] = useState(null);
-
+const storeDataWithExpiry = (key, value, ttl) => {
+  const now = new Date();
+  const item = {
+    value,
+    expiry: now.getTime() + ttl,
+  };
+  localStorage.setItem(key, JSON.stringify(item));
+};
   // Extract the file input props from register for playListCover.
   const {
     ref: fileInputRef,
@@ -65,6 +72,7 @@ function CreatePlaylist() {
       queryClient.setQueryData(["playlists"] , (oldData)=>{
         console.log(oldData);
       })
+      storeDataWithExpiry("recent",data?.message,172800000)
     },
     onError: (error) => {
       let errorMsg = error?.response?.data?.message

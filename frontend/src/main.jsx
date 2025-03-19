@@ -17,6 +17,7 @@ import { LikedSongsPage, PlaylistsPage } from "./pages/subPages/index.js";
 
 import { queryClient } from "./utils/axiosRequests.config.js";
 import ProtectedRoute from "./ProtectedRoute.jsx";
+import UserProfile from "./pages/securePages/UserProfile.jsx";
 
 const route = createBrowserRouter([
   {
@@ -38,6 +39,8 @@ const route = createBrowserRouter([
         children: [
           { path: "/", element: <HomePage /> },
           { path: "/search", element: <SearchPage /> },
+          {path:'/user-profile',element:<UserProfile/>
+          },
           {
             path: "/library",
             element: <LibraryPage />,
