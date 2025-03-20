@@ -18,6 +18,7 @@ import { LikedSongsPage, PlaylistsPage } from "./pages/subPages/index.js";
 import { queryClient } from "./utils/axiosRequests.config.js";
 import ProtectedRoute from "./ProtectedRoute.jsx";
 import UserProfile from "./pages/securePages/UserProfile.jsx";
+import AdminUploadPage from "./pages/securePages/AdminUploadPage.jsx";
 
 const route = createBrowserRouter([
   {
@@ -40,6 +41,9 @@ const route = createBrowserRouter([
           { path: "/", element: <HomePage /> },
           { path: "/search", element: <SearchPage /> },
           {path:'/user-profile',element:<UserProfile/>
+          },
+          {
+            path:"/admin-upload-page",element:<AdminUploadPage/>
           },
           {
             path: "/library",
