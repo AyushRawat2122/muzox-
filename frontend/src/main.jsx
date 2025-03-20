@@ -12,12 +12,13 @@ import {
   SearchPage,
   LyricsPage,
   CreatePlaylist,
-  UserProfile
+  UserProfile,
 } from "./pages/securePages/index.js";
 import { LikedSongsPage, PlaylistsPage } from "./pages/subPages/index.js";
 
 import { queryClient } from "./utils/axiosRequests.config.js";
 import ProtectedRoute from "./ProtectedRoute.jsx";
+import AdminUploadPage from "./pages/securePages/AdminUploadPage.jsx";
 
 const route = createBrowserRouter([
   {
@@ -45,6 +46,10 @@ const route = createBrowserRouter([
               { index: true, element: <Navigate to="/login" replace /> },
               { path: ":userID", element: <UserProfile /> },
             ],
+          },
+          {
+            path: "/admin-upload-page",
+            element: <AdminUploadPage />,
           },
           {
             path: "/library",
