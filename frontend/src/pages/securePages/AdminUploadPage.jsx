@@ -3,6 +3,9 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import axios from "axios";
+import getUser from "../../serverDataHooks/getUser";
+import { death } from "../../utils/lottie";
+import Loading from "../../components/loaders/Loading";
 
 const USchema = z.object({
   title: z.string().min(1, "Title is required"),
@@ -85,9 +88,30 @@ function AdminUploadPage() {
       console.log(error);
     }
   };
+  const { data: user } = getUser();
+
+  if (!user || !user?.isAdmin) {
+    return (
+      <div className="h-full w-full flex justify-center items-center">
+        <Loading src={death} className={"md:w-[500px]"}>
+          <h1 className="text-center lg:text-left text-white">
+            <span className="text-5xl font-extrabold">Looks like you're </span>
+            <br />{" "}
+            <span className="text-2xl font-semibold">
+              not a{" "}
+              <span className="uppercase font-normal text-lime-200 underline underline-offset-4 decoration-1 decoration-lime-300">
+                verified artist
+              </span>{" "}
+            </span>
+            <br /> <span className="text-red-400 uppercase text-3xl">yet!</span>
+          </h1>
+        </Loading>
+      </div>
+    );
+  }
 
   return (
-    <div className="max-w-6xl h-full overflow-y-scroll  w-full mx-auto bg-black p-12 rounded-xl shadow-2xl border border-gray-700">
+    <div className="max-w-6xl h-full overflow-y-scroll  w-full mx-auto bg-black p-12 rounded-xl shadow-2xl">
       <form
         onSubmit={handleSubmit(onSubmit)}
         className="flex flex-col md:flex-row items-center gap-12"

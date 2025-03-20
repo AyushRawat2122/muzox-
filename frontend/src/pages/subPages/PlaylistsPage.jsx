@@ -38,14 +38,22 @@ const PlaylistsPage = () => {
       {creations.length > 0 ? (
         <PlaylistCarousel>
           {creations.map((playlist, id) => (
-            <div key={`${date.now + id}`}>
+            <div className="h-full w-full relative" key={date.now + id}>
+              <div className="absolute px-1 h-full max-sm:bg-black/40 w-full flex items-end lg:opacity-0 hover:opacity-100 hover:bg-black/40 cursor-pointer transition-all ease-in-out duration-300">
+                <div className="w-[80%] text-left">
+                  <h1 className="whitespace-nowrap text-2xl font-bold overflow-ellipsis w-full overflow-hidden">
+                    {playlist?.name}
+                  </h1>
+                  <p className="whitespace-nowrap font-medium overflow-ellipsis w-full overflow-hidden">
+                    {playlist?.description}
+                  </p>
+                </div>
+              </div>
               <img
-                src={creations?.coverImage?.url}
-                alt=""
-                className="w-full object-cover aspect-square"
+                src={playlist?.playListCover?.url || "/playlists.png"}
+                alt="playlist"
+                className="w-full h-full aspect-square object-cover"
               />
-              <h1 className="whitespace-nowrap text-ellipsis overflow-hidden w-full"></h1>
-              <p className="whitespace-nowrap text-ellipsis overflow-hidden w-full"></p>
             </div>
           ))}
         </PlaylistCarousel>

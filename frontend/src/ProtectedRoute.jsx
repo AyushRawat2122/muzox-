@@ -135,11 +135,11 @@ const ProtectedRoute = () => {
               )}
               <NavLink to={`/user/${user?._id}`} className={`block`}>
                 <div className="h-[40px] w-[40px] rounded-full">
-                <img
-                  src={user?.profilePic?.url}
-                  alt="userProfile"
-                  className="w-[40px] h-[40px] object-cover rounded-full aspect-square"
-                />
+                  <img
+                    src={user?.profilePic?.url}
+                    alt="userProfile"
+                    className="w-[40px] h-[40px] object-cover rounded-full aspect-square"
+                  />
                 </div>
               </NavLink>
             </div>
@@ -169,7 +169,11 @@ const ProtectedRoute = () => {
                     isActive ? "text-[#fe7641]" : "text-gray-300"
                   }
                 >
-                  <div className="flex gap-2 items-center">
+                  <div
+                    className={`flex gap-2 ${
+                      leftPanelSize <= 10 ? "justify-center" : "justify-normal"
+                    } items-center`}
+                  >
                     <MdLibraryMusic size={35} />
                     {leftPanelSize > 10 && (
                       <h2 className="capitalize responsive-text font-semibold text-lg">
@@ -185,7 +189,11 @@ const ProtectedRoute = () => {
                     isActive ? "text-[#fe7641]" : "text-gray-300"
                   }
                 >
-                  <div className="flex gap-2 items-center hover:bg-white/10 py-2 rounded-md">
+                  <div
+                    className={`flex gap-2 ${
+                      leftPanelSize <= 10 ? "justify-center" : "justify-normal"
+                    } items-center hover:bg-white/10 py-2 rounded-md`}
+                  >
                     <Heart size={30} />
                     {leftPanelSize > 10 && (
                       <h2
@@ -203,7 +211,11 @@ const ProtectedRoute = () => {
                     isActive ? "text-[#fe7641]" : "text-gray-300"
                   }
                 >
-                  <div className="flex gap-2 items-center hover:bg-white/10 py-2 rounded-md">
+                  <div
+                    className={`flex gap-2 ${
+                      leftPanelSize <= 10 ? "justify-center" : "justify-normal"
+                    } items-center hover:bg-white/10 py-2 rounded-md`}
+                  >
                     <ListMusic size={30} />
                     {leftPanelSize > 10 && (
                       <h2
