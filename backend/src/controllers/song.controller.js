@@ -59,7 +59,7 @@ const uploadSong = asyncHandler(async (req, res, next) => {
 });
 
 //search Song
-const getSuggestionList = asyncHandler(async (req, res , next) => {
+const getSuggestionList = asyncHandler(async (req, res, next) => {
   const { query = "" } = req.query;
   const searchedSuggestion = await Song.aggregate([
     {
@@ -85,7 +85,7 @@ const getSuggestionList = asyncHandler(async (req, res , next) => {
 });
 
 //get liked Songs
-const getLikedSongs = asyncHandler(async (req, res , next) => {
+const getLikedSongs = asyncHandler(async (req, res, next) => {
   const { _id } = req.user; //extracting id from user request
 
   const likedSongs = await Like.aggregate([
@@ -100,9 +100,9 @@ const getLikedSongs = asyncHandler(async (req, res , next) => {
         as: "songDetailsArray",
         pipeline: [
           {
-            $addFields:{
-              isLiked:true,
-            }
+            $addFields: {
+              isLiked: true,
+            },
           },
           {
             $project: {
@@ -120,12 +120,12 @@ const getLikedSongs = asyncHandler(async (req, res , next) => {
     {
       $project: {
         songDetail: 1,
-        _id:0
+        _id: 0,
       },
     },
     {
-      $replaceRoot: { newRoot: "$songDetail" }
-    }
+      $replaceRoot: { newRoot: "$songDetail" },
+    },
   ]); //aggregation PipeLine to get Liked Song
 
   return res
@@ -134,7 +134,7 @@ const getLikedSongs = asyncHandler(async (req, res , next) => {
 });
 
 //like a song
-const likeSong = asyncHandler(async (req, res , next) => {
+const likeSong = asyncHandler(async (req, res, next) => {
   const { songId } = req.params; //extract incoming song id
   const { _id } = req.user; //extract incoming user _id
   const song = await Like.findOne({
@@ -177,6 +177,59 @@ const unlikeSong = asyncHandler(async (req, res, next) => {
     .status(200)
     .json(new ApiResponse(200, "", "successfully removed from liked song"));
 });
+const forTheUserHomePage = asyncHandler(async (req, res, next) => {
+  const { _id } = req.user;
+
+  const userLike = await Like.findOne({
+    likedBy: new mongoose.Types.ObjectId(_id),
+  }).lean();
+
+  if (!userLike) {
+    return res
+      .status(404)
+      .json(new ApiResponse(404, null, "No liked songs found"));
+  }
+
+  const song = await Song.findById(userLike.song).lean();
+  if (!song) {
+    return res.status(404).json(new ApiResponse(404, null, "Song not found"));
+  }
+
+  const songsByArtist = await Song.find({ artist: song.artist }).lean();
+
+  return res.status(200).json(new ApiResponse(200, songsByArtist, "haha"));
+});
+
+const newlyAddedSectionForHomePage = asyncHandler(async (req, res, next) => {
+  const { _id } = req.user;
+  const tenDaysAgo = new Date();
+  tenDaysAgo.setDate(tenDaysAgo.getDate() - 10);
+  const newlyAddedSong = await Song.find({
+    createdAt: {
+      $gte: tenDaysAgo,
+    },
+  });
+  const songHuh = [];
+  let ind = 0;
+  for (let i = 0; i < newlyAddedSong.length; i++) {
+    if (ind >= 10) {
+      break;
+    }
+    songHuh.push(newlyAddedSong[i]);
+    ind++;
+  }
+  return res
+    .status(200)
+    .json(new ApiResponse(200, songHuh, "Newly Added Song"));
+});
 
 //exports
-export { uploadSong, getSuggestionList, getLikedSongs, likeSong, unlikeSong };
+export {
+  uploadSong,
+  getSuggestionList,
+  getLikedSongs,
+  likeSong,
+  unlikeSong,
+  forTheUserHomePage,
+  newlyAddedSectionForHomePage,
+};

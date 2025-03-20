@@ -10,12 +10,12 @@ import User from "../models/user.models.js";
 //create PlayList
 const createPlayList = asyncHandler(async (req, res, next) => {
   const { name, description } = req.body;
-  
+
   const { _id } = req.user;
 
   if (!name || !description) {
     next(new ApiError(400, "name and description are required"));
-  } 
+  }
 
   const playListCoverLocal = req.files?.playListCover?.[0]?.path;
   console.log(playListCoverLocal);
@@ -25,9 +25,9 @@ const createPlayList = asyncHandler(async (req, res, next) => {
     next(new ApiError(400, "Playlist with this name already exists"));
   }
   if (playListCoverLocal) {
-    console.log("Fssffs")
+    console.log("Fssffs");
     playListCover = await uploadOnCloudinary(playListCoverLocal);
-    console.log(playListCover)
+    console.log(playListCover);
     if (!playListCover) {
       next(new ApiError(500, "something went wrong while uploading coverImg"));
     }
@@ -251,6 +251,24 @@ const getPlaylistSongs = asyncHandler(async (req, res, next) => {
     .status(200)
     .json(new ApiResponse(200, playlist, "playlist fetched Successfully"));
 });
+const forTheHomePage = asyncHandler(async (req, res, next) => {
+  const { _id } = req.user;
+
+  //i want to exclude the playlist which are created by the users so this will be fetching all the playlist
+  //which was created by the playlist now i will get the all the playlist and //yaa phir i can filter all the data which was created by the user
+  const playlistsNotCreatedByUser = await Playlist.find({
+    owner: { $ne: _id },
+  });
+  return res
+    .status(200)
+    .json(
+      new ApiResponse(
+        200,
+        playlistsNotCreatedByUser,
+        "playlist for the home page"
+      )
+    );
+});
 
 export {
   createPlayList,
@@ -263,4 +281,5 @@ export {
   addThisPlaylist,
   getPlaylistSongs,
   removeFromLibrary,
+  forTheHomePage
 };

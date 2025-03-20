@@ -4,7 +4,7 @@ import { authRequired } from "../middlewares/authRequired.middleware.js";
 
 import uploader from "../middlewares/multer.middleware.js";
 
-import {getLikedSongs, getSuggestionList, likeSong, unlikeSong, uploadSong} from "../controllers/song.controller.js";
+import {forTheUserHomePage, getLikedSongs, getSuggestionList, likeSong, newlyAddedSectionForHomePage, unlikeSong, uploadSong} from "../controllers/song.controller.js";
 
 const SongRouter = express.Router();
 
@@ -20,5 +20,6 @@ SongRouter.get('/suggestionList',getSuggestionList);
 SongRouter.post('/like-a-song/:songId',authRequired,likeSong);
 SongRouter.get('/getLikedSong',authRequired,getLikedSongs);
 SongRouter.delete('/unlike/:songId',authRequired,unlikeSong);
-
+SongRouter.get('/song-for-home',authRequired,forTheUserHomePage);
+SongRouter.get('/newlyAddedSong',authRequired,newlyAddedSectionForHomePage);
 export default SongRouter;

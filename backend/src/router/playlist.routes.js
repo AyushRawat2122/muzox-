@@ -8,6 +8,7 @@ import {
   searchPlaylist,
   getPlaylistSongs,
   removeFromLibrary,
+  forTheHomePage,
 } from "../controllers/playlist.controller.js";
 import { authRequired } from "../middlewares/authRequired.middleware.js";
 import uploader from "../middlewares/multer.middleware.js";
@@ -37,4 +38,5 @@ PlayListRouter.get("/search-playlist", searchPlaylist);
 PlayListRouter.get("/get-playlist-songs", authRequired, getPlaylistSongs);
 PlayListRouter.patch("/save-to-library/:playListId", authRequired, addThisPlaylist);
 PlayListRouter.patch("/remove-from-library/:playListId", authRequired, removeFromLibrary);
+PlayListRouter.get('/home-page-playlist',authRequired,forTheHomePage);
 export default PlayListRouter;
