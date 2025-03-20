@@ -92,12 +92,10 @@ const storeDataWithExpiry = (key, value, ttl) => {
   };
 
   const onSubmit = (data) => {
-    console.log(data);
     const formData = new FormData();
     formData.append("name", data.title);
     formData.append("description", data.description);
     formData.append("playListCover", data?.playListCover?.[0]);
-
     mutation.mutate(formData);
   };
 

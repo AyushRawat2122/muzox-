@@ -4,6 +4,7 @@ import LibraryPage from "./LibraryPage.jsx";
 import PremiumPage from "./PremiumPage.jsx";
 import LyricsPage from "./LyricsPage.jsx";
 import CreatePlaylist from "./CreatePlaylist.jsx";
+import UserProfile from "./UserProfile.jsx";
 export {
   HomePage,
   SearchPage,
@@ -11,4 +12,5 @@ export {
   PremiumPage,
   LyricsPage,
   CreatePlaylist,
+  UserProfile,
 };

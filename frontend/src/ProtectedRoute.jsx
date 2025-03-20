@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState, useCallback } from "react";
 import { Outlet } from "react-router";
-import { Navigate, useLocation, NavLink } from "react-router";
+import { Navigate, useLocation, NavLink, Link } from "react-router";
 import getUser from "./serverDataHooks/getUser.js";
 import MuzoxApp from "./pages/wrapperPages/MuzoxApp.jsx";
 import { queryClient } from "./utils/axiosRequests.config.js";
@@ -133,9 +133,15 @@ const ProtectedRoute = () => {
                   </button>
                 </NavLink>
               )}
-              <button className="bg-white h-[40px] w-[40px] text-2xl text-center text-black rounded-full">
-                A
-              </button>
+              <NavLink to={`/user/${user?._id}`} className={`block`}>
+                <div className="h-[40px] w-[40px] rounded-full">
+                <img
+                  src={user?.profilePic?.url}
+                  alt="userProfile"
+                  className="w-[40px] h-[40px] object-cover rounded-full aspect-square"
+                />
+                </div>
+              </NavLink>
             </div>
           </div>
         )}
