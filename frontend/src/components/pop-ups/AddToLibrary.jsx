@@ -60,11 +60,6 @@ const LikedSong = React.memo(() => {
   );
 });
 
-//user playlist component
-const PlaylistCard = () => {
-  return <div></div>;
-};
-
 const AddToLibrary = () => {
   const { toggleAddPopUp, setContext } = usePopUp();
   const popUp = useRef(null);
@@ -72,10 +67,19 @@ const AddToLibrary = () => {
   const [userPlaylist, setUserPlaylist] = useState([]);
   const { data: user, isSuccess: userSuccess, isPending: userNot } = getUser();
   const {
-    data: playlist,
+    data: playlists,
     isSuccess: playlistSuccess,
     isPending: playlistNot,
   } = getUserPlaylists();
+
+  useEffect(() => {
+    if (playlists?.data?.length > 0) {
+      const created = playlists?.data?.filter(
+        (playlist) => playlist?.owner === user?._id
+      );
+      setUserPlaylist(created);
+    }
+  }, [playlists]);
 
   const handleBackdropClick = (e) => {
     if (popUp.current && e.target === e.currentTarget) {
@@ -137,8 +141,7 @@ const AddToLibrary = () => {
           <h2 className="text-lg pt-2">Playlists</h2>
           <hr className="text-[#ffffff4b] mb-2" />
           {userPlaylist.length > 0 ? (
-            <PlaylistCarousel
-            ></PlaylistCarousel>
+            <PlaylistCarousel></PlaylistCarousel>
           ) : (
             <p className="text-gray-300">
               No created playlist found, create playlist first

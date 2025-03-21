@@ -35,7 +35,7 @@ const LyricsPage = () => {
 
   return (
     <div className="h-full w-full overflow-y-scroll flex flex-col relative pb-2">
-      <h1 className="text-2xl sm:gap-4 font-bold text-white flex max-sm:flex-col sticky top-0 pb-1 backdrop-blur-md shadow-md shadow-[#00000031] px-2">
+      <h1 className="text-2xl sm:gap-4 font-bold text-white items-baseline flex max-sm:flex-col sticky top-0 pb-1 backdrop-blur-md shadow-md shadow-[#00000031] px-2">
         Lyrics
         <span className="text-sm font-light text-gray-300">
           {"["} lyrics re not synced with the song yet {"]"}

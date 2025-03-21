@@ -13,3 +13,19 @@
   justify-content: center;
   align-items: center;
 }
+
+/* Tablets (768px to 1024px) */
+@media (max-width: 1024px) {
+  .swiper-slide {
+    width: 180px;
+    height: 180px;
+  }
+}
+
+/* Mobile Phones (Below 600px) */
+@media (max-width: 600px) {
+  .swiper-slide {
+    width: 150px;
+    height: 150px;
+  }
+}

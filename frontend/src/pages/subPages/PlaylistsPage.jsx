@@ -4,7 +4,9 @@ import { loadingPlayIcon } from "../../utils/lottie.js";
 import Loading from "../../components/loaders/Loading.jsx";
 import getUser from "../../serverDataHooks/getUser.js";
 import PlaylistCarousel from "../../components/carousel/PlaylistCarousel.jsx";
-
+import { NavLink } from "react-router";
+import { PlusCircle, Search } from "lucide-react";
+import { PlaylistCard } from "../../components/asset components/index.js";
 const PlaylistsPage = () => {
   const { data: playlists, isPending: playlistPending } = getUserPlaylists();
   const { data: user, isPending: userPending } = getUser();
@@ -21,7 +23,7 @@ const PlaylistsPage = () => {
 
     setFavorites(favs);
     setCreations(created);
-    console.log(favs, created);
+    console.log(playlists);
   }, [playlists]);
 
   const date = new Date();
@@ -33,32 +35,44 @@ const PlaylistsPage = () => {
     <div className="h-full w-full overflow-y-scroll p-2">
       <h1 className="text-3xl font-extrabold my-2">Playlists:</h1>
       <h2 className="text-xl font-semibold my-2">Your Favorites:</h2>
-      {favorites.length > 0 ? <PlaylistCarousel></PlaylistCarousel> : <p> </p>}
+      {favorites.length > 0 ? (
+        <PlaylistCarousel>
+          {favorites.map((playlist, id) => {
+            const key = date.now + id;
+            return (
+              <PlaylistCard playlist={playlist} key={key} onClick={undefined} />
+            );
+          })}
+        </PlaylistCarousel>
+      ) : (
+        <NavLink to={"/search"}>
+          <div className="max-sm:h-[150px] max-sm:w-[150px] max-lg:w-[180px] max-lg:h-[180px] h-[200px] w-[200px] bg-white/10 rounded-md hover:bg-white/14 transition-all ease-in-out duration-300">
+            <div className="flex flex-col justify-center items-center h-full gap-2">
+              <Search />
+              <p className="text-white">Browse</p>
+            </div>
+          </div>
+        </NavLink>
+      )}
       <h2 className="text-xl font-semibold my-2">Your Creations:</h2>
       {creations.length > 0 ? (
         <PlaylistCarousel>
-          {creations.map((playlist, id) => (
-            <div className="h-full w-full relative" key={date.now + id}>
-              <div className="absolute px-1 h-full max-sm:bg-black/40 w-full flex items-end lg:opacity-0 hover:opacity-100 hover:bg-black/40 cursor-pointer transition-all ease-in-out duration-300">
-                <div className="w-[80%] text-left">
-                  <h1 className="whitespace-nowrap text-2xl font-bold overflow-ellipsis w-full overflow-hidden">
-                    {playlist?.name}
-                  </h1>
-                  <p className="whitespace-nowrap font-medium overflow-ellipsis w-full overflow-hidden">
-                    {playlist?.description}
-                  </p>
-                </div>
-              </div>
-              <img
-                src={playlist?.playListCover?.url || "/playlists.png"}
-                alt="playlist"
-                className="w-full h-full aspect-square object-cover"
-              />
-            </div>
-          ))}
+          {creations.map((playlist, id) => {
+            const key = date.now + id;
+            return (
+              <PlaylistCard playlist={playlist} key={key} onClick={undefined} />
+            );
+          })}
         </PlaylistCarousel>
       ) : (
-        <p> </p>
+        <NavLink to={"/library/create-playlist"}>
+          <div className="max-sm:h-[150px] max-sm:w-[150px] max-lg:w-[180px] max-lg:h-[180px] h-[200px] w-[200px] bg-white/10 rounded-md hover:bg-white/14 transition-all ease-in-out duration-300">
+            <div className="flex flex-col justify-center items-center h-full gap-2">
+              <PlusCircle />
+              <p className="text-white">Create Playlist</p>
+            </div>
+          </div>
+        </NavLink>
       )}
     </div>
   );

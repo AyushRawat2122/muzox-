@@ -15,14 +15,14 @@ function CreatePlaylist() {
     defaultValues: { playListCover: [] },
   });
   const [coverPreview, setCoverPreview] = useState(null);
-const storeDataWithExpiry = (key, value, ttl) => {
-  const now = new Date();
-  const item = {
-    value,
-    expiry: now.getTime() + ttl,
+  const storeDataWithExpiry = (key, value, ttl) => {
+    const now = new Date();
+    const item = {
+      value,
+      expiry: now.getTime() + ttl,
+    };
+    localStorage.setItem(key, JSON.stringify(item));
   };
-  localStorage.setItem(key, JSON.stringify(item));
-};
 
   const {
     ref: fileInputRef,
@@ -68,16 +68,21 @@ const storeDataWithExpiry = (key, value, ttl) => {
     onSuccess: (data) => {
       console.log(data);
       notifySuccess(data?.message);
-      queryClient.setQueryData(["playlists"] , (oldData)=>{
-        console.log(oldData);
-      })
-      storeDataWithExpiry("recent",data?.message,172800000)
+      queryClient.setQueryData(["playlists"], (oldData) => {
+        if (!oldData) {
+          return { data: [data?.data] };
+        }
+        const newData = { ...(oldData || []) };
+        newData.data = [...(oldData?.data || []), data?.data];
+        return newData;
+      });
+      storeDataWithExpiry("recent", data?.message, 172800000);
     },
     onError: (error) => {
-      let errorMsg = error?.response?.data?.message
+      let errorMsg = error?.response?.data?.message;
       console.log(error);
-      if(error.statusCode === 500){
-        errorMsg = "Failed to create playlist"
+      if (error.statusCode === 500) {
+        errorMsg = "Failed to create playlist";
       }
       notifyError(errorMsg);
     },
