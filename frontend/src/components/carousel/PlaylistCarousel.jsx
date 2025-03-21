@@ -24,7 +24,7 @@ const PlaylistCarousel = ({ drag = true, click = true, children }) => {
       {!isTabletOrMobile && (
         <button
           onClick={handlePrev}
-          className="rounded-full absolute z-999 top-[40%] left-1 bg-black/40 p-1"
+          className="rounded-full absolute z-999 top-[40%] left-1 bg-black/40 p-2"
         >
           <CircleChevronLeft size={30} />
         </button>
@@ -46,7 +46,6 @@ const PlaylistCarousel = ({ drag = true, click = true, children }) => {
             </SwiperSlide>
           ))}
       </Swiper>
-
       {!isTabletOrMobile && (
         <button
           onClick={handleNext}
