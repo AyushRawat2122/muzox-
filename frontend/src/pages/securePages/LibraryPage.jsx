@@ -64,7 +64,7 @@ const Library = () => {
           <h1 className="text-3xl font-bold mb-8">Library</h1>
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
             {/* Card 1: Your Playlists */}
-            <NavLink to={`/library/playlists/${user?.data?._id}`} className="group">
+            <NavLink to={`/library/playlists/${user?._id}`} className="group">
               <Card
                 icon={<List size={24} />}
                 title="Your Playlists"
@@ -73,7 +73,7 @@ const Library = () => {
               />
             </NavLink>
             {/* Card 2: Liked Songs */}
-            <NavLink to={`/library/likedSongs/${user?.data?._id}`} className="group">
+            <NavLink to={`/library/likedSongs/${user?._id}`} className="group">
               <Card
                 icon={<Heart size={24} />}
                 title="Liked Songs"

@@ -11,7 +11,7 @@ export const authRequired = asyncHandler(async (req, res, next) => {
   }
 
   if (!token) {
-    next(new ApiError(401, "User not Authorized"));
+    return next(new ApiError(401, "User not Authorized"));
   }
 
   const decoded = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
@@ -21,10 +21,10 @@ export const authRequired = asyncHandler(async (req, res, next) => {
   const user = await User.findById(userId).select("-password -refreshToken");
 
   if (!user) {
-    next(new ApiError(404, "User not found"));
+    return next(new ApiError(404, "User not found"));
   }
   req.user = user;
-  next();
+  return next();
 });
 
 export default authRequired;

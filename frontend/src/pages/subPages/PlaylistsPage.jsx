@@ -4,7 +4,7 @@ import { loadingPlayIcon } from "../../utils/lottie.js";
 import Loading from "../../components/loaders/Loading.jsx";
 import getUser from "../../serverDataHooks/getUser.js";
 import PlaylistCarousel from "../../components/carousel/PlaylistCarousel.jsx";
-import { NavLink } from "react-router";
+import { NavLink, useNavigate } from "react-router";
 import { PlusCircle, Search } from "lucide-react";
 import { PlaylistCard } from "../../components/asset components/index.js";
 const PlaylistsPage = () => {
@@ -25,7 +25,7 @@ const PlaylistsPage = () => {
     setCreations(created);
     console.log(playlists);
   }, [playlists]);
-
+  const navigate = useNavigate();
   const date = new Date();
   if (playlistPending || userPending) {
     return <Loading src={loadingPlayIcon} />;
@@ -59,8 +59,15 @@ const PlaylistsPage = () => {
         <PlaylistCarousel>
           {creations.map((playlist, id) => {
             const key = date.now + id;
+            const playlistPage = `/playlist/${playlist?._id}`;
             return (
-              <PlaylistCard playlist={playlist} key={key} onClick={undefined} />
+              <PlaylistCard
+                playlist={playlist}
+                key={key}
+                onClick={() => {
+                  navigate(playlistPage);
+                }}
+              />
             );
           })}
         </PlaylistCarousel>

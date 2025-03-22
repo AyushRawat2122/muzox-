@@ -4,7 +4,6 @@ import { motion } from "framer-motion";
 import getUserLikedSong from "../../serverDataHooks/getUserLikedSong.js";
 import getUserPlaylists from "../../serverDataHooks/getUserPlaylists.js";
 import getUser from "../../serverDataHooks/getUser.js";
-import { useMediaQuery } from "react-responsive";
 import PlaylistCarousel from "../carousel/PlaylistCarousel.jsx";
 import { useLikeSong } from "../../serverDataHooks/songMutations.js";
 import {
@@ -12,6 +11,8 @@ import {
   notifySuccess,
   notifyWarning,
 } from "../../store/useNotification.js";
+import PlaylistCard from "../asset components/PlaylistCard.jsx";
+import { addToPlaylist } from "../../serverDataHooks/playlistsMutations.js";
 //liked song component
 const LikedSong = React.memo(() => {
   const { context } = usePopUp();
@@ -45,17 +46,26 @@ const LikedSong = React.memo(() => {
 
   return (
     <div
+      className="max-sm:w-[150px] max-lg:w-[180px] w-[200px] p-2 hover:bg-white/10 rounded-sm cursor-pointer"
       onClick={handleClick}
-      className="border-1 border-gray-400 p-2 rounded-md w-[200px] hover:bg-white/3 no-copy cursor-pointer"
     >
-      <img
-        src="/LikedSong.png"
-        alt=""
-        className="w-full aspect-square rounded-md"
-      />
-      <p className="text-sm pt-2 capitalize text-gray-400">
-        liked songs : {likedSong?.data?.length} tracks
-      </p>
+      <div className="relative w-full">
+        <div className="absolute h-full w-full flex items-end px-1 bg-black/20">
+          <h1 className="text-left w-[70%] whitespace-nowrap text-lg sm:text-2xl font-bold overflow-ellipsis overflow-hidden">
+            Liked Songs
+          </h1>
+        </div>
+        <img
+          src={"/LikedSong.png"}
+          alt="playlist"
+          className="w-full h-full aspect-square object-cover rounded-sm"
+        />
+      </div>
+      <div className="w-[100%] py-2 text-left">
+        <p className="whitespace-nowrap text-gray-300 text-sm font-medium overflow-ellipsis w-full overflow-hidden">
+          Total Songs: {likedSong?.data?.length} songs
+        </p>
+      </div>
     </div>
   );
 });
@@ -63,15 +73,11 @@ const LikedSong = React.memo(() => {
 const AddToLibrary = () => {
   const { toggleAddPopUp, setContext } = usePopUp();
   const popUp = useRef(null);
-  const isTabletOrMobile = useMediaQuery({ query: "(max-width: 1224px)" });
+  const date = new Date();
   const [userPlaylist, setUserPlaylist] = useState([]);
-  const { data: user, isSuccess: userSuccess, isPending: userNot } = getUser();
-  const {
-    data: playlists,
-    isSuccess: playlistSuccess,
-    isPending: playlistNot,
-  } = getUserPlaylists();
-
+  const { data: user, isPending: userNot } = getUser();
+  const { data: playlists, isPending: playlistNot } = getUserPlaylists();
+  const { context } = usePopUp();
   useEffect(() => {
     if (playlists?.data?.length > 0) {
       const created = playlists?.data?.filter(
@@ -87,6 +93,8 @@ const AddToLibrary = () => {
       toggleAddPopUp();
     }
   };
+
+  const mutation = addToPlaylist();
 
   return (
     <div>
@@ -141,7 +149,22 @@ const AddToLibrary = () => {
           <h2 className="text-lg pt-2">Playlists</h2>
           <hr className="text-[#ffffff4b] mb-2" />
           {userPlaylist.length > 0 ? (
-            <PlaylistCarousel></PlaylistCarousel>
+            <PlaylistCarousel>
+              {userPlaylist.map((playlist, id) => {
+                const key = date.now + id;
+                return (
+                  <PlaylistCard
+                    playlist={playlist}
+                    key={key}
+                    onClick={() => {
+                      const id = playlist?._id;
+                      mutation.mutate({ song: context, playlistID: id });
+                    }}
+                    playBtn={false}
+                  />
+                );
+              })}
+            </PlaylistCarousel>
           ) : (
             <p className="text-gray-300">
               No created playlist found, create playlist first

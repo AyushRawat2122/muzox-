@@ -6,8 +6,8 @@
 .swiper-slide {
   text-align: center;
   font-size: 18px;
-  width: 200px;
-  height: 200px;
+  width: fit-content;
+  height: fit-content;
   /* Center slide text vertically */
   display: flex;
   justify-content: center;
@@ -15,17 +15,3 @@
 }
 
 /* Tablets (768px to 1024px) */
-@media (max-width: 1024px) {
-  .swiper-slide {
-    width: 180px;
-    height: 180px;
-  }
-}
-
-/* Mobile Phones (Below 600px) */
-@media (max-width: 600px) {
-  .swiper-slide {
-    width: 150px;
-    height: 150px;
-  }
-}

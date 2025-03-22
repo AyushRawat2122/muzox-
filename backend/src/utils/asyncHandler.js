@@ -7,7 +7,7 @@ const asyncHandler = (requestHandler) => {
       await requestHandler(req, res, next);
     } catch (error) {
       
-      next(error);
+      return next(error);
     }
   };
 };

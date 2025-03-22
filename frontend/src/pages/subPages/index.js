@@ -1,4 +1,4 @@
 import LikedSongsPage from "./LikedSongsPage";
 import PlaylistsPage from "./PlaylistsPage";
-
-export {LikedSongsPage , PlaylistsPage}
+import PlaylistPage from "./PlaylistPage";
+export { LikedSongsPage, PlaylistsPage, PlaylistPage };

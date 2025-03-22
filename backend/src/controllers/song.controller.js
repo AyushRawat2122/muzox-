@@ -14,7 +14,7 @@ const uploadSong = asyncHandler(async (req, res, next) => {
   //i have given it name authRequired situated in ../middleware/authRequired.middleware.js!
   const { title, artist, genre = "" } = req.body; //extract data from req body......
   if (!title || !artist) {
-    next(new ApiError(400, "title and artist are required"));
+    return next(new ApiError(400, "title and artist are required"));
   } // title and artist shouldnt be empty
 
   const localSongPath = req.files?.song?.[0]?.path;
@@ -26,11 +26,11 @@ const uploadSong = asyncHandler(async (req, res, next) => {
   if (isPresent) {
     unlinkSync(localSongPath);
     unlinkSync(localCoverImgPath);
-    next(new ApiError(400, "song already exists"));
+    return next(new ApiError(400, "song already exists"));
   }
 
   if (!localSongPath || !localCoverImgPath) {
-    next(new ApiError(400, "cover and song both are required"));
+    return next(new ApiError(400, "cover and song both are required"));
   } // files re mendatory to upload
 
   const song = await uploadOnCloudinary(localSongPath);
@@ -40,7 +40,7 @@ const uploadSong = asyncHandler(async (req, res, next) => {
   if (!song || !coverImg) {
     await deleteOnCloudinary(song?.public_id);
     await deleteOnCloudinary(coverImg?.public_id);
-    next(new ApiError(500, "uploading song req to server failed unexpectedly"));
+    return next(new ApiError(500, "uploading song req to server failed unexpectedly"));
   }
   //check for the successful upload
   const uploadedSong = await Song.create({
@@ -144,7 +144,7 @@ const likeSong = asyncHandler(async (req, res, next) => {
     ],
   });
   if (song) {
-    next(new ApiError(400, "song is already liked"));
+    return next(new ApiError(400, "song is already liked"));
   }
 
   const likedSong = await Like.create({
@@ -170,7 +170,7 @@ const unlikeSong = asyncHandler(async (req, res, next) => {
   });
 
   if (!song.deletedCount) {
-    next(new ApiError(400, "not a liked song"));
+    return next(new ApiError(400, "not a liked song"));
   }
 
   return res

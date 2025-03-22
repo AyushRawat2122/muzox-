@@ -1,27 +1,34 @@
 import { useMutation } from "@tanstack/react-query";
 import { queryClient, normalRequest } from "../utils/axiosRequests.config";
-
+import { notifyError, notifySuccess } from "../store/useNotification";
 const addToPlaylist = () => {
   return useMutation({
-    mutationFn: async ({ songID, playlistID }) => {
+    mutationFn: async ({ song, playlistID }) => {
       try {
+        const oldData = queryClient.getQueryData(["playlist", playlistID]);
         const res = await normalRequest.post(
-          `/playlist/${playlistID}/${songID}`,
+          `/playlist/add-to-playlist/${playlistID}/${song?._id}`,
           { headers: { "Content-Type": "application/json" } }
         );
-        return res?.data?.data;
+        return { song, playlistID };
       } catch (error) {
         throw error;
       }
     },
-    onSuccess: (data) => {
-      queryClient.setQueryData(["playlists"], (oldData) => {
-        if (!oldData) return [data];
-        const oldList = oldData.filter(
-          (playlist) => playlist?._id !== data?._id
-        );
-        return [...oldList, data];
+    onSuccess: ({ song, playlistID }) => {
+      notifySuccess("song added to playlist successfully");
+      const oldData = queryClient.getQueryData(["playlist", playlistID]);
+      if (!oldData) return;
+      queryClient.setQueryData(["playlist", playlistID], (oldData) => {
+        return {
+          ...oldData,
+          songs: [...(oldData?.songs || []), song],
+        };
       });
+    },
+    onError: (error) => {
+      console.log(error)
+      notifyError(error.response.data.message);
     },
   });
 };
@@ -30,23 +37,26 @@ const removeFromPlaylist = () => {
   return useMutation({
     mutationFn: async ({ playlistID, songID }) => {
       try {
-        const res = await normalRequest.post(
-          `/remove-from-playlist/${playlistID}/${songID}`,
+        const res = await normalRequest.patch(
+          `/playlist/remove-from-playlist/${playlistID}/${songID}`,
           { headers: { "Content-Type": "application/json" } }
         );
-        return res?.data?.data;
+        return { playlistID, songID };
       } catch (error) {
         throw error;
       }
     },
-    onSuccess: (data) => {
-      queryClient.setQueryData(["playlists"], (oldData) => {
-        if (!oldData) return [data];
-        const oldList = oldData.filter(
-          (playlist) => playlist?._id !== data?._id
-        );
-        return [...oldList, data];
+    onSuccess: ({ playlistID, songID }) => {
+      notifySuccess("song removed Successfully");
+      queryClient.setQueryData(["playlist", playlistID], (oldData) => {
+        return {
+          ...oldData,
+          songs: [...oldData?.songs.filter((song) => song._id !== songID)],
+        };
       });
+    },
+    onError: (error) => {
+      notifyError(error.response.data.message);
     },
   });
 };
@@ -92,8 +102,9 @@ const addPlaylistToLibrary = () => {
 const removePlaylistFromLibrary = () => {
   return useMutation({
     mutationFn: async (playlistID) => {
-      try {Library
-      
+      try {
+        Library;
+
         const res = normalRequest.patch(`/save-to-library/${playlistID}`, {
           headers: { "Content-Type": "application/json" },
         });
@@ -110,7 +121,6 @@ const removePlaylistFromLibrary = () => {
 
 export {
   addPlaylistToLibrary,
-  createNewPlayist,
   removeFromPlaylist,
   removePlaylistFromLibrary,
   deletePlaylist,

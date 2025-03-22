@@ -24,7 +24,7 @@ PlayListRouter.post(
   authRequired,
   addToPlayList
 );
-PlayListRouter.post(
+PlayListRouter.patch(
   "/remove-from-playlist/:playListID/:songId",
   authRequired,
   removeFromPlayList
@@ -35,7 +35,7 @@ PlayListRouter.post(
   deletePlayList
 );
 PlayListRouter.get("/search-playlist", searchPlaylist);
-PlayListRouter.get("/get-playlist-songs", authRequired, getPlaylistSongs);
+PlayListRouter.get("/get-playlist-songs/:playListID", authRequired, getPlaylistSongs);
 PlayListRouter.patch("/save-to-library/:playListId", authRequired, addThisPlaylist);
 PlayListRouter.patch("/remove-from-library/:playListId", authRequired, removeFromLibrary);
 PlayListRouter.get('/home-page-playlist',authRequired,forTheHomePage);
