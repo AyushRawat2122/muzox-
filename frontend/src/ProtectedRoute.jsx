@@ -27,7 +27,7 @@ import { AnimatePresence } from "framer-motion";
 import { debounce } from "lodash";
 const ProtectedRoute = () => {
   const location = useLocation();
-  const { data: user, isPending, error, isSuccess } = getUser();
+  const { data: user, isPending, error} = getUser();
   const { isSideBarOpen, toggleSideBarOpen } = useSideBar();
   const [leftPanelSize, setLeftPanelSize] = useState(4);
   const [rightPanelSize, setRightPanelSize] = useState(22);
