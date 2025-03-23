@@ -3,9 +3,18 @@ import { useQuery } from "@tanstack/react-query";
 import { useParams } from "react-router";
 import { normalRequest } from "../../utils/axiosRequests.config";
 import { FastAverageColor } from "fast-average-color";
-import { Play, Repeat2, Pause, BookmarkMinus } from "lucide-react";
+import {
+  Play,
+  Repeat2,
+  Pause,
+  BookmarkMinus,
+  Trash2,
+  BookmarkPlus,
+  Globe,
+  GlobeLock,
+} from "lucide-react";
 import useAudioPlayer from "../../store/useAudioPlayer.js";
-import { useUnlikeSong } from "../../serverDataHooks/songMutations.js";
+import getUserPlaylists from "../../serverDataHooks/getUserPlaylists.js";
 import { loadingPlayIcon } from "../../utils/lottie.js";
 import Loading from "../../components/loaders/Loading.jsx";
 import getUser from "../../serverDataHooks/getUser.js";
@@ -42,27 +51,58 @@ const PlaylistPage = () => {
       console.log(error);
     }
   };
-
-  const { data: playlist, isPending: playlistPending } = useQuery({
+  const [isSaved, setIsSaved] = useState(false);
+  const [isPublic, setIsPublic] = useState(false);
+  const {
+    data: playlist,
+    isPending: playlistPending,
+    isSuccess: playlistSuccess,
+  } = useQuery({
     queryKey: ["playlist", params?.playlistID],
     queryFn: getPlaylistData,
     staleTime: Infinity,
     retry: 2,
   });
   const { data: user, isPending: userPending } = getUser();
+  const {
+    data: library,
+    isPending: libraryPending,
+    isSuccess: librarySuccess,
+  } = getUserPlaylists();
+  useEffect(() => {
+    if (
+      playlist?.publishStatus
+    ) {
+      setIsPublic(true);
+    } else {
+      setIsPublic(false);
+    }
+    
+  }, [playlist, playlistSuccess]);
+  useEffect(() => {
+    if (
+      library?.data?.some((libPlaylist) => libPlaylist?._id === playlist?._id)
+    ) {
+      setIsSaved(true);
+    } else {
+      setIsSaved(false);
+    }
+
+  }, [library, librarySuccess]);
+
   const handlePlayButtonClick = () => {
     if (playlist?.songs?.length <= 0) {
       return;
     }
-    if (queueID !== "likedSongs") {
-      initializeQueue(playlist?.songs, playlist._id);
+    if (queueID !== playlist?._id) {
+      initializeQueue(playlist?.songs, playlist?._id);
       return;
     } else {
       togglePlayPause();
     }
   };
   const handleQueueLooping = () => {
-    if (playlist?.songs?.length <= 0 || queueID !== playlist._id) {
+    if (playlist?.songs?.length <= 0 || queueID !== playlist?._id) {
       return;
     } else {
       toggleLooping();
@@ -92,7 +132,7 @@ const PlaylistPage = () => {
     // Replace with your actual image URL
   }, [playlist]);
 
-  if (userPending || playlistPending) {
+  if (userPending || playlistPending || libraryPending) {
     return <Loading src={loadingPlayIcon} />;
   }
   return (
@@ -109,7 +149,7 @@ const PlaylistPage = () => {
           ref={imgRef}
         />
         <div className="max-sm:px-2">
-          <h4 className="text-sm text-gray-400">Playlist</h4>
+          <h4 className="text-sm text-gray-400">Playlist, <span className="capitalize text-gray-300">{isPublic?"public":"private"} Playlist</span></h4>
           <div className=" w-full h-fit overflow-hidden py-2">
             <h1 className="text-4xl sm:text-6xl font-bold whitespace-nowrap overflow-ellipsis h-fit">
               {playlist?.name}
@@ -122,30 +162,65 @@ const PlaylistPage = () => {
       </div>
 
       {/* Section 2: Play Control */}
-      <div className="sticky top-0 bg-black px-2 py-2 border-b-[1px] border-[#ffffff3d] flex items-center gap-2">
-        <button
-          className={`w-14 h-14 rounded-full flex items-center justify-center`}
-          style={{ backgroundColor: dominantColor }}
-          onClick={handlePlayButtonClick}
-        >
-          {isPlaying && queueID === playlist?._id ? (
-            <Pause className="w-6 h-6" />
-          ) : (
-            <Play className="w-6 h-6" />
+      <div className="sticky top-0 bg-black px-2 py-2 border-b-[1px] border-[#ffffff3d] flex items-center justify-between gap-2">
+        <div className="flex items-center gap-2">
+          {" "}
+          <button
+            className={`w-14 h-14 rounded-full flex items-center justify-center`}
+            style={{ backgroundColor: dominantColor }}
+            onClick={handlePlayButtonClick}
+            title="Play/Pause"
+          >
+            {isPlaying && queueID === playlist?._id ? (
+              <Pause className="w-6 h-6" />
+            ) : (
+              <Play className="w-6 h-6" />
+            )}
+          </button>
+          <button
+            className="w-10 h-10 rounded-full flex items-center justify-center"
+            onClick={handleQueueLooping}
+            title="Loop Entire Playlist"
+          >
+            <Repeat2
+              className={`w-6 h-6 ${
+                isLooped && queueID === playlist._id
+                  ? "text-[#ff6a30]"
+                  : "text-white"
+              }`}
+            />
+          </button>
+        </div>
+        <div className="flex items-center gap-1">
+          {user._id === playlist.owner && (
+            <button
+              className="h-[40px] w-[40px] text-red-500"
+              title="Delete Playlist"
+            >
+              <Trash2 size={25} />
+            </button>
           )}
-        </button>
-        <button
-          className="w-10 h-10 rounded-full flex items-center justify-center"
-          onClick={handleQueueLooping}
-        >
-          <Repeat2
-            className={`w-6 h-6 ${
-              isLooped && queueID === "likedSongs"
-                ? "text-[#ff4800]"
-                : "text-white"
-            }`}
-          />
-        </button>
+          {user.id !== playlist.owner && isSaved && (
+            <button className="h-[40px] w-[40px]" title="Remove from Library">
+              <BookmarkMinus size={25} />
+            </button>
+          )}
+          {user.id !== playlist.owner && !isSaved && (
+            <button className="h-[40px] w-[40px]" title="Save to Library">
+              <BookmarkPlus size={25} />
+            </button>
+          )}
+          {user._id === playlist.owner && !isPublic && (
+            <button className="h-[40px] w-[40px]" title="Make Public">
+              <Globe size={25} />
+            </button>
+          )}
+          {user._id === playlist.owner && isPublic && (
+            <button className="h-[40px] w-[40px]" title="Make Private">
+              <GlobeLock size={25} />
+            </button>
+          )}
+        </div>
       </div>
 
       {/* Section 3: Songs List */}
@@ -225,7 +300,7 @@ const SongItem = ({ song, index, queueRef, ownerRef, userRef }) => {
         {ownerRef === userRef && (
           <span title="remove from playlist">
             <BookmarkMinus
-              className="hover:text-red-500"
+              className="hover:text-red-500 cursor-pointer"
               onClick={handleRemoveSong}
             />
           </span>
@@ -233,5 +308,8 @@ const SongItem = ({ song, index, queueRef, ownerRef, userRef }) => {
       </div>
     </div>
   );
+};
+const deletePlayList = ({}) => {
+  return <div></div>;
 };
 export default PlaylistPage;

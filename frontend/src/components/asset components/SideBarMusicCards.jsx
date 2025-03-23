@@ -4,17 +4,17 @@ const SideBarMusicCards = ({ className, onClick, Song }) => {
   return (
     <button className={`w-full hoverPlay`} onClick={onClick}>
       <div className="flex gap-2 p-2 items-center justify-between rounded-md bg-white/4 hover:bg-white/7 transition-all">
-        <div className="flex gap-2">
+        <div className="flex gap-2 overflow-hidden">
           <img
             src={Song?.coverImage?.url}
             className="h-[50px] w-[50px] rounded-md aspect-square object-cover"
             alt="next song in queue"
           />
-          <div className="flex flex-col items-start capitalize overflow-hidden">
-            <h3 className={`text-base font-semibold  h-5 whitespace-nowrap overflow-hidden text-ellipsis ${className}`}>
+          <div className="flex flex-col w-full items-start capitalize overflow-hidden">
+            <h3 className={`text-base font-semibold  h-5 whitespace-nowrap overflow-hidden overflow-ellipsis ${className}`}>
               {Song?.title}
             </h3>
-            <p className="text-sm text-[#c9c9c9] h-5 whitespace-nowrap overflow-hidden text-ellipsis  font-medium ">
+            <p className="text-sm text-[#c9c9c9] h-5 whitespace-nowrap overflow-hidden overflow-ellipsis  font-medium ">
               {Song?.artist}
             </p>
           </div>

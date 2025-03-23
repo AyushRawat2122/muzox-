@@ -161,7 +161,7 @@ const SongItem = ({ song, index, queueRef }) => {
         {convertToMinSecFormat(song?.duration)}
         <span title="remove from liked songs">
           <BookmarkMinus
-            className="hover:text-red-500"
+            className="hover:text-red-500 cursor-pointer"
             onClick={handleRemoveSong}
           />
         </span>
