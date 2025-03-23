@@ -22,15 +22,20 @@ const PlaylistCarousel = ({ drag = true, click = true, children }) => {
   return (
     <div className="carousel-container relative">
       {!isTabletOrMobile && (
-        <button
-          onClick={handlePrev}
-          className="rounded-full absolute z-999 top-[40%] left-1 bg-black/40 p-2"
-        >
-          <CircleChevronLeft size={30} />
-        </button>
+        <div className="absolute bottom-[100%] right-0">
+          <button onClick={handlePrev} className="rounded-full bg-black/40 p-2">
+            <CircleChevronLeft size={25} />
+          </button>
+          <button onClick={handleNext} className="rounded-full bg-black/40 p-1">
+            <CircleChevronRight size={25} />
+          </button>
+        </div>
       )}
+
       <Swiper
-        key={`${isTabletOrMobile ? "drag" : "nodrag"}-${!isTabletOrMobile ? "click" : "noclick"}`}
+        key={`${isTabletOrMobile ? "drag" : "nodrag"}-${
+          !isTabletOrMobile ? "click" : "noclick"
+        }`}
         onSwiper={(swiper) => setSwiperInstance(swiper)}
         allowTouchMove={isTabletOrMobile}
         slideToClickedSlide={!isTabletOrMobile}
@@ -46,14 +51,6 @@ const PlaylistCarousel = ({ drag = true, click = true, children }) => {
             </SwiperSlide>
           ))}
       </Swiper>
-      {!isTabletOrMobile && (
-        <button
-          onClick={handleNext}
-          className="rounded-full absolute z-999 top-[40%] right-1 bg-black/40 p-1"
-        >
-          <CircleChevronRight size={30} />
-        </button>
-      )}
     </div>
   );
 };

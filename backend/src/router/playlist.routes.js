@@ -9,6 +9,7 @@ import {
   getPlaylistSongs,
   removeFromLibrary,
   forTheHomePage,
+  togglePlayListStatus,
 } from "../controllers/playlist.controller.js";
 import { authRequired } from "../middlewares/authRequired.middleware.js";
 import uploader from "../middlewares/multer.middleware.js";
@@ -29,14 +30,31 @@ PlayListRouter.patch(
   authRequired,
   removeFromPlayList
 );
-PlayListRouter.post(
+PlayListRouter.delete(
   "/delete-playlist/:playListID",
   authRequired,
   deletePlayList
 );
-PlayListRouter.get("/search-playlist", searchPlaylist);
-PlayListRouter.get("/get-playlist-songs/:playListID", authRequired, getPlaylistSongs);
-PlayListRouter.patch("/save-to-library/:playListId", authRequired, addThisPlaylist);
-PlayListRouter.patch("/remove-from-library/:playListId", authRequired, removeFromLibrary);
-PlayListRouter.get('/home-page-playlist',authRequired,forTheHomePage);
+PlayListRouter.get("/search-playlist", authRequired, searchPlaylist);
+PlayListRouter.get(
+  "/get-playlist-songs/:playListID",
+  authRequired,
+  getPlaylistSongs
+);
+PlayListRouter.patch(
+  "/save-to-library/:playListId",
+  authRequired,
+  addThisPlaylist
+);
+PlayListRouter.patch(
+  "/remove-from-library/:playListId",
+  authRequired,
+  removeFromLibrary
+);
+PlayListRouter.get("/home-page-playlist", authRequired, forTheHomePage);
+PlayListRouter.patch(
+  "/toggleStatus/:playListID",
+  authRequired,
+  togglePlayListStatus
+);
 export default PlayListRouter;

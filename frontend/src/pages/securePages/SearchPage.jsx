@@ -5,9 +5,13 @@ import useSearchQuery from "../../store/useSearchQuery.js";
 import { debounce } from "lodash";
 import { Search } from "lucide-react";
 import { useMediaQuery } from "react-responsive";
-import { SearchListSongCard } from "../../components/asset components/index.js";
+import {
+  PlaylistCard,
+  SearchListSongCard,
+} from "../../components/asset components/index.js";
 import { SearchBar } from "../../components/bars";
 import { DotLottieReact } from "@lottiefiles/dotlottie-react";
+import { useNavigate } from "react-router";
 
 const SearchResult = React.memo(() => {
   const { searchQuery } = useSearchQuery();
@@ -16,6 +20,7 @@ const SearchResult = React.memo(() => {
   const [playlists, setPlaylists] = useState([]);
   const [songs, setSongs] = useState([]);
   const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
   const fetchSearchQuery = async (query) => {
     if (abortController.current) {
       abortController.current.abort();
@@ -113,6 +118,23 @@ const SearchResult = React.memo(() => {
             {songs.map((song, idx) => (
               <SearchListSongCard song={song} key={idx} />
             ))}
+          </div>
+        )}
+        {playlists.length > 0 && (
+          <div className="my-2">
+            <p className="text-lg font-bold">Playlists</p>
+            <PlaylistCarousel>
+              {playlists.map((playlist) => {
+                return (
+                  <PlaylistCard
+                    playlist={playlist}
+                    onClick={() => {
+                      navigate(`/playlist/${playlist?._id}`);
+                    }}
+                  />
+                );
+              })}
+            </PlaylistCarousel>
           </div>
         )}
       </div>

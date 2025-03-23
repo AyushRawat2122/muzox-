@@ -27,7 +27,7 @@ const addToPlaylist = () => {
       });
     },
     onError: (error) => {
-      console.log(error)
+      console.log(error);
       notifyError(error.response.data.message);
     },
   });
@@ -61,60 +61,72 @@ const removeFromPlaylist = () => {
   });
 };
 
-const deletePlaylist = () => {
-  return useMutation({
-    mutationFn: async (playlistID) => {
-      try {
-        const res = await normalRequest.post(`/delete-playlist/${playlistID}`, {
-          headers: { "Content-Type": "application/json" },
-        });
-        return playlistID;
-      } catch (error) {
-        throw error;
-      }
-    },
-    onSuccess: (playlistID) => {
-      queryClient.setQueryData(["playlists"], (oldData) => {
-        return oldData.filter((playlist) => playlist?._id !== playlistID);
-      });
-    },
-  });
-};
-
 const addPlaylistToLibrary = () => {
   return useMutation({
-    mutationFn: async (playlistID) => {
+    mutationFn: async (playlist) => {
       try {
-        const res = normalRequest.patch(`/save-to-library/${playlistID}`, {
-          headers: { "Content-Type": "application/json" },
-        });
-        return res;
+        const res = await normalRequest.patch(
+          `/playlist/save-to-library/${playlist?._id}`,
+          {
+            headers: { "Content-Type": "application/json" },
+          }
+        );
+        return playlist;
       } catch (error) {
-        throw error;
+        throw error.response.data;
       }
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries(["playlists"]);
+    onSuccess: (newPlaylist) => {
+      notifySuccess("Playlist added to library");
+      const oldQueryData = queryClient.getQueryData(["playlists"]);
+      if (oldQueryData) {
+        queryClient.setQueryData(["playlists"], (oldData) => {
+          return {
+            ...oldData,
+            data: [...(oldData?.data || []), newPlaylist],
+          };
+        });
+      }
+    },
+    onError: (error) => {
+      notifySuccess(error.message);
     },
   });
 };
 
 const removePlaylistFromLibrary = () => {
   return useMutation({
-    mutationFn: async (playlistID) => {
+    mutationFn: async (playlist) => {
       try {
-        Library;
-
-        const res = normalRequest.patch(`/save-to-library/${playlistID}`, {
-          headers: { "Content-Type": "application/json" },
-        });
-        return res;
+        const res = await normalRequest.patch(
+          `/playlist/save-to-library/${playlist?._id}`,
+          {
+            headers: { "Content-Type": "application/json" },
+          }
+        );
+        return playlist;
       } catch (error) {
-        throw error;
+        throw error.response.data;
       }
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries(["playlists"]);
+    onSuccess: (remPlaylist) => {
+      notifySuccess("Playlist removed from library");
+      const oldQueryData = queryClient.getQueryData(["playlists"]);
+      if (oldQueryData) {
+        queryClient.setQueryData(["playlists"], (oldData) => {
+          return {
+            ...oldData,
+            data: [
+              ...(oldData?.data?.filter(
+                (playlist) => playlist?._id !== remPlaylist._id
+              ) || []),
+            ],
+          };
+        });
+      }
+    },
+    onError: (error) => {
+      notifyError(error.message);
     },
   });
 };
@@ -123,6 +135,5 @@ export {
   addPlaylistToLibrary,
   removeFromPlaylist,
   removePlaylistFromLibrary,
-  deletePlaylist,
   addToPlaylist,
 };

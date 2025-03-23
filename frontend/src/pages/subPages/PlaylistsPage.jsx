@@ -39,13 +39,20 @@ const PlaylistsPage = () => {
         <PlaylistCarousel>
           {favorites.map((playlist, id) => {
             const key = date.now + id;
+            const playlistPage = `/playlist/${playlist?._id}`;
             return (
-              <PlaylistCard playlist={playlist} key={key} onClick={undefined} />
+              <PlaylistCard
+                playlist={playlist}
+                key={key}
+                onClick={() => {
+                  navigate(playlistPage);
+                }}
+              />
             );
           })}
         </PlaylistCarousel>
       ) : (
-        <NavLink to={"/search"}>
+        <NavLink to={"/search"} className={"w-fit block"}>
           <div className="max-sm:h-[150px] max-sm:w-[150px] max-lg:w-[180px] max-lg:h-[180px] h-[200px] w-[200px] bg-white/10 rounded-md hover:bg-white/14 transition-all ease-in-out duration-300">
             <div className="flex flex-col justify-center items-center h-full gap-2">
               <Search />
@@ -72,7 +79,7 @@ const PlaylistsPage = () => {
           })}
         </PlaylistCarousel>
       ) : (
-        <NavLink to={"/library/create-playlist"}>
+        <NavLink to={"/library/create-playlist"} className={"w-fit block"}>
           <div className="max-sm:h-[150px] max-sm:w-[150px] max-lg:w-[180px] max-lg:h-[180px] h-[200px] w-[200px] bg-white/10 rounded-md hover:bg-white/14 transition-all ease-in-out duration-300">
             <div className="flex flex-col justify-center items-center h-full gap-2">
               <PlusCircle />

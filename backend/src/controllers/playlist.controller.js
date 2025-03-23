@@ -29,7 +29,9 @@ const createPlayList = asyncHandler(async (req, res, next) => {
     playListCover = await uploadOnCloudinary(playListCoverLocal);
     console.log(playListCover);
     if (!playListCover) {
-      return next(new ApiError(500, "something went wrong while uploading coverImg"));
+      return next(
+        new ApiError(500, "something went wrong while uploading coverImg")
+      );
     }
   } //we ll upload only if user wants to upload file if he doesnt it's okay
 
@@ -65,7 +67,9 @@ const deletePlayList = asyncHandler(async (req, res, next) => {
   }
 
   if (_id?.toString() !== playList?.owner?.toString()) {
-    return next(new ApiError(400, "you are not authorized to delete this playlist"));
+    return next(
+      new ApiError(400, "you are not authorized to delete this playlist")
+    );
   }
 
   const picToDelete = playList?.playListCover?.public_id;
@@ -141,20 +145,30 @@ const removeFromPlayList = asyncHandler(async (req, res, next) => {
 });
 
 //toggle playList publish status
-const togglePlayListStatus = asyncHandler(async (req, res) => {
+const togglePlayListStatus = asyncHandler(async (req, res, next) => {
   const { playListID } = req.params;
   if (!playListID) {
-    return next(new ApiError(400, "Playlist id is required to toggle publish status"));
+    return next(
+      new ApiError(400, "Playlist id is required to toggle publish status")
+    );
   }
-  await Playlist.findByIdAndUpdate(
+  const playlist = await Playlist.findByIdAndUpdate(
     playListID,
     [{ $set: { publishStatus: { $not: "$publishStatus" } } }],
     { new: true }
   );
-  return new ApiResponse(200, "", "Publish Status toggled successfully");
+  return res
+    .status(200)
+    .json(
+      new ApiResponse(
+        200,
+        playlist?.publishStatus,
+        "Publish Status toggled successfully"
+      )
+    );
 });
 
-const searchPlaylist = asyncHandler(async (req, res) => {
+const searchPlaylist = asyncHandler(async (req, res, next) => {
   const { query } = req.query;
   const searchedSuggestion = await Playlist.aggregate([
     {
@@ -175,11 +189,13 @@ const searchPlaylist = asyncHandler(async (req, res) => {
 }); // umm we need to do regex thingy on this
 
 // umm okay Idk much about this we ll see this while building frontend : )
-const addThisPlaylist = asyncHandler(async (req, res) => {
+const addThisPlaylist = asyncHandler(async (req, res, next) => {
   const { playListId } = req.params;
 
   if (!playListId) {
-    return next(new ApiError(400, "Playlist id is required to add to User playlists"));
+    return next(
+      new ApiError(400, "Playlist id is required to add to User playlists")
+    );
   }
 
   const { _id } = req.user;
@@ -225,7 +241,7 @@ const removeFromLibrary = asyncHandler(async (req, res, next) => {
   return res.status(200).json(new ApiResponse(200, {}, "removed successfully"));
 });
 
-const getUserPlaylists = asyncHandler(async (req, res) => {
+const getUserPlaylists = asyncHandler(async (req, res, next) => {
   const { _id } = req.user;
 
   const populatedPlaylists = await User.findById(_id)
@@ -265,6 +281,7 @@ const forTheHomePage = asyncHandler(async (req, res, next) => {
   //which was created by the playlist now i will get the all the playlist and //yaa phir i can filter all the data which was created by the user
   const playlistsNotCreatedByUser = await Playlist.find({
     owner: { $ne: _id },
+    publishStatus: true,
   });
   return res
     .status(200)

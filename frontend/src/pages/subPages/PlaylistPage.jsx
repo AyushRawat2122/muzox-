@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
-import { useQuery } from "@tanstack/react-query";
-import { useParams } from "react-router";
-import { normalRequest } from "../../utils/axiosRequests.config";
+import { useMutation, useQuery } from "@tanstack/react-query";
+import { useNavigate, useParams } from "react-router";
+import { normalRequest, queryClient } from "../../utils/axiosRequests.config";
 import { FastAverageColor } from "fast-average-color";
 import {
   Play,
@@ -12,6 +12,8 @@ import {
   BookmarkPlus,
   Globe,
   GlobeLock,
+  AlertTriangle,
+  X,
 } from "lucide-react";
 import useAudioPlayer from "../../store/useAudioPlayer.js";
 import getUserPlaylists from "../../serverDataHooks/getUserPlaylists.js";
@@ -21,10 +23,10 @@ import getUser from "../../serverDataHooks/getUser.js";
 import {
   removeFromPlaylist,
   removePlaylistFromLibrary,
-  deletePlaylist,
   addPlaylistToLibrary,
 } from "../../serverDataHooks/playlistsMutations.js";
-
+import { AnimatePresence, motion } from "framer-motion";
+import { notifyError, notifySuccess } from "../../store/useNotification.js";
 const PlaylistPage = () => {
   const params = useParams();
   const imgRef = useRef(null);
@@ -53,6 +55,7 @@ const PlaylistPage = () => {
   };
   const [isSaved, setIsSaved] = useState(false);
   const [isPublic, setIsPublic] = useState(false);
+  const [deletePopup, setDeletePopUp] = useState(false);
   const {
     data: playlist,
     isPending: playlistPending,
@@ -70,14 +73,11 @@ const PlaylistPage = () => {
     isSuccess: librarySuccess,
   } = getUserPlaylists();
   useEffect(() => {
-    if (
-      playlist?.publishStatus
-    ) {
+    if (playlist?.publishStatus) {
       setIsPublic(true);
     } else {
       setIsPublic(false);
     }
-    
   }, [playlist, playlistSuccess]);
   useEffect(() => {
     if (
@@ -87,7 +87,6 @@ const PlaylistPage = () => {
     } else {
       setIsSaved(false);
     }
-
   }, [library, librarySuccess]);
 
   const handlePlayButtonClick = () => {
@@ -108,6 +107,42 @@ const PlaylistPage = () => {
       toggleLooping();
     }
   };
+  const handleOnBlur = (e) => {
+    e.stopPropagation();
+    console.log(e.target, e.currentTarget);
+    if (e.target === e.currentTarget) {
+      setDeletePopUp(false);
+    }
+  };
+  const toggleStatus = useMutation({
+    mutationKey: ["publishStatusToggle"],
+    mutationFn: async (playlistID) => {
+      const status = await normalRequest.patch(
+        `/playlist/toggleStatus/${playlistID}`
+      );
+      return status?.data?.data;
+    },
+    onSuccess: (status) => {
+      notifySuccess(
+        `${
+          status
+            ? "Playlist is now marked as a Public Playlist"
+            : "Playlist is now marked as a Private Playlist"
+        }`
+      );
+      queryClient.setQueryData(["playlist", playlist?._id], (oldData) => {
+        return { ...oldData, publishStatus: status };
+      });
+    },
+    onError: (err) => {
+      console.log(err);
+      notifyError("Failed to change publish status");
+    },
+  });
+
+  const playlistAddMutation = addPlaylistToLibrary();
+  const playlistRemoveMutation = removePlaylistFromLibrary();
+
   useEffect(() => {
     if (playlist) {
       const fac = new FastAverageColor();
@@ -136,113 +171,147 @@ const PlaylistPage = () => {
     return <Loading src={loadingPlayIcon} />;
   }
   return (
-    <main className="h-full w-full overflow-y-auto bg-black text-white">
+    <main className="h-full w-full relative overflow-y-auto bg-black text-white">
       {/* Section 1: Playlist Info */}
-      <div
-        className="flex  max-sm:flex-col sm:items-end gap-4  mb-6 sm:p-4 lg:rounded-t-lg"
-        style={customGradient}
-      >
-        <img
-          src={playlist?.playListCover?.url || "/playlists.png"}
-          alt="playlist"
-          className="h-48 aspect-square object-cover rounded"
-          ref={imgRef}
-        />
-        <div className="max-sm:px-2">
-          <h4 className="text-sm text-gray-400">Playlist, <span className="capitalize text-gray-300">{isPublic?"public":"private"} Playlist</span></h4>
-          <div className=" w-full h-fit overflow-hidden py-2">
-            <h1 className="text-4xl sm:text-6xl font-bold whitespace-nowrap overflow-ellipsis h-fit">
-              {playlist?.name}
-            </h1>
-          </div>
-          <p className="text-sm text-gray-400">
-            Total • {playlist?.songs?.length} Tracks
-          </p>
-        </div>
-      </div>
-
-      {/* Section 2: Play Control */}
-      <div className="sticky top-0 bg-black px-2 py-2 border-b-[1px] border-[#ffffff3d] flex items-center justify-between gap-2">
-        <div className="flex items-center gap-2">
-          {" "}
-          <button
-            className={`w-14 h-14 rounded-full flex items-center justify-center`}
-            style={{ backgroundColor: dominantColor }}
-            onClick={handlePlayButtonClick}
-            title="Play/Pause"
-          >
-            {isPlaying && queueID === playlist?._id ? (
-              <Pause className="w-6 h-6" />
-            ) : (
-              <Play className="w-6 h-6" />
-            )}
-          </button>
-          <button
-            className="w-10 h-10 rounded-full flex items-center justify-center"
-            onClick={handleQueueLooping}
-            title="Loop Entire Playlist"
-          >
-            <Repeat2
-              className={`w-6 h-6 ${
-                isLooped && queueID === playlist._id
-                  ? "text-[#ff6a30]"
-                  : "text-white"
-              }`}
-            />
-          </button>
-        </div>
-        <div className="flex items-center gap-1">
-          {user._id === playlist.owner && (
-            <button
-              className="h-[40px] w-[40px] text-red-500"
-              title="Delete Playlist"
-            >
-              <Trash2 size={25} />
-            </button>
-          )}
-          {user.id !== playlist.owner && isSaved && (
-            <button className="h-[40px] w-[40px]" title="Remove from Library">
-              <BookmarkMinus size={25} />
-            </button>
-          )}
-          {user.id !== playlist.owner && !isSaved && (
-            <button className="h-[40px] w-[40px]" title="Save to Library">
-              <BookmarkPlus size={25} />
-            </button>
-          )}
-          {user._id === playlist.owner && !isPublic && (
-            <button className="h-[40px] w-[40px]" title="Make Public">
-              <Globe size={25} />
-            </button>
-          )}
-          {user._id === playlist.owner && isPublic && (
-            <button className="h-[40px] w-[40px]" title="Make Private">
-              <GlobeLock size={25} />
-            </button>
-          )}
-        </div>
-      </div>
-
-      {/* Section 3: Songs List */}
-      <div className="mt-6">
-        {/* Header */}
-        <div className="grid gap-5 sm:gap-10 grid-cols-[auto_1fr_auto] px-4 items-center border-b border-gray-700 pb-2 mb-2 text-sm text-gray-400">
-          <div>#</div>
-          <div>Title</div>
-          <div className="text-right">Duration</div>
-        </div>
-        {/* Songs */}
-        {playlist?.songs?.map((song, index) => (
-          <SongItem
-            key={index}
-            song={song}
-            index={index}
-            queueRef={playlist._id}
-            ownerRef={playlist?.owner}
-            userRef={user._id}
+      <div>
+        {" "}
+        <div
+          className="flex  max-sm:flex-col sm:items-end gap-4  mb-6 sm:p-4 lg:rounded-t-lg"
+          style={customGradient}
+        >
+          <img
+            src={playlist?.playListCover?.url || "/playlists.png"}
+            alt="playlist"
+            className="h-48 aspect-square object-cover rounded"
+            ref={imgRef}
           />
-        ))}
+          <div className="max-sm:px-2">
+            <h4 className="text-sm text-gray-400">
+              Playlist,{" "}
+              <span className="capitalize text-gray-300">
+                {isPublic ? "public" : "private"} Playlist
+              </span>
+            </h4>
+            <div className=" w-full h-fit overflow-hidden py-2">
+              <h1 className="text-4xl sm:text-6xl font-bold whitespace-nowrap overflow-ellipsis h-fit">
+                {playlist?.name}
+              </h1>
+            </div>
+            <p className="text-sm text-gray-400">
+              Total • {playlist?.songs?.length} Tracks
+            </p>
+          </div>
+        </div>
+        {/* Section 2: Play Control */}
+        <div className="sticky top-0 bg-black px-2 py-2 border-b-[1px] border-[#ffffff3d] flex items-center justify-between gap-2">
+          <div className="flex items-center gap-2">
+            {" "}
+            <button
+              className={`w-14 h-14 rounded-full flex items-center justify-center`}
+              style={{ backgroundColor: dominantColor }}
+              onClick={handlePlayButtonClick}
+              title="Play/Pause"
+            >
+              {isPlaying && queueID === playlist?._id ? (
+                <Pause className="w-6 h-6" />
+              ) : (
+                <Play className="w-6 h-6" />
+              )}
+            </button>
+            <button
+              className="w-10 h-10 rounded-full flex items-center justify-center"
+              onClick={handleQueueLooping}
+              title="Loop Entire Playlist"
+            >
+              <Repeat2
+                className={`w-6 h-6 ${
+                  isLooped && queueID === playlist._id
+                    ? "text-[#ff6a30]"
+                    : "text-white"
+                }`}
+              />
+            </button>
+          </div>
+          <div className="flex items-center gap-1">
+            {user._id === playlist.owner && (
+              <button
+                className="h-[40px] w-[40px] text-red-500"
+                title="Delete Playlist"
+                onClick={() => {
+                  setDeletePopUp(true);
+                }}
+              >
+                <Trash2 size={25} />
+              </button>
+            )}
+            {user._id !== playlist.owner && isSaved && (
+              <button className="h-[40px] w-[40px]" title="Remove from Library" onClick={()=>{playlistRemoveMutation.mutate(playlist)}}>
+                <BookmarkMinus size={25} />
+              </button>
+            )}
+            {user._id !== playlist.owner && !isSaved && (
+              <button className="h-[40px] w-[40px]" title="Save to Library" onClick={()=>{playlistAddMutation.mutate(playlist)}}>
+                <BookmarkPlus size={25} />
+              </button>
+            )}
+            {user._id === playlist.owner && !isPublic && (
+              <button
+                className="h-[40px] w-[40px]"
+                title="Make Public"
+                onClick={() => {
+                  toggleStatus.mutate(playlist?._id);
+                }}
+              >
+                <Globe size={25} />
+              </button>
+            )}
+            {user._id === playlist.owner && isPublic && (
+              <button
+                className="h-[40px] w-[40px]"
+                title="Make Private"
+                onClick={() => {
+                  toggleStatus.mutate(playlist?._id);
+                }}
+              >
+                <GlobeLock size={25} />
+              </button>
+            )}
+          </div>
+        </div>
+        {/* Section 3: Songs List */}
+        <div className="mt-6">
+          {/* Header */}
+          <div className="grid gap-5 sm:gap-10 grid-cols-[auto_1fr_auto] overflow-hidden px-4 items-center border-b border-gray-700 pb-2 mb-2 text-sm text-gray-400">
+            <div>#</div>
+            <div>Title</div>
+            <div className="text-right">Duration</div>
+          </div>
+          {/* Songs */}
+          {playlist?.songs?.map((song, index) => (
+            <SongItem
+              key={index}
+              song={song}
+              index={index}
+              queueRef={playlist._id}
+              ownerRef={playlist?.owner}
+              userRef={user._id}
+            />
+          ))}
+        </div>
       </div>
+      <AnimatePresence mode="wait">
+        {deletePopup && (
+          <div
+            className="h-full w-full overflow-hidden px-3 fixed z-777 bg-black/30 backdrop-blur-sm top-0 flex justify-center items-center"
+            onClick={handleOnBlur}
+          >
+            <DeletePlayList
+              setDeletePopUp={setDeletePopUp}
+              playlistID={playlist?._id}
+            ></DeletePlayList>
+          </div>
+        )}
+      </AnimatePresence>
     </main>
   );
 };
@@ -274,25 +343,25 @@ const SongItem = ({ song, index, queueRef, ownerRef, userRef }) => {
   };
   return (
     <div
-      className="grid gap-5 sm:gap-10 grid-cols-[auto_1fr_auto] items-center px-4 py-2 transition-colors hover:bg-gray-800"
+      className="grid gap-5 sm:gap-10 grid-cols-[auto_1fr_auto] w-full overflow-hidden items-center px-4 py-2 transition-colors hover:bg-gray-800"
       onClick={changeCurrentSongOfQueue}
     >
       <div className="flex items-center justify-center">
         <span>{index + 1}</span>
       </div>
-      <div className="flex items-center gap-3">
+      <div className="flex items-center gap-2 overflow-hidden">
         <img
           src={song?.coverImage?.url || "/placeholder.svg?height=40&width=40"}
           alt={song.title}
           className="w-10 h-10 rounded object-cover"
         />
-        <div className="overflow-hidden">
-          <div className="font-medium text-ellipsis whitespace-nowrap overflow-hidden">
+        <div className="overflow-hidden ">
+          <p className="font-medium text-ellipsis whitespace-nowrap overflow-hidden">
             {song.title}
-          </div>
-          <div className="text-xs text-gray-400 text-ellipsis whitespace-nowrap overflow-hidden">
+          </p>
+          <p className="text-xs text-gray-400 text-ellipsis whitespace-nowrap overflow-hidden">
             {song.artist}
-          </div>
+          </p>
         </div>
       </div>
       <div className="text-xs text-gray-400 text-right flex gap-2 items-center">
@@ -309,7 +378,105 @@ const SongItem = ({ song, index, queueRef, ownerRef, userRef }) => {
     </div>
   );
 };
-const deletePlayList = ({}) => {
-  return <div></div>;
+const DeletePlayList = ({ setDeletePopUp, playlistID }) => {
+  useEffect(() => {
+    return () => {
+      setDeletePopUp(false);
+    };
+  }, []);
+  const { data: user, isPending: userPending } = getUser();
+  const navigate = useNavigate();
+  const deletePlaylist = async (playlistID) => {
+    try {
+      await normalRequest.delete(`/playlist/delete-playlist/${playlistID}`, {
+        headers: { "Content-Type": "application/json" },
+      });
+      return playlistID;
+    } catch (error) {
+      throw error?.response?.data;
+    }
+  };
+  const mutation = useMutation({
+    mutationKey: ["deletePlaylist"],
+    mutationFn: deletePlaylist,
+    onSuccess: (playlistID) => {
+      notifySuccess("playlist deleted successfully");
+      queryClient.removeQueries({ queryKey: ["playlist", playlistID] });
+      const oldQueryData = queryClient.getQueryData(["playlists"]);
+      if (oldQueryData) {
+        queryClient.setQueryData(["playlists"], (oldData) => {
+          return {
+            ...oldData,
+            data: [
+              ...(oldData.data.filter(
+                (playlist) => playlist?._id !== playlistID
+              ) || []),
+            ],
+          };
+        });
+      }
+      navigate(`/library/playlists/${user?._id}`);
+    },
+    onError: (error) => {
+      console.log(error);
+      notifyError(error.message);
+    },
+  });
+  if (userPending) {
+    <Loading src={loadingPlayIcon} />;
+  }
+  return (
+    <motion.div
+      key="deletePopup"
+      initial={{ opacity: 0, scale: 0.8 }}
+      animate={{ opacity: 1, scale: 1 }}
+      exit={{
+        opacity: 0,
+        scale: 0.8,
+        transition: { duration: 0.2, ease: "easeInOut" },
+      }}
+      transition={{ duration: 0.2 }}
+      className="no-copy overflow-hidden py-2"
+    >
+      <div className="bg-white/10 rounded-md px-3 py-2">
+        <div className="flex gap-2 items-center py-1">
+          <AlertTriangle size={25} className="text-red-400" />
+          <h1 className="text-left grow text-2xl font-bold">
+            Delete Confirmation
+          </h1>
+          <button
+            onClick={() => {
+              setDeletePopUp(false);
+            }}
+          >
+            <X size={25} className="hover:text-red-400" />
+          </button>
+        </div>
+        <hr className="text-[#ffffff32]" />
+        <p className="text-lg py-4 font-light">
+          Are you sure you want to delete this playlist? <br />
+          This action cannot be undone.
+        </p>
+        <div className="flex gap-2 justify-end">
+          <button
+            className="p-2 border border-[#ffffff32] rounded-md hover:bg-white/10 transition-all ease-in-out duration-200"
+            onClick={() => {
+              setDeletePopUp(false);
+            }}
+          >
+            Cancel
+          </button>
+          <button
+            onClick={() => {
+              mutation.mutate(playlistID);
+            }}
+            className="p-2 bg-red-400 rounded-md hover:bg-red-500 transition-all ease-in-out duration-200"
+          >
+            Delete
+          </button>
+        </div>
+      </div>
+    </motion.div>
+  );
 };
 export default PlaylistPage;
