@@ -5,6 +5,7 @@ import React, {
   useImperativeHandle,
 } from "react";
 import useAudioPlayer from "../../../../store/useAudioPlayer.js";
+import { saveInIDB } from "../../../../utils/frontendStorage.js";
 
 //used forwardRef to pass a ref from soundBar to here so that sound bar can take access of the audioRef
 
@@ -38,6 +39,10 @@ const AudioPlayer = forwardRef((props, ref) => {
 
     if (audioRef.current?.src !== currentSong?.song?.url) {
       audioRef.current.src = currentSong?.song?.url;
+      console.log("yaha aarha hai")
+      console.log(currentSong);
+
+       saveInIDB(currentSong);
     } // setting audio src
 
     if (isPlaying) {

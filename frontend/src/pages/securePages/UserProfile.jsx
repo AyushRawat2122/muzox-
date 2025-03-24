@@ -1,12 +1,11 @@
 import { useState } from "react";
-import { Pencil, X, Check, LogOut, Upload, User } from "lucide-react";
+import { X, Check, LogOut, User } from "lucide-react";
 import getUser from "../../serverDataHooks/getUser";
 import { normalRequest, queryClient } from "../../utils/axiosRequests.config";
 import { useMutation } from "@tanstack/react-query";
 import Loading from "../../components/loaders/Loading";
-import { loadingPlayIcon } from "../../utils/lottie.js";
+import { loadingDotsOrange } from "../../utils/lottie.js";
 import { useNavigate } from "react-router";
-import { replace } from "lodash";
 
 function UserProfile() {
   const [state, setState] = useState("stats");
@@ -14,77 +13,72 @@ function UserProfile() {
   const [tempUsername, setTempUsername] = useState("");
   const user = getUser();
   const navigate = useNavigate();
+  const [prevSrc,setPrevSrc]=useState(user.profilePic);
+
   const formatDate = (updatedAt) => {
     const [year, month, day] = updatedAt.split("T")[0].split("-");
     const months = [
-      "January",
-      "February",
-      "March",
-      "April",
-      "May",
-      "June",
-      "July",
-      "August",
-      "September",
-      "October",
-      "November",
-      "December",
+      "January", "February", "March", "April", "May", "June",
+      "July", "August", "September", "October", "November", "December",
     ];
-    return `${months[parseInt(month, 10) - 1]} ${parseInt(
-      day,
-      10
-    )}, 2k${year.slice(2)}`;
+    return `${months[parseInt(month, 10) - 1]} ${parseInt(day, 10)}, 2k${year.slice(2)}`;
   };
 
-  const updateUserName = async () => {
-    try {
+  const mutation1 = useMutation({
+    mutationFn: async () => {
       const res = await normalRequest.post("/user/updateUserDetails", {
         username: tempUsername,
       });
-      console.log(res.data);
-      setEditingUsername(false);
-    } catch (error) {
-      console.error(error);
-    }
-  };
+      return res.data;
+    },
+    onMutate: () => setEditingUsername(false),
+    onSuccess: (data) => {
+      queryClient.setQueryData(["user"], (oldData) => ({
+        ...oldData,
+        username: tempUsername,
+      }));
+    },
+    onError: (err) => console.error(err),
+  });
 
-  const updateProfilePic = async (e) => {
-    const file = e.target.files[0];
-    if (!file) return;
-    try {
+  const anoMutation = useMutation({
+    mutationFn: async (file) => {
       const formData = new FormData();
       formData.append("profilePic", file);
       const res = await normalRequest.post("/user/updateProfilePic", formData, {
         headers: { "Content-Type": "multipart/form-data" },
       });
-      console.log(res.data);
-    } catch (error) {
-      console.error(error);
-    }
-  };
+      return res.data;
+    },
+    onSuccess: (data) => {
+      queryClient.setQueryData(["user"], (oldData) => ({
+        ...oldData,
+        profilePic: data.profilePic,
+      }));
+    },
+    onError: (err) => console.error(err),
+  });
 
-  const userLogout = async () => {
-    try {
-      const res = await normalRequest.post("/user/logout");
-    } catch (error) {
-      console.error(error);
-    }
-  };
   const mutation = useMutation({
-    mutationFn: userLogout,
+    mutationFn: async () => {
+      await normalRequest.post("/user/logout");
+    },
     onSuccess: () => {
-      window.history.pushState(null, null, "/login");
       queryClient.clear();
       navigate("/login", { replace: true });
     },
-    onError: (error) => {
-      console.error(error);
-    },
+    onError: (error) => console.error(error),
   });
 
-  if (mutation.isPending) {
-    return <Loading src={loadingPlayIcon} />;
-  }
+  const handleProfileUpdate = (e) => {
+    const file = e.target.files[0];
+     anoMutation.mutate(file);
+  };
+
+  const handleUsernameUpdate = () => {
+    mutation1.mutate();
+  };
+
   const getRecentData = () => {
     const itemStr = localStorage.getItem("recent");
     if (!itemStr) return null;
@@ -98,8 +92,11 @@ function UserProfile() {
     }
     return item?.value;
   };
-  const recentData = getRecentData();
 
+  // if (mutation.isPending || mutation1.isPending || anoMutation.isPending) {
+  //   return <Loading src={loadingDotsOrange} />;
+  // }
+  const recentData = getRecentData();
   return (
     <div className="w-full h-full overflow-y-scroll bg-zinc-950 text-white p-4 md:p-8">
       <header className="flex justify-between items-center mb-6">
@@ -119,7 +116,6 @@ function UserProfile() {
 
       <section className="bg-gray-500/10 p-6 rounded-lg shadow-xl mb-6 text-gray-300">
         <div className="flex flex-col md:flex-row items-center gap-6">
-          {/* Profile Image Section */}
           <div className="flex flex-col items-center">
             <label
               htmlFor="profile-image"
@@ -144,7 +140,7 @@ function UserProfile() {
               type="file"
               accept="image/*"
               className="hidden"
-              onChange={updateProfilePic}
+              onChange={handleProfileUpdate}
             />
           </div>
 
@@ -158,7 +154,7 @@ function UserProfile() {
                     className="text-white text-right outline-none capitalize text-2xl md:text-6xl p-2 w-full"
                   />
                   <button
-                    onClick={updateUserName}
+                    onClick={handleUsernameUpdate}
                     className="text-green-400 hover:text-green-300"
                   >
                     <Check size={18} />

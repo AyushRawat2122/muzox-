@@ -3,7 +3,7 @@ import { Play, Repeat2, Pause, BookmarkMinus } from "lucide-react";
 import useAudioPlayer from "../../store/useAudioPlayer.js";
 import getUserLikedSong from "../../serverDataHooks/getUserLikedSong.js";
 import { useUnlikeSong } from "../../serverDataHooks/songMutations.js";
-import { loadingPlayIcon } from "../../utils/lottie.js";
+import { loadingDotsOrange, loadingPlayIcon } from "../../utils/lottie.js";
 import Loading from "../../components/loaders/Loading.jsx"
 const LikedSongsPage = () => {
   const {
@@ -40,7 +40,7 @@ const LikedSongsPage = () => {
   }; // custom gradient for cover
 
   if(isPending){
-    return <Loading src={loadingPlayIcon}/>
+    return <Loading src={loadingDotsOrange}/>
   }
 
   return (

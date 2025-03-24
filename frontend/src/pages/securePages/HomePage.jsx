@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { normalRequest } from "../../utils/axiosRequests.config";
 import { useQuery } from "@tanstack/react-query";
 import Loading from "../../components/loaders/Loading";
-import { loadingPlayIcon } from "../../utils/lottie";
+import { loadingDotsOrange } from "../../utils/lottie";
 import PlaylistCarousel from "../../components/carousel/PlaylistCarousel";
 import { PlaylistCard } from "../../components/asset components";
 
@@ -41,7 +41,7 @@ const HomePage = () => {
   if (isPending) {
     return (
       <div className="flex items-center justify-center h-screen">
-        <Loading src={loadingPlayIcon} />
+        <Loading src={loadingDotsOrange} />
       </div>
     );
   }
