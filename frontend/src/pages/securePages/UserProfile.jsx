@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { X, Check, LogOut, User } from "lucide-react";
+import { useEffect, useState } from "react";
+import { X, Check, LogOut, User, Bitcoin } from "lucide-react";
 import getUser from "../../serverDataHooks/getUser";
 import { normalRequest, queryClient } from "../../utils/axiosRequests.config";
 import { useMutation } from "@tanstack/react-query";
@@ -13,7 +13,7 @@ function UserProfile() {
   const [tempUsername, setTempUsername] = useState("");
   const user = getUser();
   const navigate = useNavigate();
-  const [prevSrc,setPrevSrc]=useState(user.profilePic);
+  const [prevSrc, setPrevSrc] = useState(user.data.profilePic.url);
 
   const formatDate = (updatedAt) => {
     const [year, month, day] = updatedAt.split("T")[0].split("-");
@@ -23,7 +23,12 @@ function UserProfile() {
     ];
     return `${months[parseInt(month, 10) - 1]} ${parseInt(day, 10)}, 2k${year.slice(2)}`;
   };
-
+ const TakeToAdmin=()=>{
+  navigate("/admin-panel");
+ }
+ const TakeToAdminRequest=()=>{
+  navigate("/admin-panel-req")
+ }
   const mutation1 = useMutation({
     mutationFn: async () => {
       const res = await normalRequest.post("/user/updateUserDetails", {
@@ -31,14 +36,23 @@ function UserProfile() {
       });
       return res.data;
     },
-    onMutate: () => setEditingUsername(false),
-    onSuccess: (data) => {
-      queryClient.setQueryData(["user"], (oldData) => ({
-        ...oldData,
+    onMutate: async () => {
+      setEditingUsername(false);
+      await queryClient.cancelQueries(["user"]);
+      const previousUser = queryClient.getQueryData(["user"]);
+      queryClient.setQueryData(["user"], old => ({
+        ...old,
         username: tempUsername,
       }));
+      return { previousUser };
     },
-    onError: (err) => console.error(err),
+    onError: (err, variables, context) => {
+      queryClient.setQueryData(["user"], context.previousUser);
+      console.error(err);
+    },
+    onSettled: () => {
+      queryClient.invalidateQueries(["user"]);
+    },
   });
 
   const anoMutation = useMutation({
@@ -50,13 +64,33 @@ function UserProfile() {
       });
       return res.data;
     },
+    onMutate: async (file) => {
+      await queryClient.cancelQueries(["user"]);
+      const previousUser = queryClient.getQueryData(["user"]);
+      const localImageUrl = URL.createObjectURL(file);
+      setPrevSrc(localImageUrl);
+      queryClient.setQueryData(["user"], old => ({
+        ...old,
+        profilePic: { url: localImageUrl },
+      }));
+      return { previousUser, localImageUrl };
+    },
+    onError: (err, file, context) => {
+      queryClient.setQueryData(["user"], context.previousUser);
+      setPrevSrc(context.previousUser.profilePic.url);
+      console.error(err);
+    },
     onSuccess: (data) => {
-      queryClient.setQueryData(["user"], (oldData) => ({
-        ...oldData,
-        profilePic: data.profilePic,
+      const newUrl = data.message.profilePic.url;
+      setPrevSrc(newUrl);
+      queryClient.setQueryData(["user"], old => ({
+        ...old,
+        profilePic: data.message.profilePic,
       }));
     },
-    onError: (err) => console.error(err),
+    onSettled: () => {
+      queryClient.invalidateQueries(["user"]);
+    },
   });
 
   const mutation = useMutation({
@@ -72,20 +106,22 @@ function UserProfile() {
 
   const handleProfileUpdate = (e) => {
     const file = e.target.files[0];
-     anoMutation.mutate(file);
+    if (file) {
+      anoMutation.mutate(file);
+    }
   };
 
   const handleUsernameUpdate = () => {
-    mutation1.mutate();
+    if (tempUsername.trim()) {
+      mutation1.mutate();
+    }
   };
 
   const getRecentData = () => {
     const itemStr = localStorage.getItem("recent");
     if (!itemStr) return null;
-
     const item = JSON.parse(itemStr);
     const now = new Date();
-
     if (now.getTime() > item.expiry) {
       localStorage.removeItem("recent");
       return null;
@@ -93,23 +129,25 @@ function UserProfile() {
     return item?.value;
   };
 
-  // if (mutation.isPending || mutation1.isPending || anoMutation.isPending) {
-  //   return <Loading src={loadingDotsOrange} />;
-  // }
   const recentData = getRecentData();
+
+  if (mutation.isLoading || mutation1.isLoading || anoMutation.isLoading) {
+    return <Loading src={loadingDotsOrange} />;
+  }
+
   return (
     <div className="w-full h-full overflow-y-scroll bg-zinc-950 text-white p-4 md:p-8">
-      <header className="flex justify-between items-center mb-6">
-        <h2 className="font-bold text-2xl md:text-5xl">
+      <header className="flex justify-between space-around items-center mb-6">
+        <h2 className="font-bold flex gap-1 text-2xl md:text-5xl">
           Your Profile{" "}
-          {user?.data?.isPremiumUser ? <span>~Premium</span> : null}
+          {user?.data?.isPremiumUser ? <span className="text-yellow-400"><Bitcoin size={25}/></span> : null}
         </h2>
+         
         <button
-          onClick={() => {
-            mutation.mutate();
-          }}
+          onClick={() => mutation.mutate()}
           className="flex items-center gap-2 text-red-500 hover:text-red-400"
         >
+        
           <LogOut size={16} /> Logout
         </button>
       </header>
@@ -124,7 +162,7 @@ function UserProfile() {
               <div className="w-32 h-32 sm:w-[200px] sm:h-[200px] rounded-full overflow-hidden">
                 {user.data?.profilePic?.url ? (
                   <img
-                    src={user.data.profilePic.url}
+                    src={prevSrc}
                     alt="Profile"
                     className="w-full h-full object-cover"
                   />
@@ -179,13 +217,9 @@ function UserProfile() {
               )}
             </div>
 
-            {/* Email */}
-
             <span>{user.data?.email}</span>
-
-            {/* Member Since */}
             <div className="flex items-center text-gray-500 text-sm ">
-              <span className="">Member Since: </span>
+              <span>Member Since: </span>
               <span>
                 {user.data?.createdAt && formatDate(user.data.createdAt)}
               </span>
@@ -252,7 +286,28 @@ function UserProfile() {
             </div>
           )}
         </div>
+        
       </div>
+    <div className="flex items-center justify-center mt-5">
+  {user.data.isAdmin ? (
+    <button
+      onClick={TakeToAdmin}
+      className="px-6 py-2 rounded-lg border border-amber-300 text-amber-200 hover:bg-amber-300   hover:text-zinc-950 transition duration-200"
+      aria-label="Go to Admin Panel"
+    >
+      Admin Panel
+    </button>
+  ) : (
+    <button
+      onClick={TakeToAdminRequest}
+      className="px-6 py-2 rounded-lg border border-green-400 text-green-400 hover:bg-green-400 hover:text-white transition duration-200"
+      aria-label="Request Admin Access"
+    >
+      Request For Admin
+    </button>
+  )}
+</div>
+
     </div>
   );
 }

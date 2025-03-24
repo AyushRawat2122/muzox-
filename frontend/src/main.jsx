@@ -52,7 +52,7 @@ const route = createBrowserRouter([
             ],
           },
           {
-            path: "/upload",
+            path: "/admin-panel",
             element: <AdminUploadPage />,
           },
           {
