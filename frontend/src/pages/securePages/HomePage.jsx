@@ -4,14 +4,22 @@ import { useQuery } from "@tanstack/react-query";
 import Loading from "../../components/loaders/Loading";
 import { loadingDotsOrange } from "../../utils/lottie";
 import PlaylistCarousel from "../../components/carousel/PlaylistCarousel";
-import { PlaylistCard } from "../../components/asset components";
-
+import {
+  PlaylistCard,
+  SearchListSongCard,
+} from "../../components/asset components";
+import { useNavigate } from "react-router";
+import { Play } from "lucide-react";
+import useAudioPlayer from "../../store/useAudioPlayer";
+import { getRecentSongs } from "../../utils/frontendStorage";
 const HomePage = () => {
   const [data, setData] = useState({
     playlists: [],
     songs: [],
     newlyAdded: [],
   });
+  const [recentSongs, setRecentSongs] = useState([]);
+  const navigate = useNavigate();
 
   const fetchData = async () => {
     const [playlistRes, songRes, newSongRes] = await Promise.all([
@@ -33,10 +41,16 @@ const HomePage = () => {
   });
 
   useEffect(() => {
-    if (homePageData) {
-      setData(homePageData);
-    }
+    if (homePageData) setData(homePageData);
   }, [homePageData]);
+
+  useEffect(() => {
+    getRecentSongs()
+      .then((fetchedSongs) => {
+        setRecentSongs(fetchedSongs);
+      })
+      .catch((err) => console.error("Error fetching recent songs:", err));
+  }, []);
 
   if (isPending) {
     return (
@@ -46,98 +60,92 @@ const HomePage = () => {
     );
   }
 
-
-  const half = Math.ceil(data.newlyAdded.length / 2);
-  const firstColumn = data.newlyAdded.slice(0, half);
-  const secondColumn = data.newlyAdded.slice(half);
-
   return (
-    <div className="p-4 overflow-y-scroll h-full">
-      <div className="mb-8">
-        <h1 className="text-2xl font-bold mb-4">Top Playlist For You</h1>
-        <PlaylistCarousel>
-          {data.playlists.map((item, index) => {
-            const key = index + data.now;
-            return (
-              <PlaylistCard key={key} playlist={item} onClick={undefined} />
-            );
-          })}
-        </PlaylistCarousel>
+    <div className="overflow-y-scroll h-full px-1 capitalize space-y-6">
+    {/* Jump back in Time */}
+    <section>
+      <h1 className="text-2xl font-bold mb-2">Jump back in Time</h1>
+      <PlaylistCarousel>
+        {recentSongs.map((song) => (
+          <HoverCard
+            key={song?._id}
+            img={song?.coverImage?.url}
+            name={song?.title}
+            song={song}
+          />
+        ))}
+      </PlaylistCarousel>
+    </section>
+  
+    {/* Top Playlist For You */}
+    <section>
+      <h1 className="text-2xl font-bold mb-2">Top Playlist For You</h1>
+      <PlaylistCarousel>
+        {data.playlists.map((item) => (
+          <PlaylistCard
+            key={item._id}
+            playlist={item}
+            onClick={() => navigate(`/playlist/${item?._id}`)}
+          />
+        ))}
+      </PlaylistCarousel>
+    </section>
+  
+    {/* Recommended Songs */}
+    <section>
+      <h1 className="text-2xl font-bold mb-2">Recommended Songs</h1>
+      <PlaylistCarousel>
+        {data.songs.map((song) => (
+          <HoverCard
+            key={song?._id}
+            img={song?.coverImage?.url}
+            name={song?.title}
+            song={song}
+          />
+        ))}
+      </PlaylistCarousel>
+    </section>
+  
+    {/* Latest Songs */}
+    <section>
+      <h1 className="text-2xl font-bold mb-2">Latest Songs</h1>
+      <div className="grid sm:grid-cols-2 gap-4">
+        {data.newlyAdded.map((song, idx) => (
+          <SearchListSongCard key={`${idx}LatestSongKEY`} song={song} />
+        ))}
       </div>
+    </section>
+  </div>
+  
+  );
+};
 
-      <div className="mb-8">
-        <h1 className="text-2xl font-bold mb-4">Recommended Songs</h1>
-        <div className="grid grid-cols-3 gap-4">
-          {data.songs.map((item, index) => (
-            <div
-              key={index}
-              className="relative group rounded-lg overflow-hidden shadow-lg"
-            >
-              <img
-                src={item.coverImage.url}
-                alt={`${item.title}-img`}
-                className="w-full h-45 object-cover hover:opacity-45"
-              />
-              <div className="absolute bottom-0 left-0 w-full  bg-opacity-50 text-white p-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                <div className="font-semibold">{item.title}</div>
-                <div className="text-sm">{item.artist}</div>
-              </div>
-            </div>
-          ))}
-        </div>
+const HoverCard = ({ img, name, song }) => {
+  const { initializeQueue } = useAudioPlayer();
+  const handleClick = (e) => {
+    initializeQueue([song], song?._id);
+  };
+  return (
+    <div
+      className="hover:bg-white/10 main w-[150px] h-[180px] rounded-md overflow-hidden shadow-sm flex flex-col p-1"
+      onClick={handleClick}
+    >
+      <div className="relative w-full rounded-lg overflow-hidden">
+        <img
+          src={img}
+          alt={name}
+          className="w-full aspect-square object-cover"
+        />
+        <button className="absolute inset-0 flex items-center justify-center playBtn">
+          <div className="w-10 h-10 rounded-full flex items-center justify-center bg-[#ff733c]">
+            <Play className="text-white w-5 h-5" size={50} strokeWidth={4} />
+          </div>
+        </button>
       </div>
-
-      <div>
-        <h1 className="text-2xl font-bold mb-4">Latest Songs</h1>
-        <div className="grid grid-cols-2 gap-10">
-          <div className="flex flex-col space-y-2">
-            {firstColumn.map((song, index) => (
-              <div
-                key={index}
-                className="flex items-center justify-between p-2 rounded-md hover:bg-neutral-800 transition-colors"
-              >
-                <div className="flex items-center space-x-3">
-                  <img
-                    src={song.coverImage.url}
-                    alt={song.title}
-                    className="w-12 h-12 object-cover rounded hover:opacity-75"
-                  />
-                  <div>
-                    <p className="text-sm font-semibold">{song.title}</p>
-                    <p className="text-xs text-gray-400">{song.artist}</p>
-                  </div>
-                </div>
-                <div className="text-gray-400 hover:text-white cursor-pointer">
-               <button>•••</button>
-                </div>
-              </div>
-            ))}
-          </div>
-          <div className="flex flex-col space-y-2">
-            {secondColumn.map((song, index) => (
-              <div
-                key={index}
-                className="flex items-center justify-between p-2 rounded-md hover:bg-neutral-800 transition-colors"
-              >
-                <div className="flex items-center space-x-3">
-                  <img
-                    src={song.coverImage.url}
-                    alt={song.title}
-                    className="w-12 h-12 object-cover rounded"
-                  />
-                  <div>
-                    <p className="text-sm font-semibold">{song.title}</p>
-                    <p className="text-xs text-gray-400">{song.artist}</p>
-                  </div>
-                </div>
-                <div className="text-gray-400 hover:text-white cursor-pointer">
-                  <button>•••</button>
-                   {/* abhi ke liye button de diya */}
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
+      <div className="p-2 overflow-hidden">
+        <p className="text-white text-sm text-left whitespace-nowrap text-ellipsis overflow-hidden">
+          {name}
+        </p>
       </div>
     </div>
   );

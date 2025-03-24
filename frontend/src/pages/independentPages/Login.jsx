@@ -77,19 +77,19 @@ const Login = () => {
       console.log(error);
     },
   });
-
-  if (mutation.isPending) {
-    return <Loading src={loadingPlayIcon} />;
-  }
-
+  
   const toggleIsVisible = (e) => {
     e.preventDefault();
     setIsVisible((prev) => !prev);
   };
 
+  if (mutation.isPending) {
+    return <Loading src={loadingPlayIcon} />;
+  }
+
   return (
     <div className="h-full w-full bg-black text-white flex justify-center items-center jakartha">
-      <div className="h-full max-sm:max-w-[300px] max-w-[350px] flex flex-col gap-7 sm:gap-7 hiddenScroll items-center overflow-y-scroll">
+      <div className="h-full max-sm:max-w-[300px] max-w-[350px] flex flex-col gap-7 sm:gap-7 hiddenScroll items-center justify-center overflow-y-scroll">
         <img
           src={Logo}
           alt="logo"

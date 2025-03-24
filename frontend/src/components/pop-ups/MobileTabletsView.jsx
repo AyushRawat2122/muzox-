@@ -34,7 +34,7 @@ const MobileTabletsView = (props) => {
             }}
           >
            
-            <div className="flex flex-col items-center pt-1 px-2 ">
+            <div className="flex flex-col items-center pt-1 px- ">
               <h1 className="text-sm sm:text-base text-gray-300">Now Playing</h1>
               <p className="capitalize text-bold text-lg sm:text-xl text-gray-100 text-center ">
                 {" "}

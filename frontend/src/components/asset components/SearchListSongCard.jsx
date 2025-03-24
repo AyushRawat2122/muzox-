@@ -11,11 +11,11 @@ const SearchListSongCard = ({ song }) => {
     setPlayIcon(false);
   };
   const { initializeQueue } = useAudioPlayer();
-  const { artist, coverImage, title, duration } = song;
+  const { artist, coverImage, title, duration , _id } = song;
   const {toggleAddPopUp,setContext,context,addPopUp} = usePopUp();
   const handleClick = (e) => {
     e.stopPropagation();
-    initializeQueue([song] , "song");
+    initializeQueue([song] , _id);
   };
   const convertToMinSecFormat = (number) => {
     const min = Math.floor(number / 60); //get min

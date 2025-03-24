@@ -256,7 +256,7 @@ const ProtectedRoute = () => {
           {isDesktopOrLaptop && isSideBarOpen && (
             <Panel
               className="bg-black/40"
-              minSize={15}
+              minSize={18}
               maxSize={25}
               order={3}
               defaultSize={rightPanelSize}
