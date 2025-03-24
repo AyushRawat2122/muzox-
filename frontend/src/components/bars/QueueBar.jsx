@@ -6,7 +6,14 @@ import { getRecentSongs } from "../../utils/frontendStorage.js";
 
 const QueueBar = ({ className, isRecentTabOpen }) => {
   const [songs, setSongs] = useState([]);
-  const { currentSong, currentSongIdx, queue, setCurrentSong } = useAudioPlayer();
+  const {
+    currentSong,
+    currentSongIdx,
+    queue,
+    setCurrentSong,
+    initializeQueue,
+    queueID,
+  } = useAudioPlayer();
 
   useEffect(() => {
     if (isRecentTabOpen) {
@@ -24,7 +31,10 @@ const QueueBar = ({ className, isRecentTabOpen }) => {
         <div className="h-full w-full flex flex-col gap-5 py-3 text-sm font-bold capitalize">
           <div>
             <h1 className="py-2">Now playing</h1>
-            <SideBarMusicCards className={"text-[#fe7641]"} Song={currentSong} />
+            <SideBarMusicCards
+              className={"text-[#fe7641]"}
+              Song={currentSong}
+            />
           </div>
           <div>
             <h1 className="py-2">Up Next</h1>
@@ -54,7 +64,15 @@ const QueueBar = ({ className, isRecentTabOpen }) => {
           <h1 className="capitalize text-sm font-bold">recently played</h1>
           <ul>
             {songs.map((elm) => (
-              <SideBarMusicCards Song={elm} key={elm.id} />
+              <SideBarMusicCards
+                Song={elm}
+                key={elm._id}
+                onClick={() => {
+                  if (queueID !== elm._id) {
+                    initializeQueue([elm], elm._id);
+                  }
+                }}
+              />
             ))}
           </ul>
         </div>

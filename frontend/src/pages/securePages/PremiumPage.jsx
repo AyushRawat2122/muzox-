@@ -88,7 +88,7 @@ function PremiumPage() {
         <h2 className="text-3xl font-bold">
           Unlock unlimited access to millions of songs, ad-free listening, and exclusive features.
         </h2>
-        <div className="mt-10 flex justify-center gap-6">
+        <div className="mt-10 flex justify-center gap-6 flex-wrap">
           <button className="border-2 border-[#fe7641] text-white px-6 py-3 rounded-full font-bold hover:bg-[#fe7641]">
             Try Free For 30 Days
           </button>

@@ -2,7 +2,7 @@ import React from "react";
 import { motion } from "framer-motion";
 import { SoundBar } from "../bars/index.js";
 import useAudioPlayer from "../../store/useAudioPlayer.js";
-import { ChevronDown } from "lucide-react";
+import { ChevronDownCircle } from "lucide-react";
 import usePopUp from "../../store/usePopUp.js";
 
 const MobileTabletsView = (props) => {
@@ -27,23 +27,22 @@ const MobileTabletsView = (props) => {
       <div className="absolute inset-0 bg-black/40 backdrop-blur-sm"></div>
       <div className="relative z-10 text-white text-2xl flex justify-center items-center h-full">
         <div className="flex flex-col h-full w-full">
-          <div className="flex py-2 items-center gap-1">
-            <ChevronDown
-              size={40}
-              className="text-gray-300"
-              onClick={() => {
-                // Assuming toggling soundBarPopUp might also trigger unmount of this view in the parent
-                setSoundBarPopUp(false);
-              }}
-            />
-            <div className="flex items-center gap-2">
-              <h1>Now Playing:</h1>
-              <span className="marquee-container max-sm:w-[150px] sm:w-[300px]">
-                <p className="marquee capitalize"> {currentSong?.title + " | " + currentSong?.artist} </p>
-              </span>
+          <div
+            className="flex justify-center relative w-full bg-black/10 border-b-4 rounded-b-2xl pb-2 border-[#ffffff1c]"
+            onClick={() => {
+              setSoundBarPopUp(false);
+            }}
+          >
+           
+            <div className="flex flex-col items-center pt-1 px-2 ">
+              <h1 className="text-sm sm:text-base text-gray-300">Now Playing</h1>
+              <p className="capitalize text-bold text-lg sm:text-xl text-gray-100 text-center ">
+                {" "}
+                {currentSong?.title + " | " + currentSong?.artist}{" "}
+              </p>
             </div>
+            <ChevronDownCircle size={25} className="text-[#ffffffa5] bg-white/10 rounded-full backdrop:blur-7xl absolute bottom-0 translate-y-[60%]" />
           </div>
-          <hr className="text-[#ffffff89] mx-[10%]" />
           <div className="grow pointer-events-none"></div>
           <motion.div
             animate={soundBarPopUp ? { y: 0 } : { y: "100%" }}
