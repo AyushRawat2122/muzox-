@@ -80,7 +80,7 @@ const signup = asyncHandler(async (req, res, next) => {
     email: email,
     otp: otp,
     name: username,
-    type: "VERIFY",
+    type: "VERIFICATION",
     userId: user._id,
   });
 
@@ -221,7 +221,7 @@ const passwordResetMail = asyncHandler(async (req, res, next) => {
     email: user.email,
     otp: otp,
     name: user.username,
-    type: "PASSWORD_RESET",
+    type: "RESET PASSWORD",
     userId: userId,
   });
 
