@@ -28,13 +28,13 @@ const MobileTabletsView = (props) => {
       <div className="relative z-10 text-white text-2xl flex justify-center items-center h-full">
         <div className="flex flex-col h-full w-full">
           <div
-            className="flex justify-center relative w-full bg-black/10 border-b-4 rounded-b-2xl pb-2 border-[#ffffff1c]"
+            className="flex justify-center relative w-full bg-black/20 border-b-4 rounded-b-2xl pb-2 border-[#ffffff1c]"
             onClick={() => {
               setSoundBarPopUp(false);
             }}
           >
            
-            <div className="flex flex-col items-center pt-1 px- ">
+            <div className="flex flex-col items-center pt-1">
               <h1 className="text-sm sm:text-base text-gray-300">Now Playing</h1>
               <p className="capitalize text-bold text-lg sm:text-xl text-gray-100 text-center ">
                 {" "}
@@ -50,7 +50,7 @@ const MobileTabletsView = (props) => {
           >
             <SoundBar
               audioElement={audioElement}
-              className="px-1 py-2 rounded-top-md bg-transparent mb-4"
+              className="px-1 py-2 rounded-top-md bg-transparent mb-8"
             />
           </motion.div>
         </div>

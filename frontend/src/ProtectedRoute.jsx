@@ -240,7 +240,7 @@ const ProtectedRoute = () => {
           )}
 
           {/* MIDDLE PANEL (Auto-Adjust) */}
-          <Panel className="bg-black/30" id="middle-panel" order={2}>
+          <Panel className="bg-black/30 overflow-hidden" id="middle-panel" order={2}>
             <Outlet />
           </Panel>
 
