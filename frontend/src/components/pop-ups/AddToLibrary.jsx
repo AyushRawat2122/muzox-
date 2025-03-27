@@ -119,7 +119,7 @@ const AddToLibrary = () => {
             transition: { duration: 0.3, ease: "easeInOut" },
           }}
           transition={{ duration: 0.3 }}
-          className="relative w-[80%] h-[80%] overflow-y-scroll hiddenScroll p-6 gradientBg text-white rounded-lg shadow-sm shadow-gray-300"
+          className="relative w-[80%] h-[80%] overflow-y-scroll hiddenScroll p-6 bg-black/50 text-white rounded-lg shadow-sm shadow-gray-300"
         >
           {/* Close Button */}
           <button

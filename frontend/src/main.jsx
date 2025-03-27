@@ -4,7 +4,12 @@ import "./index.css";
 import App from "./App.jsx";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { RouterProvider, createBrowserRouter, Navigate } from "react-router";
-import { Signup, Login, Verify } from "./pages/independentPages/index.js";
+import {
+  Signup,
+  Login,
+  Verify,
+  ResetPasswordPage,
+} from "./pages/independentPages/index.js";
 import {
   HomePage,
   LibraryPage,
@@ -37,6 +42,10 @@ const route = createBrowserRouter([
           { index: true, element: <Navigate to="/login" replace /> },
           { path: ":userID", element: <Verify /> },
         ],
+      },
+      {
+        path: "/reset-password",
+        element: <ResetPasswordPage />,
       },
       {
         path: "/",

@@ -18,15 +18,21 @@ import { HiOutlineQueueList } from "react-icons/hi2";
 import TrackDisplay from "./sound-bar-components/TrackDisplay";
 import useSideBar from "../../../store/useSideBar.js";
 import { NavLink } from "react-router";
+import { useMediaQuery } from "react-responsive";
 
 const SoundBar = ({ audioElement, className }) => {
   const audio = audioElement;
-  const [currentPosition, setCurrentPosition] = useState( audio?.currentTime || 0);
-  const [duration, setDuration] = useState(audio?.duration || 0 );
+  const isMobile = useMediaQuery({ query: "(max-width: 40rem)" });
+  const [currentPosition, setCurrentPosition] = useState(
+    audio?.currentTime || 0
+  );
+  const [duration, setDuration] = useState(audio?.duration || 0);
   const [isSeeking, setIsSeeking] = useState(false);
-  const [volume, setVolume] = useState(Math.floor(parseInt(audio?.volume * 100)) || 100);
+  const [volume, setVolume] = useState(
+    Math.floor(parseInt(audio?.volume * 100)) || 100
+  );
   const [isMuted, setIsMuted] = useState(false);
-  const [isLoop, setIsLoop] = useState(audio?.loop||false);
+  const [isLoop, setIsLoop] = useState(audio?.loop || false);
 
   const {
     isShuffled,
@@ -152,7 +158,7 @@ const SoundBar = ({ audioElement, className }) => {
         {/* Current song seek + control */}
         <div className="flex flex-col-reverse lg:flex-col w-full lg:w-[60%]">
           {/* Song Controls */}
-          <div className="flex justify-between lg:justify-center items-center px-2 pt-2 gap-2 bg-transparent">
+          <div className="flex justify-between lg:justify-center items-center sm:px-2 pt-2 gap-2 bg-transparent">
             {/* Shuffle */}
             <button
               className="h-8 w-8 rounded-full relative"
@@ -179,13 +185,23 @@ const SoundBar = ({ audioElement, className }) => {
               </button>
               {/* Play || Pause */}
               <button
-                className="w-10 text-white rounded-full relative text-3xl"
+                className="max-sm:w-[50px] max-sm:h-[50px] max-sm:bg-white/20  sm:w-10 text-white rounded-full relative text-3xl"
                 onClick={togglePlay}
               >
                 {isPlaying ? (
-                  <Pause title="pause" className="adjustCenter" size={30} />
+                  <Pause
+                    title="pause"
+                    className="adjustCenter bg-transparent"
+                    size={30}
+                    strokeWidth={isMobile ? 2.5 : 2} 
+                  />
                 ) : (
-                  <PlayIcon title="play" className="adjustCenter" size={30} />
+                  <PlayIcon
+                    title="play"
+                    className="adjustCenter bg-transparent translate-x-[2px]"
+                    size={30}
+                    strokeWidth={isMobile ? 2.5 : 2} 
+                  />
                 )}
               </button>
               {/* PlayNext */}
@@ -214,10 +230,10 @@ const SoundBar = ({ audioElement, className }) => {
           </div>
 
           {/* Seek Bar */}
-          <div className="flex justify-center lg:pb-2">
-            <div className="text-sm flex lg:max-w-[60vw] items-center justify-center grow gap-2">
+          <div className="flex justify-center lg:pb-2 max-sm:my-3">
+            <div className="text-sm flex lg:max-w-[60vw] relative items-center justify-center grow gap-2">
               {/* Current Time */}
-              <span>{curr_time}</span>
+              <span className="max-sm:absolute max-sm:top-full max-sm:left-0 max-sm:mt-1">{curr_time}</span>
               {/* Seek Bar */}
               <SeekBar
                 value={currentPosition}
@@ -231,7 +247,7 @@ const SoundBar = ({ audioElement, className }) => {
                 onTouchEnd={handleSeekEnd}
               />
               {/* Total Time */}
-              <span>{Totalduration}</span>
+              <span className="max-sm:absolute max-sm:top-full max-sm:right-0 max-sm:mt-1">{Totalduration}</span>
             </div>
           </div>
         </div>
