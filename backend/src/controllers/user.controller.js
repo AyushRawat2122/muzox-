@@ -99,34 +99,27 @@ const signup = asyncHandler(async (req, res, next) => {
 //verify user
 
 const verifyUser = asyncHandler(async (req, res, next) => {
-  const { userId } = req.params;
+  const { email } = req.params;
 
   const { otp } = req.body;
 
-  if (!userId || !otp) {
+  if (!email || !otp) {
     return next(new ApiError(400, "Please enter to confirm your validations"));
   }
 
-  const user = await User.findById(userId);
-
+  const user = await User.findOne(email);
   if (!user) {
     return next(new ApiError(404, "User not found"));
   }
-
   if (user.isVerified === true) {
     return next(new ApiError(400, "User already verified"));
   }
-
   if (user.verifyToken != otp) {
     return next(new ApiError(400, "Invalid OTP"));
   }
-
-  //fucked upon this logic we need to think something about this
-
   if (Date.now() > user.verifyTokenExpiry) {
     await User.findByIdAndDelete(userId);
     await deleteOnCloudinary(user.profilePic);
-
     return next(new ApiError(400, "OTP has expired.You need to signup again"));
   }
 
@@ -197,13 +190,13 @@ const login = asyncHandler(async (req, res, next) => {
 });
 
 const passwordResetMail = asyncHandler(async (req, res, next) => {
-  const userId = req.user._id;
+  const {email}=req.body
 
-  if (!userId) {
+  if (!email) {
     return next(new ApiError(404, "User not found"));
   }
 
-  const user = await User.findById(userId);
+  const user = await User.findOne(email);
 
   if (!user) {
     return next(new ApiError(404, "User not found"));
@@ -222,7 +215,7 @@ const passwordResetMail = asyncHandler(async (req, res, next) => {
     otp: otp,
     name: user.username,
     type: "RESET PASSWORD",
-    userId: userId,
+    userId: user._id,
   });
 
   return res
@@ -267,32 +260,44 @@ const refreshAccessToken = asyncHandler(async (req, res, next) => {
       )
     );
 });
+const resetOtpVerification=asyncHandler(async(req,res,next)=>{
+  const {otp} = req.body;
+  const {email}=req.params;
+  const user = await User.findOne({ email });
+  if (!user) return next(new ApiError(404, "User not found"));
+  if(user.passwordToken !== otp){
+    return next(new ApiError(401, "Invalid OTP"))
+  }
+  
+  if (new Date() > user.passwordTokenExpiry) {
+    return next(new ApiError(404, "OTP has expired Please try again later"));
+  }
+  user.passwordTokenExpiry = null;
+  user.passwordToken = null;
+  await user.save();
+  return res
 
+    .status(200)
+
+    .json(new ApiResponse(200, "OTP verified Success"));
+})
 const resetPassword = asyncHandler(async (req, res) => {
-  const userId = req.user._id;
-
-  const { otp, newPassword } = req.body;
-  if (!userId) {
+  const {email} = req.params;
+  const { password, newPassword } = req.body;
+  if (!email) {
     return next(new ApiError(404, "Page  Not Found"));
   }
 
-  if (otp === "" || newPassword === "") {
-    return next(new ApiError(400, "OTP and New Password fields are required"));
+  if ( password===""||newPassword === "") {
+    return next(new ApiError(400, "Password and New Password fields are required"));
   }
 
-  const user = await User.findById(userId);
-
+  if(password!==newPassword){
+    return next(new ApiError(400, "Password and New Password fields must be same"))
+  }
+  const user = await User.findOne(email);
   if (!user) {
     return next(new ApiError(404, "User not found Please try again later"));
-  }
-
-  console.log(typeof user.passwordToken);
-  if (user.passwordToken !== otp) {
-    return next(new ApiError(404, "Please enter the valid OTP"));
-  }
-
-  if (new Date() > user.passwordTokenExpiry) {
-    return next(new ApiError(404, "OTP has expired Please try again later"));
   }
 
   const salt = await bcryptjs.genSalt(10);
@@ -300,10 +305,6 @@ const resetPassword = asyncHandler(async (req, res) => {
   const hashedPassword = bcryptjs.hashSync(newPassword, salt);
 
   user.password = hashedPassword;
-
-  user.passwordToken = null;
-
-  user.passwordTokenExpiry = null;
 
   await user.save();
 
@@ -506,4 +507,5 @@ export {
   userSongs,
   likedSong,
   refreshAccessToken,
+  resetOtpVerification
 };

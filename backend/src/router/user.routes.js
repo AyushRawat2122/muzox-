@@ -15,6 +15,7 @@ import {
   updateUserDetails,
   updateProfilePic,
   refreshAccessToken,
+  resetOtpVerification,
 } from "../controllers/user.controller.js";
 
 import { getUserPlaylists } from "../controllers/playlist.controller.js";
@@ -27,7 +28,7 @@ userRouter.post(
   signup
 );
 
-userRouter.post("/verifyUser/:userId", verifyUser);
+userRouter.post("/verifyUser/:email", verifyUser);
 
 userRouter.post("/login", login);
 
@@ -35,9 +36,11 @@ userRouter.get("/userDetails", authRequired, getCurrentUser);
 
 userRouter.post("/logout", authRequired, logout);
 
-userRouter.post("/PasswordResetMail", authRequired, passwordResetMail);
+userRouter.post("/PasswordResetMail/:email", passwordResetMail);
 
-userRouter.post("/resetPassword", authRequired, resetPassword);
+userRouter.post("/resetPassword/:email", resetPassword);
+
+userRouter.post('/otpVerification',resetOtpVerification)
 
 userRouter.get("/generateAccessToken", refreshAccessToken);
 
