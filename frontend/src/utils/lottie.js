@@ -8,10 +8,13 @@ const death =
   "https://lottie.host/a19099d2-0972-4f4c-a3dd-e4e7896d7a23/KezGmGsbYS.lottie";
 const loadingDotsOrange =
   "https://lottie.host/6a0ff631-19f3-4bad-b123-70235aa3b0b0/qAevSffkR8.lottie";
+const premium =
+  "https://lottie.host/dce3acc8-6068-4f47-a28d-b6f37ae1f9a6/lGRxTmoBgs.lottie";
 export {
   loadingPlayIcon,
   floatingMusicIcons,
   loadingDots,
   death,
   loadingDotsOrange,
+  premium
 };

@@ -61,7 +61,7 @@ const HomePage = () => {
   }
 
   return (
-    <div className="overflow-y-scroll h-full px-1 capitalize space-y-6">
+    <div className="max-lg:pb-[18vh] overflow-y-scroll h-full px-1 capitalize space-y-6">
     {/* Jump back in Time */}
     <section>
       <h1 className="text-2xl font-bold mb-2">Jump back in Time</h1>

@@ -7,6 +7,7 @@ import { normalRequest } from "../../utils/axiosRequests.config";
 import { useMutation } from "@tanstack/react-query";
 import Loading from "../../components/loaders/Loading";
 import { loadingPlayIcon } from "../../utils/lottie.js";
+import { notifyError, notifySuccess } from "../../store/useNotification.js";
 const schema = z.object({
   otp: z
     .string()
@@ -42,10 +43,11 @@ const Verify = () => {
   const mutation = useMutation({
     mutationFn: onVerifyMe,
     onSuccess: () => {
+      notifySuccess("user verified successfully");
       navigate("/login");
     },
     onError: (error) => {
-      console.log(error);
+      notifyError(error.response.data.message || "user verification failed")
     },
   });
 

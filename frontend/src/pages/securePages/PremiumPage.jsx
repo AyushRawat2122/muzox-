@@ -83,7 +83,7 @@ function Card({ name, tagline }) {
 
 function PremiumPage() {
   return (
-    <div className="text-white font-mono overflow-y-scroll w-full h-full p-6 ">
+    <div className="max-lg:pb-[18vh] max-lg:pb-[18vh]  text-white font-mono overflow-y-scroll w-full h-full p-6 ">
       <div className="mt-16 text-center">
         <h2 className="text-3xl font-bold">
           Unlock unlimited access to millions of songs, ad-free listening, and exclusive features.

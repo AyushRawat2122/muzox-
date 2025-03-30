@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from "react";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { useNavigate, useParams } from "react-router";
 import { normalRequest, queryClient } from "../../utils/axiosRequests.config";
-import { FastAverageColor } from "fast-average-color";
+import { Vibrant } from "node-vibrant/browser";
 import {
   Play,
   Repeat2,
@@ -145,7 +145,6 @@ const PlaylistPage = () => {
 
   useEffect(() => {
     if (playlist) {
-      const fac = new FastAverageColor();
 
       async function fetchImageAsBlob(url) {
         try {
@@ -155,8 +154,8 @@ const PlaylistPage = () => {
 
           if (imgRef.current) {
             imgRef.current.src = blobUrl; // Set Blob URL as img src
-            const color = await fac.getColorAsync(imgRef.current);
-            setDominantColor(color.hex);
+            const color = await Vibrant.from(imgRef.current).getPalette();
+            setDominantColor(color.Vibrant.hex);
           }
         } catch (err) {
           console.error("Error fetching image:", err);
@@ -171,7 +170,7 @@ const PlaylistPage = () => {
     return <Loading src={loadingPlayIcon} />;
   }
   return (
-    <main className="h-full w-full relative overflow-y-auto bg-black text-white">
+    <main className="h-full max-lg:pb-[18vh] w-full relative overflow-y-auto bg-black text-white">
       {/* Section 1: Playlist Info */}
       <div>
         {" "}
@@ -206,18 +205,19 @@ const PlaylistPage = () => {
         <div className="sticky top-0 bg-black px-2 py-2 border-b-[1px] border-[#ffffff3d] flex items-center justify-between gap-2">
           <div className="flex items-center gap-2">
             {" "}
-            <button
-              className={`w-14 h-14 rounded-full flex items-center justify-center`}
-              style={{ backgroundColor: dominantColor }}
+           <div className="w-14 h-14 rounded-full overflow-hidden" style={{ backgroundColor: dominantColor }}>
+           <button
+              className={`w-full h-full rounded-full flex items-center justify-center bg-black/15`}
               onClick={handlePlayButtonClick}
               title="Play/Pause"
             >
               {isPlaying && queueID === playlist?._id ? (
-                <Pause className="w-6 h-6" />
+                <Pause size={25} strokeWidth={3.5}/>
               ) : (
-                <Play className="w-6 h-6" />
+                <Play size={25} strokeWidth={3.5}/>
               )}
             </button>
+           </div>
             <button
               className="w-10 h-10 rounded-full flex items-center justify-center"
               onClick={handleQueueLooping}

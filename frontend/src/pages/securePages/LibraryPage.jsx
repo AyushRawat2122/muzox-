@@ -60,7 +60,7 @@ const Library = () => {
             }
           }
         `}</style>
-        <div className="h-full w-full bg-black text-white p-4 sm:p-8 overflow-y-scroll">
+        <div className="max-lg:pb-[18vh]  max-lg:pb-[18vh] h-full w-full bg-black text-white p-4 sm:p-8 overflow-y-scroll">
           <h1 className="text-3xl font-bold mb-8">Library</h1>
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
             {/* Card 1: Your Playlists */}

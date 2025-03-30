@@ -190,16 +190,16 @@ const login = asyncHandler(async (req, res, next) => {
 });
 
 const passwordResetMail = asyncHandler(async (req, res, next) => {
-  const {email}=req.body
+  const {email}=req.params
 
   if (!email) {
-    return next(new ApiError(404, "User not found"));
+    return next(new ApiError(404, "Email is required"));
   }
 
-  const user = await User.findOne(email);
+  const user = await User.findOne({email:email});
 
   if (!user) {
-    return next(new ApiError(404, "User not found"));
+    return next(new ApiError(404, "No User found associated with this Email Address"));
   }
 
   const otp = Math.floor(100000 + Math.random() * 900000).toString();
@@ -260,6 +260,7 @@ const refreshAccessToken = asyncHandler(async (req, res, next) => {
       )
     );
 });
+
 const resetOtpVerification=asyncHandler(async(req,res,next)=>{
   const {otp} = req.body;
   const {email}=req.params;
@@ -281,11 +282,12 @@ const resetOtpVerification=asyncHandler(async(req,res,next)=>{
 
     .json(new ApiResponse(200, "OTP verified Success"));
 })
+
 const resetPassword = asyncHandler(async (req, res) => {
   const {email} = req.params;
   const { password, newPassword } = req.body;
   if (!email) {
-    return next(new ApiError(404, "Page  Not Found"));
+    return next(new ApiError(404, "Page Not Found"));
   }
 
   if ( password===""||newPassword === "") {
@@ -295,7 +297,7 @@ const resetPassword = asyncHandler(async (req, res) => {
   if(password!==newPassword){
     return next(new ApiError(400, "Password and New Password fields must be same"))
   }
-  const user = await User.findOne(email);
+  const user = await User.findOne({email:email});
   if (!user) {
     return next(new ApiError(404, "User not found Please try again later"));
   }

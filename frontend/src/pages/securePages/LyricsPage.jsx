@@ -1,11 +1,10 @@
 import React, { useState, useEffect, useCallback } from "react";
 import useAudioPlayer from "../../store/useAudioPlayer";
 import axios from "axios";
-
 const LyricsPage = () => {
   const [lyrics, setLyrics] = useState("");
   const [error, setError] = useState("");
-  const { currentSong } = useAudioPlayer();
+  const { currentSong, colors } = useAudioPlayer();
   const lyricsErrorMessages = [
     "Lyrics? We got you on this one—our team is working on it!",
     "No lyrics right now. Trust us, we’re on it!",
@@ -13,6 +12,9 @@ const LyricsPage = () => {
     "Oops, no lyrics available at the moment. We’re on the case!",
   ];
   const fetchLyrics = useCallback(async () => {
+    setError("");
+    setLyrics("");
+
     try {
       if (!currentSong) {
         setError(
@@ -24,43 +26,54 @@ const LyricsPage = () => {
         `https://api.lyrics.ovh/v1/${currentSong.artist}/${currentSong.title}`,
         { headers: { "Content-Type": "application/json" } }
       );
+      console.log(res.data.lyrics);
       setLyrics(res.data.lyrics);
     } catch (err) {
       console.log(err);
       const randIdx = Math.floor(Math.random() * lyricsErrorMessages.length);
       setError(lyricsErrorMessages[randIdx]);
     }
-  }, []);
+  }, [currentSong]);
+  console.log(colors);
   useEffect(() => {
     fetchLyrics();
   }, [currentSong]);
-
   return (
-    <div className="h-full w-full overflow-y-scroll flex flex-col relative pb-2">
-      <h1 className="text-2xl -translate-y-0.5 sm:gap-4 font-bold text-white items-baseline flex max-sm:flex-col sticky top-0 pb-1 backdrop-blur-md shadow-md shadow-[#00000031] px-2">
-        Lyrics
-        <span className="text-sm font-light text-gray-300">
-          {"["} lyrics re not synced with the song yet {"]"}
-        </span>
-      </h1>
-      <hr className="text-[#cccccc9a]" />
-      <div className="grow bg-black/20 my-2 rounded-lg shadow-lg p-8 mx-2">
+    <div className="h-full w-full overflow-y-scroll flex flex-col relative hiddenScroll">
+      <div className="bg-[linear-gradient(180deg,transparent_20%,rgba(0,0,0,0.4)_100%)] sticky top-0  rounded-b-md ">
+        <h1 className="py-2 text-4xl bg-black/20  -translate-y-0.5 sm:gap-4 font-bold text-white items-baseline flex max-sm:flex-col pb-1 backdrop-blur-md shadow-md shadow-[#00000031] px-2">
+          Lyrics
+          <span className="text-base font-light text-gray-100">
+            {"["} lyrics re not synced with the song yet {"]"}
+          </span>
+        </h1>
+      </div>
+      <div className="h-full px-2 w-full grow flex items-center justify-center shadow-lg overflow-hidden">
         {error ? (
           <p className="text-gray-300 text-center h-full w-full text-[30px] flex justify-center items-center">
             {error}
           </p>
         ) : lyrics ? (
-          <pre className="whitespace-pre-wrap font-mono text-[30px] text-center tracking-wider  text-gray-200 pointer-events-none no-copy">
-            {lyrics}
-          </pre>
+          <div className="h-full w-full overflow-y-scroll ">
+            <hr className="text-[#cccccc9a]" />
+            <pre className="whitespace-pre-wrap font-mono text-[33px] font-semibold text-center tracking-wider  text-gray-200 pointer-events-none no-copy">
+              {lyrics}
+            </pre>
+            <hr className="text-[#cccccc9a]" />
+            <p className="py-2 text-sm text-gray-300 px-2  max-lg:pb-[18vh]">
+              Powered by Lyrics.ovh-
+            </p>
+          </div>
         ) : (
           <p className="text-gray-300 h-full w-full flex justify-center items-center">
             Loading...
           </p>
         )}
       </div>
-      <hr className="text-[#cccccc9a]" />
-      <p className="py-2 text-sm text-gray-300 px-2">Powered by Lyrics.ovh-</p>
+      <div
+        className="h-full w-full absolute -z-20"
+        style={{ backgroundColor: `${colors?.Vibrant?.hex || ""}` }}
+      ></div>
     </div>
   );
 };

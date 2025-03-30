@@ -75,13 +75,23 @@ button {
   color: #fe7641;
 }
 
-.hiddenScroll {
-  scrollbar-width: none; /* For Firefox */
-  -ms-overflow-style: none; /* For Internet Explorer and Edge */
-}
+@media (max-width: 1023px) {
+  .hiddenScroll {
+    scrollbar-width: none; /* For Firefox */
+    -ms-overflow-style: none; /* For Internet Explorer and Edge */
+  }
 
-.hiddenScroll::-webkit-scrollbar {
-  display: none; /* For Chrome, Safari, and Opera */
+  .hiddenScroll::-webkit-scrollbar {
+    display: none; /* For Chrome, Safari, and Opera */
+  }
+  *{
+    scrollbar-width: none; /* For Firefox */
+    -ms-overflow-style: none; /* For Internet Explorer and Edge */
+  }
+
+  *::-webkit-scrollbar {
+    display: none; /* For Chrome, Safari, and Opera */
+  }
 }
 
 /* text */
@@ -213,12 +223,12 @@ button {
   }
 }
 
-.playBtn{
+.playBtn {
   opacity: 0;
-  transition: all ease-in-out .2s;
+  transition: all ease-in-out 0.2s;
 }
-.main:hover{
-  .playBtn{
+.main:hover {
+  .playBtn {
     opacity: 1;
   }
 }

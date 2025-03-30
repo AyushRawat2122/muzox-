@@ -105,7 +105,7 @@ function CreatePlaylist() {
   };
 
   return (
-    <div className="flex flex-col items-center gap-y-6 p-5 bg-zinc-950 text-white min-h-screen">
+    <div className="flex max-lg:pb-[18vh] flex-col items-center gap-y-6 p-5 bg-zinc-950 text-white min-h-screen hiddenScroll">
       <h1 className="font-semibold flex items-center text-2xl sm:text-4xl text-left gap-3">
         <span className="text-orange-600">
           <ListMusic size={30} />
@@ -115,7 +115,7 @@ function CreatePlaylist() {
 
       <form
         onSubmit={handleSubmit(onSubmit)}
-        className="flex flex-col gap-4 w-full max-w-md"
+        className="flex flex-col gap-4 hiddenScroll w-full max-w-md"
       >
         <h1>Cover Image</h1>
         <label className="font-medium" htmlFor="fileInput">

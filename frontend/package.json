@@ -19,6 +19,7 @@
     "framer-motion": "^12.5.0",
     "lodash": "^4.17.21",
     "lucide-react": "^0.477.0",
+    "node-vibrant": "^4.0.3",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "react-fast-marquee": "^1.6.5",

@@ -79,7 +79,7 @@ const getRecentSongs = async () => {
     const songs = [];
     req.onsuccess = (event) => {
       const cursor = event.target.result;
-      if (cursor && songs.length < 10) {
+      if (cursor && songs.length < 20) {
         songs.push(cursor.value);
         cursor.continue();
       } else {

@@ -32,7 +32,7 @@ const PlaylistsPage = () => {
   }
 
   return (
-    <div className="h-full w-full overflow-y-scroll p-2">
+    <div className="h-full max-lg:pb-[18vh] w-full overflow-y-scroll p-2">
       <h1 className="text-3xl font-extrabold my-2">Playlists:</h1>
       <h2 className="text-xl font-semibold my-2">Your Favorites:</h2>
       {favorites.length > 0 ? (

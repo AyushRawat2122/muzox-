@@ -10,6 +10,7 @@ import getUser from "../../serverDataHooks/getUser";
 import { useMutation } from "@tanstack/react-query";
 import Loading from "../../components/loaders/Loading.jsx";
 import { loadingPlayIcon } from "../../utils/lottie.js";
+import { notifyError, notifySuccess } from "../../store/useNotification.js";
 const schema = z.object({
   username: z.string().min(6, "Username must be at least 6 characters"),
   email: z.string().email("Invalid email"),
@@ -74,7 +75,7 @@ const Signup = () => {
   const mutation = useMutation({
     mutationFn: onSignup,
     onSuccess: (data) => {
-      console.log(data);
+      notifySuccess("user created successfully");
       if (data) {
         const userID = data?._id;
         const email = data?.email;
@@ -82,7 +83,10 @@ const Signup = () => {
       }
     },
     onError: (error) => {
-      console.log(error);
+      notifyError(
+        error.response.data.message ||
+          "signed up process failed due to unexpected reason"
+      );
     },
   });
 

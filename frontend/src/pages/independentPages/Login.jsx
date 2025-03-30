@@ -13,6 +13,7 @@ import getUser from "../../serverDataHooks/getUser.js";
 import { useMutation } from "@tanstack/react-query";
 import Loading from "../../components/loaders/Loading.jsx";
 import { loadingPlayIcon } from "../../utils/lottie.js";
+import { notifyError, notifySuccess } from "../../store/useNotification.js";
 const schema = z.object({
   email: z.string().email("Invalid email"),
   password: z
@@ -71,10 +72,11 @@ const Login = () => {
   const mutation = useMutation({
     mutationFn: onLogin,
     onSuccess: () => {
+      notifySuccess("logged in successfully")
       queryClient.invalidateQueries([{ queryKey: "user" }]);
     },
     onError: (error) => {
-      console.log(error);
+      notifyError(error.response.data.message || "login failed");
     },
   });
   
@@ -172,7 +174,7 @@ const Login = () => {
 
         <div className="flex flex-col gap-4 sm:gap-10 sm:mt-5 ">
           <a
-            href="/"
+            href="/reset-password"
             className="muzoxPurple text-center underline underline-offset-2"
           >
             Forgot your password?

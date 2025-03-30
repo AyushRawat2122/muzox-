@@ -44,7 +44,7 @@ const LikedSongsPage = () => {
   }
 
   return (
-    <main className="h-full w-full overflow-y-auto bg-black text-white">
+    <main className="max-lg:pb-[18vh] h-full w-full overflow-y-auto bg-black text-white">
       {/* Section 1: Playlist Info */}
       <div
         className="flex  max-sm:flex-col sm:items-end gap-4  mb-6 sm:p-4 lg:rounded-t-lg"

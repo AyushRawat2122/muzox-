@@ -4,7 +4,7 @@ import { Home, Search, Library, Crown } from "lucide-react";
 
 const Navbar = () => {
   return (
-    <nav className="w-full bg-black/40 p-4 flex justify-around items-center rounded-t-md">
+    <nav className="w-full p-4 flex justify-around items-center rounded-t-md bg-black/20">
       <NavLink
         to="/"
         className={({ isActive }) => (isActive ? "text-white" : "text-gray-400")}

@@ -1,30 +1,107 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useForm } from "react-hook-form";
+import { useNavigate } from "react-router";
 import { EyeIcon, EyeOffIcon } from "lucide-react";
-
+import { useMutation } from "@tanstack/react-query";
+import { normalRequest } from "../../utils/axiosRequests.config.js";
+import { notifyError, notifySuccess } from "../../store/useNotification.js";
 const ResetPassword = () => {
+  const navigate = useNavigate();
   const [currentStep, setCurrentStep] = useState("email");
-
+  const [otp, setOtp] = useState("");
+  const [email, setEmail] = useState("");
+  const requestOtp = useMutation({
+    mutationKey: "reqOtp",
+    mutationFn: async ({ email }) => {
+      try {
+        await normalRequest.post(`user/PasswordResetMail/${email}`, {
+          headers: { "Content-Type": "application/json" },
+        });
+        return email;
+      } catch (error) {
+        throw error.response.data;
+      }
+    },
+    onSuccess: (email) => {
+      notifySuccess(`Otp sent successfully at ${email}`);
+      setEmail(email);
+      if (currentStep !== "otp") {
+        setCurrentStep("otp");
+      }
+    },
+    onError: (error) => {
+      notifyError(error.message || "Otp request failed");
+    },
+  });
+  const VerifyOtp = useMutation({
+    mutationKey: "VerifyOtp",
+    mutationFn: async ({ email, otp }) => {
+      try {
+        await normalRequest.post(
+          `user/otpVerification/${email}`,
+          { otp },
+          {
+            headers: { "Content-Type": "application/json" },
+          }
+        );
+        return otp;
+      } catch (error) {
+        throw error.response.data;
+      }
+    },
+    onSuccess: (otp) => {
+      notifySuccess(`Otp verified successfully`);
+      setOtp(otp);
+      setCurrentStep("reset");
+    },
+    onError: (error) => {
+      notifyError(error.message || "Invalid OTP");
+    },
+  });
+  const RequestChange = useMutation({
+    mutationKey: "RequestChange",
+    mutationFn: async ({ email, password, newPassword }) => {
+      try {
+        await normalRequest.post(
+          `user/resetPassword/${email}`,
+          { password, newPassword },
+          {
+            headers: { "Content-Type": "application/json" },
+          }
+        );
+      } catch (error) {
+        throw error.response.data;
+      }
+    },
+    onSuccess: () => {
+      notifySuccess(`Password changed successfully`);
+      navigate("/login");
+    },
+    onError: (error) => {
+      notifyError(error.message || "Invalid OTP");
+    },
+  });
   return (
     <div className="min-h-screen flex flex-col items-center gap-2 justify-center p-4 bg-black">
       <div className="flex items-center justify-center w-full gap-2.5">
-        <img src="/Logo.png" alt="Logo" className="h-[80px] w-[80px] aspect-square" />
+        <img
+          src="/Logo.png"
+          alt="Logo"
+          className="h-[80px] w-[80px] aspect-square"
+        />
         <div className="border border-white h-[45px] w-0"></div>
         <img src="/MUZOX.png" alt="logoName" className="h-[40px]" />
       </div>
       <div className="w-full max-w-md">
-        {/* Logo or Title (Optional) */}
-        {/* <div className="flex justify-center mb-6">
-          <img src="/logo.png" alt="Logo" className="h-8" />
-        </div> */}
-
-        {currentStep === "email" && (
-          <EmailInput onNext={() => setCurrentStep("otp")} />
-        )}
+        {currentStep === "email" && <EmailInput requestOtp={requestOtp} />}
 
         {currentStep === "otp" && (
           <>
-            <OtpConfirmation />
+            <OtpConfirmation
+              VerifyOtp={VerifyOtp}
+              requestOtp={requestOtp}
+              email={email}
+            />
             <div className="mt-4 text-center">
               <button
                 onClick={() => setCurrentStep("reset")}
@@ -44,7 +121,7 @@ const ResetPassword = () => {
 
         {currentStep === "reset" && (
           <>
-            <ResetPasswordForm />
+            <ResetPasswordForm RequestChange={RequestChange} email={email} />
             <div className="mt-4 text-center">
               <button
                 onClick={() => setCurrentStep("otp")}
@@ -60,7 +137,7 @@ const ResetPassword = () => {
   );
 };
 
-function EmailInput({ onNext }) {
+function EmailInput({ requestOtp }) {
   const {
     register,
     handleSubmit,
@@ -68,8 +145,7 @@ function EmailInput({ onNext }) {
   } = useForm({ defaultValues: { email: "" } });
 
   const onSubmit = (data) => {
-    console.log("Email submitted:", data.email);
-    onNext();
+    requestOtp.mutate(data);
   };
 
   return (
@@ -79,7 +155,10 @@ function EmailInput({ onNext }) {
         Enter your email address to receive an OTP.
       </p>
 
-      <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 flex flex-col gap-5">
+      <form
+        onSubmit={handleSubmit(onSubmit)}
+        className="space-y-4 flex flex-col gap-5"
+      >
         <div>
           <label htmlFor="email" className="block mb-1 font-medium">
             Email Address
@@ -116,8 +195,7 @@ function EmailInput({ onNext }) {
     </div>
   );
 }
-
-function OtpConfirmation() {
+function OtpConfirmation({ VerifyOtp, requestOtp, email }) {
   const [resendTimer, setResendTimer] = useState(0);
   const [otpValues, setOtpValues] = useState(Array(6).fill(""));
   const inputRefs = useRef([]);
@@ -138,13 +216,12 @@ function OtpConfirmation() {
 
   const handleResendOtp = () => {
     setResendTimer(30);
-    console.log("Resending OTP...");
+    requestOtp.mutate({ email });
   };
 
   const onSubmit = () => {
     const otpString = otpValues.join("");
-    console.log("OTP submitted:", otpString);
-    // Simulate OTP verification
+    VerifyOtp.mutate({ email, otp: otpString });
   };
 
   const handleOtpChange = (index, value) => {
@@ -152,7 +229,7 @@ function OtpConfirmation() {
     const newOtpValues = [...otpValues];
     newOtpValues[index] = value;
     setOtpValues(newOtpValues);
-    // Focus next input if current filled
+    // Focus next input if current is filled
     if (value && index < 5) {
       inputRefs.current[index + 1]?.focus();
     }
@@ -164,6 +241,14 @@ function OtpConfirmation() {
       inputRefs.current[index - 1]?.focus();
     }
   };
+
+  // Combine error messages from all OTP inputs
+  const aggregatedError =
+    errors.otp &&
+    Object.values(errors.otp)
+      .map((err) => err.message)
+      .filter(Boolean)
+      .join(" | ");
 
   return (
     <div className="bg-white/10 text-white rounded-xl shadow-lg p-6">
@@ -202,9 +287,12 @@ function OtpConfirmation() {
             ))}
         </div>
 
-        {errors.otp && (
+        {/* Show a single consolidated error message */}
+        {aggregatedError && (
           <p className="text-red-400 text-sm text-center">
-            {errors.otp.message}
+            {aggregatedError.includes("Must be a number")
+              ? "Must be a number"
+              : "Otp is required"}
           </p>
         )}
 
@@ -220,9 +308,7 @@ function OtpConfirmation() {
 
       <div className="mt-4 text-center">
         {resendTimer > 0 ? (
-          <p className="text-sm text-gray-300">
-            Resend OTP in {resendTimer}s
-          </p>
+          <p className="text-sm text-gray-300">Resend OTP in {resendTimer}s</p>
         ) : (
           <button
             type="button"
@@ -236,8 +322,7 @@ function OtpConfirmation() {
     </div>
   );
 }
-
-function ResetPasswordForm() {
+function ResetPasswordForm({ RequestChange, email }) {
   const [showNewPassword, setShowNewPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
@@ -251,13 +336,18 @@ function ResetPasswordForm() {
   const newPassword = watch("newPassword");
 
   const onSubmit = (data) => {
-    console.log("Password reset submitted:", data);
-    // Simulate password reset
+    RequestChange.mutate({
+      email:email,
+      password: data.newPassword,
+      newPassword: data.confirmPassword,
+    });
   };
 
   return (
     <div className="bg-white/10 text-white rounded-xl shadow-lg p-6">
-      <h2 className="text-3xl font-bold mb-2 text-center">Create New Password</h2>
+      <h2 className="text-3xl font-bold mb-2 text-center">
+        Create New Password
+      </h2>
       <p className="text-gray-300 mb-6 text-center">
         Set a new password for your account.
       </p>
@@ -280,12 +370,6 @@ function ResetPasswordForm() {
                 minLength: {
                   value: 8,
                   message: "Password must be at least 8 characters",
-                },
-                pattern: {
-                  value:
-                    /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&]).{8,}$/,
-                  message:
-                    "Must include uppercase, lowercase, number & special char",
                 },
               })}
             />
@@ -310,10 +394,7 @@ function ResetPasswordForm() {
 
         {/* Confirm Password */}
         <div>
-          <label
-            htmlFor="confirmPassword"
-            className="block mb-1 font-medium"
-          >
+          <label htmlFor="confirmPassword" className="block mb-1 font-medium">
             Confirm Password
           </label>
           <div className="relative">
@@ -332,9 +413,7 @@ function ResetPasswordForm() {
             <button
               type="button"
               className="absolute right-0 top-0 h-full px-3 flex items-center"
-              onClick={() =>
-                setShowConfirmPassword(!showConfirmPassword)
-              }
+              onClick={() => setShowConfirmPassword(!showConfirmPassword)}
             >
               {showConfirmPassword ? (
                 <EyeOffIcon className="h-5 w-5 text-[#fe7641]" />
@@ -365,4 +444,4 @@ function ResetPasswordForm() {
   );
 }
 
-export default ResetPassword;
+export default React.memo(ResetPassword);

@@ -110,7 +110,7 @@ const SearchResult = React.memo(() => {
         </div>
       )}
 
-      <div className="p-2">
+      <div className="p-2 max-lg:pb-[18vh]">
         {songs.length > 0 && (
           <div className="">
             <p className="text-lg font-bold">Songs</p>

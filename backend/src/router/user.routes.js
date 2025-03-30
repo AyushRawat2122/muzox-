@@ -40,7 +40,7 @@ userRouter.post("/PasswordResetMail/:email", passwordResetMail);
 
 userRouter.post("/resetPassword/:email", resetPassword);
 
-userRouter.post('/otpVerification',resetOtpVerification)
+userRouter.post('/otpVerification/:email',resetOtpVerification)
 
 userRouter.get("/generateAccessToken", refreshAccessToken);
 

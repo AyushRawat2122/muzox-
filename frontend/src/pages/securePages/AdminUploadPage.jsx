@@ -6,6 +6,8 @@ import axios from "axios";
 import getUser from "../../serverDataHooks/getUser";
 import { death } from "../../utils/lottie";
 import Loading from "../../components/loaders/Loading";
+import { Upload, Music } from "lucide-react";
+import { notifyError, notifySuccess } from "../../store/useNotification";
 
 const USchema = z.object({
   title: z.string().min(1, "Title is required"),
@@ -82,10 +84,10 @@ function AdminUploadPage() {
           headers: { "Content-Type": "multipart/form-data" },
         }
       );
-      console.log(res.data);
+      notifySuccess("Song Uploaded Successfully");
       reset();
     } catch (error) {
-      console.log(error);
+      notifyError("Song Upload Failed");
     }
   };
   const { data: user } = getUser();
@@ -111,13 +113,17 @@ function AdminUploadPage() {
   }
 
   return (
-    <div className="max-w-6xl h-full overflow-y-scroll  w-full mx-auto bg-black p-12 rounded-xl shadow-2xl">
+    <div className="max-w-6xl max-lg:pb-[18vh] h-full overflow-y-scroll px-4 w-full mx-auto bg-black p-12 rounded-xl shadow-2xl">
+      <h1 className="text-3xl max-sm:text-center font-bold py-2">Upload Song</h1>
       <form
         onSubmit={handleSubmit(onSubmit)}
-        className="flex flex-col md:flex-row items-center gap-12"
+        className="flex flex-col md:flex-row items-center gap-12 p-10 border-5 border-dashed border-gray-400/30"
       >
-        <div className="flex flex-col items-start md:w-1/2">
-          <div className="w-54 h-54 ml-[3rem] sm:w-65 sm:h-64 rounded-lg   flex items-center border border-gray-300 justify-center text-center  text-White mb-4 overflow-hidden">
+        <div className="flex flex-col items-center md:w-1/2">
+          <label
+            htmlFor="cover"
+            className="w-54 h-54 sm:w-70 sm:h-70 rounded-lg cursor-pointer flex border-dashed items-center border-4 border-gray-300/20 justify-center text-center  text-White  overflow-hidden"
+          >
             {coverPreview ? (
               <img
                 src={coverPreview}
@@ -125,32 +131,14 @@ function AdminUploadPage() {
                 className="w-full h-full object-cover rounded-lg "
               />
             ) : (
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 24 24"
-                fill="currentColor"
-                className="w-[3rem] h-[4rem] "
-              >
-                <path
-                  fillRule="evenodd"
-                  d="M12 3a1 1 0 0 1 1 1v8h3a1 1 0 0 1 .7 1.7l-4 4a1 1 0 0 1-1.4 0l-4-4A1 1 0 0 1 8 12h3V4a1 1 0 0 1 1-1zm-6 16a1 1 0 1 0 0 2h12a1 1 0 1 0 0-2H6z"
-                  clipRule="evenodd"
-                />
-              </svg>
+              <Upload size={100} className="text-gray-300" />
             )}
-          </div>
-
+          </label>
           <input
             type="file"
+            id="cover"
             {...register("coverImage")}
-            className={`text-sm text-gray-400
-              ${
-                errors.coverImage
-                  ? "border-red-400"
-                  : "border-gray-500 hover:border-white"
-              }
-              border-[1px] rounded-md p-2 outline-none
-            `}
+            className={`opacity-0 h-0 pointer-events-none`}
           />
           {errors.coverImage && (
             <p className="text-red-400 text-sm mt-1">
@@ -161,6 +149,7 @@ function AdminUploadPage() {
 
         <div className="flex flex-col gap-4 md:w-1/2">
           <div className="flex flex-col">
+            <h2 className="text-lg mb-1">Song Title</h2>
             <input
               type="text"
               placeholder="title"
@@ -178,6 +167,7 @@ function AdminUploadPage() {
             )}
           </div>
           <div className="flex flex-col">
+            <h2 className="text-lg mb-1">Song Artist</h2>
             <input
               type="text"
               placeholder="artist"
@@ -195,6 +185,7 @@ function AdminUploadPage() {
             )}
           </div>
           <div className="flex flex-col">
+            <h2 className="text-lg mb-1">Song Genre</h2>
             <input
               type="text"
               placeholder="genre"
@@ -211,24 +202,25 @@ function AdminUploadPage() {
               <p className="text-red-400 text-sm">{errors.genre.message}</p>
             )}
           </div>
-          <div className="flex flex-col">
+          <div className="flex flex-col items-center">
+            <label
+              htmlFor="Song"
+              className="flex justify-center items-center h-[100px] w-[100px] bg-gray-100/10 border-4 overflow-hidden border-dashed rounded-md border-gray-400/10"
+            >
+              <Music></Music>
+            </label>
             <input
               type="file"
               placeholder="MP3 only"
+              id="Song"
               {...register("song")}
-              className={`w-full p-2 rounded-md bg-black text-white border-[1px] outline-none
-                ${
-                  errors.song
-                    ? "border-red-400"
-                    : "border-gray-500 hover:border-white"
-                }
-              `}
+              className={`opacity-0 h-0 pointer-events-none`}
             />
             {errors.song && (
-              <p className="text-red-400 text-sm">{errors.song.message}</p>
+              <p className="text-red-400 text-sm mt-1">{errors.song.message}</p>
             )}
             {songName && (
-              <p className="text-gray-400 text-sm mt-1">
+              <p className="text-gray-400 text-sm mt-1 text-center">
                 <span className="text-white font-semibold">Selected file:</span>{" "}
                 {songName}
               </p>
@@ -242,7 +234,7 @@ function AdminUploadPage() {
           type="submit"
           form="hook-form"
           onClick={handleSubmit(onSubmit)}
-          className="gradientButton font-extrabold rounded-full px-40 py-4 cursor-pointer"
+          className="gradientButton font-extrabold rounded-full sm:w-1/3 w-full p-4 cursor-pointer"
         >
           UPLOAD
         </button>

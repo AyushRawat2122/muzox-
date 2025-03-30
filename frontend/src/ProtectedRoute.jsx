@@ -27,7 +27,7 @@ import { AnimatePresence } from "framer-motion";
 import { debounce } from "lodash";
 const ProtectedRoute = () => {
   const location = useLocation();
-  const { data: user, isPending, error} = getUser();
+  const { data: user, isPending, error } = getUser();
   const { isSideBarOpen, toggleSideBarOpen } = useSideBar();
   const [leftPanelSize, setLeftPanelSize] = useState(4);
   const [rightPanelSize, setRightPanelSize] = useState(22);
@@ -63,7 +63,6 @@ const ProtectedRoute = () => {
     []
   );
 
-  console.log("renders");
   useEffect(() => {
     const interval = setInterval(() => {
       if (audioPlayerRef.current && audioPlayerRef.current.getAudioElement()) {
@@ -88,7 +87,7 @@ const ProtectedRoute = () => {
   }
 
   return (
-    <MuzoxApp className={"max-sm:px-[1px] relative"}>
+    <MuzoxApp className={"relative"}>
       {/* Mobile popup gets the audio element via prop instead of ref */}
       <AnimatePresence mode="wait">
         {soundBarPopUp && isTabletOrMobile && audioReady && (
@@ -100,9 +99,9 @@ const ProtectedRoute = () => {
         <AudioPlayer ref={audioPlayerRef} />
 
         {/* Top bar */}
-        {((isTabletOrMobile && location.pathname !== "/search") ||
+        {((isTabletOrMobile && (location.pathname !== "/search" && location.pathname !== "/lyrics" )) ||
           isDesktopOrLaptop) && (
-          <div className="flex py-2  max-sm:px-2 justify-between bg-black/50">
+          <div className="flex py-2 max-sm:px-2 justify-between bg-black/50">
             <div>
               <img
                 src="/MUZOX.png"
@@ -240,7 +239,11 @@ const ProtectedRoute = () => {
           )}
 
           {/* MIDDLE PANEL (Auto-Adjust) */}
-          <Panel className="bg-black/30 overflow-hidden" id="middle-panel" order={2}>
+          <Panel
+            className="bg-black/30 overflow-hidden"
+            id="middle-panel"
+            order={2}
+          >
             <Outlet />
           </Panel>
 
@@ -282,9 +285,16 @@ const ProtectedRoute = () => {
           <SoundBar audioElement={getAudio()} />
         )}
         {/* Mobile SoundBar Display */}
-        {isTabletOrMobile && queue.length > 0 && <MobileSoundBarDisplay />}
-        {/* NavBar for tablet/mobile */}
-        {isTabletOrMobile && <NavBar />}
+        {isTabletOrMobile && (
+        <div className="w-full absolute bottom-0 z-777 bg-[linear-gradient(180deg,transparent_10%,rgba(0,0,0,1.2)_100%)]">
+            {queue.length > 0 && audioReady && (
+              <div className="p-2">
+                <MobileSoundBarDisplay audioElement={getAudio()} />
+              </div>
+            )}
+            <NavBar />
+          </div>
+        )}
       </div>
     </MuzoxApp>
   );

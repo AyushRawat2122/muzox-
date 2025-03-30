@@ -9,6 +9,7 @@ const useAudioPlayer = create((set, get) => ({
   isLooped: false,
   isShuffled: false,
   originalQueue: [], //backup for shuffle
+  colors: {},
 
   // plays the next song
   playNext: () => {
@@ -134,6 +135,9 @@ const useAudioPlayer = create((set, get) => ({
       currentSong: state.queue[currentIdx],
       isPlaying: true,
     }));
+  },
+  setColor: (colors) => {
+    set({ colors: colors });
   },
 }));
 

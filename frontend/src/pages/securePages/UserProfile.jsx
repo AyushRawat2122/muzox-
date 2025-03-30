@@ -4,9 +4,9 @@ import getUser from "../../serverDataHooks/getUser";
 import { normalRequest, queryClient } from "../../utils/axiosRequests.config";
 import { useMutation } from "@tanstack/react-query";
 import Loading from "../../components/loaders/Loading";
-import { loadingDotsOrange } from "../../utils/lottie.js";
+import { loadingDotsOrange, premium } from "../../utils/lottie.js";
 import { useNavigate } from "react-router";
-
+import { DotLottieReact } from "@lottiefiles/dotlottie-react";
 function UserProfile() {
   const [state, setState] = useState("stats");
   const [editingUsername, setEditingUsername] = useState(false);
@@ -18,17 +18,30 @@ function UserProfile() {
   const formatDate = (updatedAt) => {
     const [year, month, day] = updatedAt.split("T")[0].split("-");
     const months = [
-      "January", "February", "March", "April", "May", "June",
-      "July", "August", "September", "October", "November", "December",
+      "January",
+      "February",
+      "March",
+      "April",
+      "May",
+      "June",
+      "July",
+      "August",
+      "September",
+      "October",
+      "November",
+      "December",
     ];
-    return `${months[parseInt(month, 10) - 1]} ${parseInt(day, 10)}, 2k${year.slice(2)}`;
+    return `${months[parseInt(month, 10) - 1]} ${parseInt(
+      day,
+      10
+    )}, 2k${year.slice(2)}`;
   };
- const TakeToAdmin=()=>{
-  navigate("/admin-panel");
- }
- const TakeToAdminRequest=()=>{
-  navigate("/admin-panel-req")
- }
+  const TakeToAdmin = () => {
+    navigate("/admin-panel");
+  };
+  const TakeToAdminRequest = () => {
+    navigate("/admin-panel-req");
+  };
   const mutation1 = useMutation({
     mutationFn: async () => {
       const res = await normalRequest.post("/user/updateUserDetails", {
@@ -40,7 +53,7 @@ function UserProfile() {
       setEditingUsername(false);
       await queryClient.cancelQueries(["user"]);
       const previousUser = queryClient.getQueryData(["user"]);
-      queryClient.setQueryData(["user"], old => ({
+      queryClient.setQueryData(["user"], (old) => ({
         ...old,
         username: tempUsername,
       }));
@@ -69,7 +82,7 @@ function UserProfile() {
       const previousUser = queryClient.getQueryData(["user"]);
       const localImageUrl = URL.createObjectURL(file);
       setPrevSrc(localImageUrl);
-      queryClient.setQueryData(["user"], old => ({
+      queryClient.setQueryData(["user"], (old) => ({
         ...old,
         profilePic: { url: localImageUrl },
       }));
@@ -83,7 +96,7 @@ function UserProfile() {
     onSuccess: (data) => {
       const newUrl = data.message.profilePic.url;
       setPrevSrc(newUrl);
-      queryClient.setQueryData(["user"], old => ({
+      queryClient.setQueryData(["user"], (old) => ({
         ...old,
         profilePic: data.message.profilePic,
       }));
@@ -136,18 +149,23 @@ function UserProfile() {
   }
 
   return (
-    <div className="w-full h-full overflow-y-scroll bg-zinc-950 text-white p-4 md:p-8">
+    <div className="w-full h-full max-lg:pb-[18vh]  overflow-y-scroll bg-zinc-950 text-white p-4 md:p-8">
       <header className="flex justify-between space-around items-center mb-6">
-        <h2 className="font-bold flex gap-1 text-2xl md:text-5xl">
-          Your Profile{" "}
-          {user?.data?.isPremiumUser ? <span className="text-yellow-400"><Bitcoin size={25}/></span> : null}
-        </h2>
-         
+        <div className="flex items-center">
+          <h2 className="font-bold grow text-2xl md:text-5xl">Your Profile </h2>
+          <DotLottieReact
+            src={premium}
+            autoplay
+            loop
+            className={`max-sm:h-[50px] max-sm:w-[50px] h-[80px] w-[80px]`}
+            title="premium user"
+          ></DotLottieReact>
+        </div>
+
         <button
           onClick={() => mutation.mutate()}
           className="flex items-center gap-2 text-red-500 hover:text-red-400"
         >
-        
           <LogOut size={16} /> Logout
         </button>
       </header>
@@ -286,28 +304,26 @@ function UserProfile() {
             </div>
           )}
         </div>
-        
       </div>
-    <div className="flex items-center justify-center mt-5">
-  {user.data.isAdmin ? (
-    <button
-      onClick={TakeToAdmin}
-      className="px-6 py-2 rounded-lg border border-amber-300 text-amber-200 hover:bg-amber-300   hover:text-zinc-950 transition duration-200"
-      aria-label="Go to Admin Panel"
-    >
-      Admin Panel
-    </button>
-  ) : (
-    <button
-      onClick={TakeToAdminRequest}
-      className="px-6 py-2 rounded-lg border border-green-400 text-green-400 hover:bg-green-400 hover:text-white transition duration-200"
-      aria-label="Request Admin Access"
-    >
-      Request For Admin
-    </button>
-  )}
-</div>
-
+      <div className="flex items-center justify-center mt-5 font-semibold">
+        {user.data.isAdmin ? (
+          <button
+            onClick={TakeToAdmin}
+            className="px-6 py-2 rounded-lg border border-amber-300 text-amber-200 hover:bg-amber-300   hover:text-zinc-950 transition duration-200"
+            aria-label="Go to Admin Panel"
+          >
+            Distributor page
+          </button>
+        ) : (
+          <button
+            onClick={TakeToAdminRequest}
+            className="px-6 py-2 rounded-lg border border-green-400 text-green-400 hover:bg-green-400 hover:text-white transition duration-200"
+            aria-label="Request Admin Access"
+          >
+            Register as Distributor
+          </button>
+        )}
+      </div>
     </div>
   );
 }

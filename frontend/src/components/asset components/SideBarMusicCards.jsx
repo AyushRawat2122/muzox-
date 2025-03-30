@@ -2,7 +2,7 @@ import React from "react";
 import { IoPlaySharp } from "react-icons/io5";
 const SideBarMusicCards = ({ className, onClick, Song }) => {
   return (
-    <button className={`w-full main`} onClick={onClick}>
+    <div className={`w-full main`} onClick={onClick}>
       <div className="flex gap-2 p-2 items-center justify-between rounded-md bg-white/4 hover:bg-white/7 transition-all">
         <div className="flex gap-2 grow overflow-hidden">
           <img
@@ -23,7 +23,7 @@ const SideBarMusicCards = ({ className, onClick, Song }) => {
          <IoPlaySharp className="text-2xl playBtn" />
         </button>
       </div>
-    </button>
+    </div>
   );
 };
 

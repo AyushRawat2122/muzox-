@@ -6,11 +6,11 @@ import React, {
 } from "react";
 import useAudioPlayer from "../../../../store/useAudioPlayer.js";
 import { saveInIDB } from "../../../../utils/frontendStorage.js";
-
+import { Vibrant } from "node-vibrant/browser";
 //used forwardRef to pass a ref from soundBar to here so that sound bar can take access of the audioRef
 
 const AudioPlayer = forwardRef((props, ref) => {
-  const { currentSong, isPlaying, playNext } = useAudioPlayer(); //methods and states imported from global audioPlayer
+  const { currentSong, isPlaying, playNext ,setColor } = useAudioPlayer(); //methods and states imported from global audioPlayer
   const audioRef = useRef(null); //create ref of audio element to prevent modifiying at rerenders
 
   useImperativeHandle(ref, () => {
@@ -36,13 +36,22 @@ const AudioPlayer = forwardRef((props, ref) => {
 
   useEffect(() => {
     if (!audioRef.current || !currentSong) return;
-
+    async function fetchImageAsBlob(url) {
+      try {
+        const response = await fetch(url, { mode: "cors" }); // Fetch the image
+        const blob = await response.blob(); // Convert it into a Blob
+        const blobUrl = URL.createObjectURL(blob); // Create a local Blob URL
+        const color = await Vibrant.from(blobUrl).getPalette();
+        console.log(color);
+        setColor(color);
+      } catch (err) {
+        console.error("Error fetching image:", err);
+      }
+    }
     if (audioRef.current?.src !== currentSong?.song?.url) {
       audioRef.current.src = currentSong?.song?.url;
-      console.log("yaha aarha hai")
-      console.log(currentSong);
-
-       saveInIDB(currentSong);
+      fetchImageAsBlob(currentSong?.coverImage?.url);
+      saveInIDB(currentSong);
     } // setting audio src
 
     if (isPlaying) {
