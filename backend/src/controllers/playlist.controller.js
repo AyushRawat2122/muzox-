@@ -246,14 +246,14 @@ const getUserPlaylists = asyncHandler(async (req, res, next) => {
 
   const populatedPlaylists = await User.findById(_id)
     .populate("playlists")
-    .select("playlists");
+    .select("playlists -_id");
 
   const userCreatedPlaylist = await Playlist.find({
     owner: new mongoose.Types.ObjectId(_id),
   });
-
+  console.log();
   const data = [
-    ...(populatedPlaylists.playLists || []),
+    ...(populatedPlaylists.playlists || []),
     ...userCreatedPlaylist,
   ];
 

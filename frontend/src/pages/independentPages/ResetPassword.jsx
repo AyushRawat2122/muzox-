@@ -102,34 +102,12 @@ const ResetPassword = () => {
               requestOtp={requestOtp}
               email={email}
             />
-            <div className="mt-4 text-center">
-              <button
-                onClick={() => setCurrentStep("reset")}
-                className="text-pink-400 hover:underline font-semibold"
-              >
-                Skip to Reset Password (Demo)
-              </button>
-              <button
-                onClick={() => setCurrentStep("email")}
-                className="ml-2 text-pink-400 hover:underline font-semibold"
-              >
-                Back to Email
-              </button>
-            </div>
           </>
         )}
 
         {currentStep === "reset" && (
           <>
             <ResetPasswordForm RequestChange={RequestChange} email={email} />
-            <div className="mt-4 text-center">
-              <button
-                onClick={() => setCurrentStep("otp")}
-                className="text-pink-400 hover:underline font-semibold"
-              >
-                Back to OTP Verification
-              </button>
-            </div>
           </>
         )}
       </div>
@@ -368,8 +346,8 @@ function ResetPasswordForm({ RequestChange, email }) {
               {...register("newPassword", {
                 required: "New password is required",
                 minLength: {
-                  value: 8,
-                  message: "Password must be at least 8 characters",
+                  value: 6,
+                  message: "Password must be at least 6 characters",
                 },
               })}
             />
