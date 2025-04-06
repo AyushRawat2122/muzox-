@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { ToastContainer } from "react-toastify";
 import { Outlet, useLocation, useNavigate } from "react-router";
 function App() {
+ 
   const [isOnline, setIsOnline] = useState();
   const location = useLocation();
   const navigate = useNavigate();
