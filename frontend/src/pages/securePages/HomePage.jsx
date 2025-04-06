@@ -4,7 +4,10 @@ import { useQuery } from "@tanstack/react-query";
 import Loading from "../../components/loaders/Loading";
 import { loadingDotsOrange } from "../../utils/lottie";
 import PlaylistCarousel from "../../components/carousel/PlaylistCarousel";
-import { PlaylistCard, SearchListSongCard } from "../../components/asset components";
+import {
+  PlaylistCard,
+  SearchListSongCard,
+} from "../../components/asset components";
 import { useNavigate } from "react-router";
 import { Play } from "lucide-react";
 import useAudioPlayer from "../../store/useAudioPlayer";
@@ -29,13 +32,26 @@ const fetchHomePageData = async () => {
 };
 
 const HomePage = () => {
-  const [data, setData] = useState({ playlists: [], songs: [], newlyAdded: [] });
+  const [data, setData] = useState({
+    playlists: [],
+    songs: [],
+    newlyAdded: [],
+  });
   const [recentSongs, setRecentSongs] = useState([]);
   const navigate = useNavigate();
 
   const { data: homePageData, isLoading } = useQuery({
     queryKey: ["homePageData"],
     queryFn: fetchHomePageData,
+    retry: (failureCount, error) => {
+      if (error.response?.status === 404) return false; // Don't retry on 404
+      return failureCount < 4;
+    },
+    retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 3000),
+    retryOnMount: true,
+    keepPreviousData: true,
+    refetchOnWindowFocus: false,
+    refetchOnReconnect: true,
   });
 
   useEffect(() => {
@@ -78,13 +94,7 @@ const HomePage = () => {
       )}
 
       <section>
-        <video
-          src="/WELCOME.mp4"
-          className="w-full"
-          loop
-          autoPlay
-          muted
-        />
+        <video src="/WELCOME.mp4" className="w-full" loop autoPlay muted />
       </section>
 
       {/* Top Playlist For You */}
@@ -121,13 +131,7 @@ const HomePage = () => {
       )}
 
       <section>
-        <video
-          src="/MUZOX.mp4"
-          className="w-full"
-          loop
-          autoPlay
-          muted
-        />
+        <video src="/MUZOX.mp4" className="w-full" loop autoPlay muted />
       </section>
 
       {/* Latest Songs */}

@@ -10,11 +10,17 @@ const loadingDotsOrange =
   "https://lottie.host/387cb6bd-4b47-49d5-ae7c-d4332c270fec/nm8gNFhMKq.lottie";
 const premium =
   "https://lottie.host/dce3acc8-6068-4f47-a28d-b6f37ae1f9a6/lGRxTmoBgs.lottie";
+const cat404 =
+  "https://lottie.host/06168cc4-7785-48a0-a852-ed4420a2f73c/67AfdYsxLV.lottie";
+const astronaut503 =
+  "https://lottie.host/5e41ab33-c3b0-4f2a-bdbf-0defee89d572/zCOS0Qhqpu.lottie";
 export {
   loadingPlayIcon,
   floatingMusicIcons,
   loadingDots,
   death,
   loadingDotsOrange,
-  premium
+  premium,
+  cat404,
+  astronaut503
 };

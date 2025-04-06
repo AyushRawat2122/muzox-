@@ -8,6 +8,7 @@ import {
   Signup,
   Login,
   Verify,
+  Error,
   ResetPasswordPage,
 } from "./pages/independentPages/index.js";
 import {
@@ -36,6 +37,7 @@ const route = createBrowserRouter([
     children: [
       { path: "/login", element: <Login /> },
       { path: "/signup", element: <Signup /> },
+      { path: "/error", element: <Error/> },
       {
         path: "/verify",
         children: [

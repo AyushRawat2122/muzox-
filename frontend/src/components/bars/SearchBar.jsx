@@ -32,6 +32,9 @@ const SearchBar = () => {
         className="outline-none grow text-lg px-2"
         onFocus={handleFocus}
         onChange={handleChange}
+        onBlur={() => {
+          setIsFocused(false);
+        }}
         type="text"
         value={query}
         placeholder="What do you want to play ?"

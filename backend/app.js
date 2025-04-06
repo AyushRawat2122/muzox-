@@ -7,33 +7,36 @@ import cookieParser from "cookie-parser";
 import errorHandler from "./src/middlewares/errorHandler.js";
 import userRouter from "./src/router/user.routes.js";
 import SongRouter from "./src/router/song.routes.js";
-import PlaylistRouter from "./src/router/playlist.routes.js"
+import PlaylistRouter from "./src/router/playlist.routes.js";
+import mongoose from "mongoose";
+
+mongoose.set("debug", true);
 dotenv.config({});
 
 const app = express();
 const PORT = process.env.PORT || 5000;
 
 // Middlewares
-app.use(cors({
-  origin: "http://localhost:5173",
-  credentials: true, // Cookies allow karni ho toh
-  methods: ["GET", "POST", "PUT", "DELETE", "PATCH"], // Jo methods allow karni ho
-  allowedHeaders: ["Content-Type", "Authorization"], // Jo headers allow karne ho
-}));
+app.use(
+  cors({
+    origin: "http://localhost:5173",
+    credentials: true, // Cookies allow karni ho toh
+    methods: ["GET", "POST", "PUT", "DELETE", "PATCH"], // Jo methods allow karni ho
+    allowedHeaders: ["Content-Type", "Authorization"], // Jo headers allow karne ho
+  })
+);
 app.use(express.urlencoded({ extended: true, limit: "20mb" }));
 app.use(express.json());
 app.use(cookieParser());
 app.use(express.static("public"));
-app.use((req , res , next) => {
-  res.setHeader("Cache-Control", "no-store, no-cache, must-revalidate, max-age=0");
+app.use((req, res, next) => {
+  res.setHeader(
+    "Cache-Control",
+    "no-store, no-cache, must-revalidate, max-age=0"
+  );
   res.setHeader("Pragma", "no-cache");
   res.setHeader("Expires", "0");
-  next();
-})
-
-// Test route
-app.get("/welcome-to-my-app", (req, res) => {
-  res.send("Welcome to my app");
+  next();
 });
 
 const startServer = async () => {
@@ -52,14 +55,7 @@ startServer();
 //Testing
 app.use("/api/muzox-/user", userRouter);
 app.use("/api/muzox-/songs", SongRouter);
-app.use("/api/muzox-/playlist",PlaylistRouter);
-
-
-
-
-
-
-
+app.use("/api/muzox-/playlist", PlaylistRouter);
 
 //error in json format :}
 
