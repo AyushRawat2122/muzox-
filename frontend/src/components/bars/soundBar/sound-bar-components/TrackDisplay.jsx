@@ -9,12 +9,12 @@ const TrackDisplay = () => {
   const { setContext, addPopUp, toggleAddPopUp } = usePopUp();
 
   const isTabletOrMobile = useMediaQuery({ query: "(max-width: 1224px)" });
-  const handleAddToLibrary = () =>{
-    if(addPopUp === false){
+  const handleAddToLibrary = () => {
+    if (addPopUp === false) {
       setContext(currentSong);
       toggleAddPopUp();
     }
-  }
+  };
   return (
     <div className="h-full w-full flex items-center gap-2 py-1 lg:p-0">
       {/* Image of the current song playing */}
@@ -25,10 +25,10 @@ const TrackDisplay = () => {
           alt="song Image"
         />
       </div>
-      {currentSong ? (
-        <div className="flex w-full h-full justify-between lg:justify-normal items-center gap-2.5">
+      {currentSong && (
+        <div className="flex w-full h-full justify-between lg:justify-normal overflow-hidden items-center gap-2.5">
           {" "}
-          <div className=" capitalize pr-4 overflow-hidden max-w-[90%]">
+          <div className=" capitalize pr-4 overflow-hidden">
             <p className="cursor-pointer  hover:underline underline-offset-2 whitespace-nowrap overflow-hidden text-ellipsis">
               {currentSong.title}
             </p>
@@ -36,14 +36,12 @@ const TrackDisplay = () => {
               {currentSong.artist}
             </p>
           </div>
-          {isTabletOrMobile && (
-            <button onClick={handleAddToLibrary}>
-              <CirclePlus />
-            </button>
-          )}
         </div>
-      ) : (
-        <></>
+      )}
+      {isTabletOrMobile && currentSong && (
+        <button onClick={handleAddToLibrary}>
+          <CirclePlus />
+        </button>
       )}
     </div>
   );

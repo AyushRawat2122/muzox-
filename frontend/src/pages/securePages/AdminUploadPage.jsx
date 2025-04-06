@@ -6,8 +6,8 @@ import axios from "axios";
 import getUser from "../../serverDataHooks/getUser";
 import { death } from "../../utils/lottie";
 import Loading from "../../components/loaders/Loading";
-import { Upload, Music } from "lucide-react";
-import { notifyError, notifySuccess } from "../../store/useNotification";
+import { Upload, Music, Loader } from "lucide-react";
+import { notifyError, notifySuccess, notifyWarning } from "../../store/useNotification";
 
 const USchema = z.object({
   title: z.string().min(1, "Title is required"),
@@ -45,6 +45,7 @@ function AdminUploadPage() {
   });
   const [coverPreview, setCoverPreview] = useState(null);
   const [songName, setSongName] = useState("");
+  const [submitting, setSubmitting] = useState(false);
   const watchCover = watch("coverImage");
   const watchSong = watch("song");
   useEffect(() => {
@@ -63,31 +64,37 @@ function AdminUploadPage() {
     }
   }, [watchSong]);
   const onSubmit = async (data) => {
-    console.log(data);
-    try {
-      const { artist, title, genre, coverImage, song } = data;
-      const f1 = coverImage[0];
-      const f2 = song[0];
-      console.log(f1, f2);
-      const formData = new FormData();
-      formData.append("title", title);
-      formData.append("artist", artist);
-      formData.append("genre", genre);
-      formData.append("coverImage", f1);
-      formData.append("song", f2);
-      console.log(data.song[0].name);
+    if(!submitting){
+      setSubmitting(true);
+      try {
+        const { artist, title, genre, coverImage, song } = data;
+        const f1 = coverImage[0];
+        const f2 = song[0];
+        console.log(f1, f2);
+        const formData = new FormData();
+        formData.append("title", title);
+        formData.append("artist", artist);
+        formData.append("genre", genre);
+        formData.append("coverImage", f1);
+        formData.append("song", f2);
+        console.log(data.song[0].name);
 
-      const res = await axios.post(
-        "http://localhost:3000/api/muzox-/songs/uploadMusic",
-        formData,
-        {
-          headers: { "Content-Type": "multipart/form-data" },
-        }
-      );
-      notifySuccess("Song Uploaded Successfully");
-      reset();
-    } catch (error) {
-      notifyError("Song Upload Failed");
+        const res = await axios.post(
+          "http://localhost:3000/api/muzox-/songs/uploadMusic",
+          formData,
+          {
+            headers: { "Content-Type": "multipart/form-data" },
+          }
+        );
+        notifySuccess("Song Uploaded Successfully");
+        reset();
+      } catch (error) {
+        notifyError("Song Upload Failed");
+      } finally {
+        setSubmitting(false);
+      }
+    }else{
+      notifyWarning("song is uploading")
     }
   };
   const { data: user } = getUser();
@@ -114,7 +121,9 @@ function AdminUploadPage() {
 
   return (
     <div className="max-w-6xl max-lg:pb-[18vh] h-full overflow-y-scroll px-4 w-full mx-auto bg-black p-12 rounded-xl shadow-2xl">
-      <h1 className="text-3xl max-sm:text-center font-bold py-2">Upload Song</h1>
+      <h1 className="text-3xl max-sm:text-center font-bold py-2">
+        Upload Song
+      </h1>
       <form
         onSubmit={handleSubmit(onSubmit)}
         className="flex flex-col md:flex-row items-center gap-12 p-10 border-5 border-dashed border-gray-400/30"
@@ -221,8 +230,10 @@ function AdminUploadPage() {
             )}
             {songName && (
               <p className="text-gray-400 text-sm mt-1 text-center">
-                <span className="text-white font-semibold">Selected file:</span>{" "}
-                {songName}
+                <span className="text-white font-semibold w-full overflow-hidden overflow-ellipsis whitespace-nowrap">
+                  Selected file:
+                </span>{" "}
+                {songName.slice(0,15)}
               </p>
             )}
           </div>
@@ -234,9 +245,9 @@ function AdminUploadPage() {
           type="submit"
           form="hook-form"
           onClick={handleSubmit(onSubmit)}
-          className="gradientButton font-extrabold rounded-full sm:w-1/3 w-full p-4 cursor-pointer"
+          className="gradientButton flex justify-center font-extrabold rounded-full sm:w-1/3 w-full p-4 cursor-pointer"
         >
-          UPLOAD
+          {submitting ? <Loader /> : "UPLOAD"}
         </button>
       </div>
     </div>

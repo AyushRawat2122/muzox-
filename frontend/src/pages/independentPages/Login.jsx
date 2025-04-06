@@ -4,7 +4,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { CircleAlert, Eye, EyeClosed } from "lucide-react";
 import Logo from "/Logo.png";
-import { Link, useNavigate } from "react-router";
+import { Link, Navigate , useNavigate} from "react-router";
 import {
   normalRequest,
   queryClient,
@@ -31,15 +31,8 @@ const schema = z.object({
 });
 
 const Login = () => {
-  const { data: user, isSuccess } = getUser();
+  const { data: user, isSuccess , isLoading } = getUser();
   const navigate = useNavigate();
-
-  useEffect(() => {
-    if (isSuccess) {
-      navigate("/");
-    } // if user is logged in then send it back to home
-  }, [isSuccess]);
-
   const [isVisible, setIsVisible] = useState(false);
   const {
     register,
@@ -74,6 +67,7 @@ const Login = () => {
     onSuccess: () => {
       notifySuccess("logged in successfully")
       queryClient.invalidateQueries([{ queryKey: "user" }]);
+      navigate('/');
     },
     onError: (error) => {
       notifyError(error.response.data.message || "login failed");
@@ -85,7 +79,11 @@ const Login = () => {
     setIsVisible((prev) => !prev);
   };
 
-  if (mutation.isPending) {
+  if(isSuccess && user){
+    return <Navigate to={"/"} replace/>
+  }
+
+  if (mutation.isPending || isLoading) {
     return <Loading src={loadingPlayIcon} />;
   }
 

@@ -4,7 +4,7 @@ import asyncHandler from "../utils/asyncHandler.js";
 import ApiError from "../utils/ApiError.js";
 
 export const authRequired = asyncHandler(async (req, res, next) => {
-  const token = req.cookies.accessToken;
+  let token = req.cookies.accessToken;
 
   if (!token && req.headers.authorization) {
     token = req.headers.authorization.replace("Bearer", "");

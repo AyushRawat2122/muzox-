@@ -32,10 +32,12 @@ const Verify = () => {
   const email = location.state?.email || "";
   const onVerifyMe = async (data) => {
     try {
-      const res = await normalRequest.post(`/user/verifyUser/${userID}`, data, {
+      console.log(data);
+      const res = await normalRequest.post(`/user/verifyUser/${email}`, data, {
         headers: { "Content-Type": "application/json" },
       });
     } catch (error) {
+      console.log(error);
       throw error;
     }
   };

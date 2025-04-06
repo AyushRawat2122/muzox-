@@ -65,7 +65,7 @@ const LikedSongsPage = () => {
       </div>
 
       {/* Section 2: Play Control */}
-      <div className="sticky top-0 bg-black px-2 py-2 border-b-[1px] border-[#ffffff3d] flex items-center gap-2">
+      <div className="sticky -translate-y-1 top-0 bg-black px-2 py-2 border-b-[1px] border-[#ffffff3d] flex items-center gap-2">
         <button
           className="w-14 h-14 rounded-full bg-[#ff4800] flex items-center justify-center"
           onClick={handlePlayButtonClick}
@@ -152,9 +152,9 @@ const SongItem = ({ song, index, queueRef }) => {
           alt={song.title}
           className="w-10 h-10 rounded object-cover"
         />
-        <div>
-          <div className="font-medium">{song.title}</div>
-          <div className="text-xs text-gray-400">{song.artist}</div>
+        <div className="truncate">
+          <div className="font-medium truncate">{song.title}</div>
+          <div className="text-xs text-gray-400 truncate">{song.artist}</div>
         </div>
       </div>
       <div className="text-xs text-gray-400 text-right flex gap-2 items-center">

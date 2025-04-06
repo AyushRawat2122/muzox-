@@ -22,11 +22,11 @@ const PlaylistCarousel = ({ drag = true, click = true, children }) => {
   return (
     <div className="carousel-container relative">
       {!isTabletOrMobile && (
-        <div className="absolute bottom-[100%] right-0">
-          <button onClick={handlePrev} className="rounded-full bg-black/40 p-2">
+        <div className="absolute bottom-[100%] flex gap-2.5 -translate-y-3 right-0">
+          <button onClick={handlePrev}>
             <CircleChevronLeft size={25} />
           </button>
-          <button onClick={handleNext} className="rounded-full bg-black/40 p-1">
+          <button onClick={handleNext}>
             <CircleChevronRight size={25} />
           </button>
         </div>

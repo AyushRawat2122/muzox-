@@ -1,10 +1,14 @@
 import React, { useState, useEffect, useCallback } from "react";
 import useAudioPlayer from "../../store/useAudioPlayer";
+import { useMediaQuery } from "react-responsive";
+import Loading from "../../components/loaders/Loading.jsx"
+import {loadingDotsOrange} from "../../utils/lottie.js"
 import axios from "axios";
 const LyricsPage = () => {
   const [lyrics, setLyrics] = useState("");
   const [error, setError] = useState("");
   const { currentSong, colors } = useAudioPlayer();
+  const isTabletOrMobile = useMediaQuery({ query: "(max-width: 1224px)" });
   const lyricsErrorMessages = [
     "Lyrics? We got you on this one—our team is working on it!",
     "No lyrics right now. Trust us, we’re on it!",
@@ -38,42 +42,54 @@ const LyricsPage = () => {
   useEffect(() => {
     fetchLyrics();
   }, [currentSong]);
+
+  if (error) {
+    return (
+      <div className="h-full w-full">
+        <div className="h-full w-full" style={{ backgroundColor: `${colors?.Vibrant?.hex || ""}` }}>
+          <p className="h-full w-full px-2.5 flex justify-center items-center text-4xl sm:text-5xl text-center text-white font-bold bg-black/25">{error}</p>
+        </div>
+      </div>
+    );
+  }
+  if (!error && !lyrics) {
+    return (
+      <div className="h-full w-full">
+        <div className="h-full w-full" style={{ backgroundColor: `${colors?.Vibrant?.hex || ""}` }}>
+          <div className="h-full w-full px-2.5 flex justify-center items-center bg-black/25">
+          <Loading src={loadingDotsOrange} />
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+
   return (
     <div className="h-full w-full overflow-y-scroll flex flex-col relative hiddenScroll">
-      <div className="bg-[linear-gradient(180deg,transparent_20%,rgba(0,0,0,0.4)_100%)] sticky top-0  rounded-b-md ">
-        <h1 className="py-2 text-4xl bg-black/20  -translate-y-0.5 sm:gap-4 font-bold text-white items-baseline flex max-sm:flex-col pb-1 backdrop-blur-md shadow-md shadow-[#00000031] px-2">
-          Lyrics
-          <span className="text-base font-light text-gray-100">
-            {"["} lyrics re not synced with the song yet {"]"}
-          </span>
-        </h1>
-      </div>
-      <div className="h-full px-2 w-full grow flex items-center justify-center shadow-lg overflow-hidden">
-        {error ? (
-          <p className="text-gray-300 text-center h-full w-full text-[30px] flex justify-center items-center">
-            {error}
-          </p>
-        ) : lyrics ? (
-          <div className="h-full w-full overflow-y-scroll ">
-            <hr className="text-[#cccccc9a]" />
+      <div style={{ backgroundColor: `${colors?.Vibrant?.hex || ""}` }}>
+        <div className="h-fit bg-black/25">
+          <div
+            className="top-0 rounded-b-md"
+            style={isTabletOrMobile ? { position: "" } : { position: "sticky" }}
+          >
+            <h1 className="py-2 text-4xl -translate-y-0.5 sm:gap-4 font-bold text-white items-baseline flex max-sm:flex-col pb-1 backdrop-blur-md shadow-md shadow-[#00000031] px-2">
+              Lyrics
+              <span className="text-base font-light text-gray-100">
+                {"["} lyrics re not synced with the song yet {"]"}
+              </span>
+            </h1>
+          </div>
+          <div className="px-2 w-full flex flex-col items-center justify-center shadow-lg">
             <pre className="whitespace-pre-wrap font-mono text-[33px] font-semibold text-center tracking-wider  text-gray-200 pointer-events-none no-copy">
               {lyrics}
             </pre>
-            <hr className="text-[#cccccc9a]" />
-            <p className="py-2 text-sm text-gray-300 px-2  max-lg:pb-[18vh]">
+            <p className="py-2 border-t-2 border-gray-400/50 text-sm text-gray-300 text-left px-2 w-full  max-lg:pb-[18vh]">
               Powered by Lyrics.ovh-
             </p>
           </div>
-        ) : (
-          <p className="text-gray-300 h-full w-full flex justify-center items-center">
-            Loading...
-          </p>
-        )}
+        </div>
       </div>
-      <div
-        className="h-full w-full absolute -z-20"
-        style={{ backgroundColor: `${colors?.Vibrant?.hex || ""}` }}
-      ></div>
     </div>
   );
 };

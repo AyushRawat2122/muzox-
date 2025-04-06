@@ -15,7 +15,6 @@ import { useNavigate } from "react-router";
 
 const SearchResult = React.memo(() => {
   const { searchQuery } = useSearchQuery();
-  const isTabletOrMobile = useMediaQuery({ query: "(max-width: 1224px)" });
   const abortController = useRef(null);
   const [playlists, setPlaylists] = useState([]);
   const [songs, setSongs] = useState([]);
@@ -75,6 +74,7 @@ const SearchResult = React.memo(() => {
           src="https://lottie.host/b6ed7211-8749-45d9-8ed6-a50acf95d33f/m7v5QYV6qA.lottie"
           loop
           autoplay
+          className="w-[200px] lg:w-[300px] h-[200px] lg:h-[300px]"
         />
       </div>
     );
@@ -96,54 +96,49 @@ const SearchResult = React.memo(() => {
           </p>
         </div>
       )}
-
-      {loading && (
-        <div className="h-full w-full flex justify-center items-center">
-          {" "}
-          <div className="h-[100px] w-[200px]">
-            <DotLottieReact
-              src="https://lottie.host/b6ed7211-8749-45d9-8ed6-a50acf95d33f/m7v5QYV6qA.lottie"
-              loop
-              autoplay
-            />
-          </div>
+      {(playlists.length !== 0 || songs.length !== 0) && searchQuery !== "" && (
+        <div className="p-2 max-lg:pb-[18vh]">
+          {songs.length > 0 && (
+            <div className="">
+              <p className="text-lg font-bold">Songs</p>
+              <hr className="muzoxSubText" />
+              {songs.map((song, idx) => (
+                <SearchListSongCard song={song} key={idx+"searchResult"} />
+              ))}
+            </div>
+          )}
+          {playlists.length > 0 && (
+            <div className="my-2">
+              <p className="text-lg font-bold">Playlists</p>
+              <PlaylistCarousel>
+                {playlists.map((playlist , idx) => {
+                  return (
+                    <PlaylistCard
+                      playlist={playlist}
+                      onClick={() => {
+                        navigate(`/playlist/${playlist?._id}`);
+                      }}
+                      key={idx+"searchPlaylist"}
+                    />
+                  );
+                })}
+              </PlaylistCarousel>
+            </div>
+          )}
         </div>
       )}
-
-      <div className="p-2 max-lg:pb-[18vh]">
-        {songs.length > 0 && (
-          <div className="">
-            <p className="text-lg font-bold">Songs</p>
-            <hr className="muzoxSubText" />
-            {songs.map((song, idx) => (
-              <SearchListSongCard song={song} key={idx} />
-            ))}
-          </div>
-        )}
-        {playlists.length > 0 && (
-          <div className="my-2">
-            <p className="text-lg font-bold">Playlists</p>
-            <PlaylistCarousel>
-              {playlists.map((playlist) => {
-                return (
-                  <PlaylistCard
-                    playlist={playlist}
-                    onClick={() => {
-                      navigate(`/playlist/${playlist?._id}`);
-                    }}
-                  />
-                );
-              })}
-            </PlaylistCarousel>
-          </div>
-        )}
-      </div>
     </div>
   );
 });
 
 const SearchPage = () => {
   const isTabletOrMobile = useMediaQuery({ query: "(max-width: 1224px)" });
+  const { updateSearchQuery } = useSearchQuery();
+  useEffect(() => {
+    return () => {
+      updateSearchQuery("eeeeee");
+    };
+  }, []);
   return (
     <div className="h-full w-full overflow-y-scroll relative">
       {isTabletOrMobile && (

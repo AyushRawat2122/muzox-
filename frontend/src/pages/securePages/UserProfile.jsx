@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { X, Check, LogOut, User, Bitcoin } from "lucide-react";
 import getUser from "../../serverDataHooks/getUser";
 import { normalRequest, queryClient } from "../../utils/axiosRequests.config";
@@ -7,41 +7,34 @@ import Loading from "../../components/loaders/Loading";
 import { loadingDotsOrange, premium } from "../../utils/lottie.js";
 import { useNavigate } from "react-router";
 import { DotLottieReact } from "@lottiefiles/dotlottie-react";
+import {notifyInfo} from "../../store/useNotification.js"
+
 function UserProfile() {
   const [state, setState] = useState("stats");
   const [editingUsername, setEditingUsername] = useState(false);
   const [tempUsername, setTempUsername] = useState("");
   const user = getUser();
   const navigate = useNavigate();
-  const [prevSrc, setPrevSrc] = useState(user.data.profilePic.url);
+  const [prevSrc, setPrevSrc] = useState(user?.data?.profilePic?.url);
 
   const formatDate = (updatedAt) => {
+    if (!updatedAt) return "";
     const [year, month, day] = updatedAt.split("T")[0].split("-");
     const months = [
-      "January",
-      "February",
-      "March",
-      "April",
-      "May",
-      "June",
-      "July",
-      "August",
-      "September",
-      "October",
-      "November",
-      "December",
+      "January", "February", "March", "April", "May", "June",
+      "July", "August", "September", "October", "November", "December",
     ];
-    return `${months[parseInt(month, 10) - 1]} ${parseInt(
-      day,
-      10
-    )}, 2k${year.slice(2)}`;
+    return `${months[parseInt(month, 10) - 1]} ${parseInt(day, 10)}, 2k${year.slice(2)}`;
   };
-  const TakeToAdmin = () => {
-    navigate("/admin-panel");
-  };
-  const TakeToAdminRequest = () => {
-    navigate("/admin-panel-req");
-  };
+
+  const formattedJoinDate = useMemo(
+    () => formatDate(user?.data?.createdAt),
+    [user?.data?.createdAt]
+  );
+
+  const TakeToAdmin = () => navigate("/admin-panel");
+  const TakeToAdminRequest = () => navigate("/admin-panel-req");
+
   const mutation1 = useMutation({
     mutationFn: async () => {
       const res = await normalRequest.post("/user/updateUserDetails", {
@@ -55,12 +48,15 @@ function UserProfile() {
       const previousUser = queryClient.getQueryData(["user"]);
       queryClient.setQueryData(["user"], (old) => ({
         ...old,
-        username: tempUsername,
+        data: {
+          ...old?.data,
+          username: tempUsername,
+        },
       }));
       return { previousUser };
     },
     onError: (err, variables, context) => {
-      queryClient.setQueryData(["user"], context.previousUser);
+      queryClient.setQueryData(["user"], context?.previousUser);
       console.error(err);
     },
     onSettled: () => {
@@ -84,21 +80,27 @@ function UserProfile() {
       setPrevSrc(localImageUrl);
       queryClient.setQueryData(["user"], (old) => ({
         ...old,
-        profilePic: { url: localImageUrl },
+        data: {
+          ...old?.data,
+          profilePic: { url: localImageUrl },
+        },
       }));
       return { previousUser, localImageUrl };
     },
     onError: (err, file, context) => {
-      queryClient.setQueryData(["user"], context.previousUser);
-      setPrevSrc(context.previousUser.profilePic.url);
+      queryClient.setQueryData(["user"], context?.previousUser);
+      setPrevSrc(context?.previousUser?.data?.profilePic?.url);
       console.error(err);
     },
     onSuccess: (data) => {
-      const newUrl = data.message.profilePic.url;
+      const newUrl = data?.message?.profilePic?.url;
       setPrevSrc(newUrl);
       queryClient.setQueryData(["user"], (old) => ({
         ...old,
-        profilePic: data.message.profilePic,
+        data: {
+          ...old?.data,
+          profilePic: data?.message?.profilePic,
+        },
       }));
     },
     onSettled: () => {
@@ -111,23 +113,20 @@ function UserProfile() {
       await normalRequest.post("/user/logout");
     },
     onSuccess: () => {
+      queryClient.cancelQueries();
       queryClient.clear();
-      navigate("/login", { replace: true });
+      window.location.href = "/login";
     },
     onError: (error) => console.error(error),
   });
 
   const handleProfileUpdate = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      anoMutation.mutate(file);
-    }
+    const file = e?.target?.files?.[0];
+    if (file) anoMutation.mutate(file);
   };
 
   const handleUsernameUpdate = () => {
-    if (tempUsername.trim()) {
-      mutation1.mutate();
-    }
+    if (tempUsername?.trim()) mutation1.mutate();
   };
 
   const getRecentData = () => {
@@ -135,7 +134,7 @@ function UserProfile() {
     if (!itemStr) return null;
     const item = JSON.parse(itemStr);
     const now = new Date();
-    if (now.getTime() > item.expiry) {
+    if (now.getTime() > item?.expiry) {
       localStorage.removeItem("recent");
       return null;
     }
@@ -149,19 +148,18 @@ function UserProfile() {
   }
 
   return (
-    <div className="w-full h-full max-lg:pb-[18vh]  overflow-y-scroll bg-zinc-950 text-white p-4 md:p-8">
-      <header className="flex justify-between space-around items-center mb-6">
+    <div className="w-full h-full max-lg:pb-[18vh] overflow-y-scroll bg-zinc-950 text-white p-4 md:p-8">
+      <header className="flex justify-between items-center mb-6">
         <div className="flex items-center">
-          <h2 className="font-bold grow text-2xl md:text-5xl">Your Profile </h2>
+          <h2 className="font-bold grow text-2xl md:text-5xl">Your Profile</h2>
           <DotLottieReact
             src={premium}
             autoplay
             loop
-            className={`max-sm:h-[50px] max-sm:w-[50px] h-[80px] w-[80px]`}
+            className="max-sm:h-[50px] max-sm:w-[50px] h-[80px] w-[80px]"
             title="premium user"
-          ></DotLottieReact>
+          />
         </div>
-
         <button
           onClick={() => mutation.mutate()}
           className="flex items-center gap-2 text-red-500 hover:text-red-400"
@@ -178,7 +176,7 @@ function UserProfile() {
               className="mt-3 cursor-pointer text-sm text-gray-400 hover:text-white flex items-center gap-1"
             >
               <div className="w-32 h-32 sm:w-[200px] sm:h-[200px] rounded-full overflow-hidden">
-                {user.data?.profilePic?.url ? (
+                {user?.data?.profilePic?.url ? (
                   <img
                     src={prevSrc}
                     alt="Profile"
@@ -201,12 +199,13 @@ function UserProfile() {
           </div>
 
           <div className="flex flex-col items-center sm:items-end w-full space-y-3">
-            <div className="flex items-center justify-between">
+            <div className="flex items-center justify-between w-full">
               {editingUsername ? (
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-2 w-full">
                   <input
                     value={tempUsername}
                     onChange={(e) => setTempUsername(e.target.value)}
+                    onKeyDown={(e) => e.key === "Enter" && handleUsernameUpdate()}
                     className="text-white text-right outline-none capitalize text-2xl md:text-6xl p-2 w-full"
                   />
                   <button
@@ -224,30 +223,27 @@ function UserProfile() {
                 </div>
               ) : (
                 <span
-                  className="cursor-pointer text-2xl capitalize font-extrabold md:text-6xl hover:text-white"
+                  className="cursor-pointer text-2xl max-sm:text-center w-full capitalize font-extrabold md:text-6xl hover:text-white"
                   onClick={() => {
-                    setTempUsername(user.data.username);
+                    setTempUsername(user?.data?.username ?? "");
                     setEditingUsername(true);
                   }}
                 >
-                  {user.data?.username}
+                  {user?.data?.username ?? "Username"}
                 </span>
               )}
             </div>
-
-            <span>{user.data?.email}</span>
-            <div className="flex items-center text-gray-500 text-sm ">
+            <span>{user?.data?.email ?? "Email not set"}</span>
+            <div className="flex items-center text-gray-500 text-sm">
               <span>Member Since: </span>
-              <span>
-                {user.data?.createdAt && formatDate(user.data.createdAt)}
-              </span>
+              <span>{formattedJoinDate || "N/A"}</span>
             </div>
           </div>
         </div>
       </section>
 
-      <div className="p-4 bg-gray-500/10">
-        <div className="flex flex-col gap-4 shadow rounded p-4 bg-white/1">
+      <div className="p-4 bg-gray-500/10 rounded-lg">
+        <div className="flex flex-col gap-4 shadow rounded p-4 bg-white/5">
           <div className="flex justify-between mb-4">
             <button
               onClick={() => setState("stats")}
@@ -274,15 +270,19 @@ function UserProfile() {
           {state === "stats" ? (
             <div>
               <h2 className="text-2xl font-bold text-white">
-                {user.data.playlists.length}
+                {user?.data?.playlists?.length ?? 0}
               </h2>
               <div>
                 <h2 className="text-xl font-semibold text-gray-300">Songs</h2>
-                <ul className="list-disc ml-5 text-gray-300">
-                  {user.data.playlists.map((elm, ind) => (
-                    <li key={ind}>{elm.name}</li>
-                  ))}
-                </ul>
+                {user?.data?.playlists?.length > 0 ? (
+                  <ul className="list-disc ml-5 text-gray-300">
+                    {user.data.playlists.map((elm, ind) => (
+                      <li key={ind}>{elm?.name ?? "Untitled"}</li>
+                    ))}
+                  </ul>
+                ) : (
+                  <p className="text-sm text-gray-400">No playlists available.</p>
+                )}
               </div>
             </div>
           ) : (
@@ -305,18 +305,21 @@ function UserProfile() {
           )}
         </div>
       </div>
+
       <div className="flex items-center justify-center mt-5 font-semibold">
-        {user.data.isAdmin ? (
+        {user?.data?.isAdmin ? (
           <button
             onClick={TakeToAdmin}
-            className="px-6 py-2 rounded-lg border border-amber-300 text-amber-200 hover:bg-amber-300   hover:text-zinc-950 transition duration-200"
+            className="px-6 py-2 rounded-lg border border-amber-300 text-amber-200 hover:bg-amber-300 hover:text-zinc-950 transition duration-200"
             aria-label="Go to Admin Panel"
           >
             Distributor page
           </button>
         ) : (
           <button
-            onClick={TakeToAdminRequest}
+            onClick={()=>{
+              notifyInfo("Distributor applications are currently closed")
+            }}
             className="px-6 py-2 rounded-lg border border-green-400 text-green-400 hover:bg-green-400 hover:text-white transition duration-200"
             aria-label="Request Admin Access"
           >

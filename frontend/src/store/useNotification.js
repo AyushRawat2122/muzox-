@@ -18,8 +18,8 @@ const notifyWarning = (warning) => {
   });
 };
 
-const notifyError = (warning) => {
-  toast.error(warning, {
+const notifyError = (error) => {
+  toast.error(error, {
     position: "top-right",
     hideProgressBar: false,
     closeOnClick: true,
@@ -27,4 +27,14 @@ const notifyError = (warning) => {
   });
 };
 
-export { notifyError, notifySuccess, notifyWarning };
+const notifyInfo = (Info) => {
+  toast.info(Info, {
+    position: "top-right",
+    hideProgressBar: false,
+    closeOnClick: true,
+    theme: "dark",
+  });
+};
+
+
+export { notifyError, notifySuccess, notifyWarning , notifyInfo};

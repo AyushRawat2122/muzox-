@@ -24,6 +24,12 @@ app.use(express.urlencoded({ extended: true, limit: "20mb" }));
 app.use(express.json());
 app.use(cookieParser());
 app.use(express.static("public"));
+app.use((req , res , next) => {
+  res.setHeader("Cache-Control", "no-store, no-cache, must-revalidate, max-age=0");
+  res.setHeader("Pragma", "no-cache");
+  res.setHeader("Expires", "0");
+  next();
+})
 
 // Test route
 app.get("/welcome-to-my-app", (req, res) => {

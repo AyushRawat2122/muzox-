@@ -20,6 +20,7 @@ const getUser = () =>
     queryFn: fetchUserData,
     retry: false,
     staleTime: Infinity,
+    refetchOnWindowFocus: false, 
   });
 
 export default getUser;

@@ -54,10 +54,10 @@ const SearchListSongCard = ({ song }) => {
           className="h-full w-full aspect-square object-cover"
         />
       </div>
-      <div className="grow flex justify-between items-center">
-        <div>
-          <h1 className="capitalize">{title}</h1>
-          <p className="text-gray-300 capitalize">{artist}</p>
+      <div className="grow flex justify-between items-center  gap-5 overflow-hidden">
+        <div className="grow overflow-hidden">
+          <h1 className="capitalize whitespace-nowrap overflow-hidden overflow-ellipsis">{title}</h1>
+          <p className="text-gray-300 capitalize whitespace-nowrap overflow-hidden overflow-ellipsis">{artist}</p>
         </div>
         <p className="text-sm text-gray-300">{convertToMinSecFormat(duration)}</p>
       </div>

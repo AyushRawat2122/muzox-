@@ -31,11 +31,6 @@ const SearchBar = () => {
       <input
         className="outline-none grow text-lg px-2"
         onFocus={handleFocus}
-        onBlur={() => {
-          setIsFocused(false);
-          updateSearchQuery("");
-          setQuery("");
-        }}
         onChange={handleChange}
         type="text"
         value={query}

@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState, useCallback } from "react";
 import { Outlet } from "react-router";
-import { Navigate, useLocation, NavLink, Link } from "react-router";
+import { Navigate, useLocation, NavLink, Link , useNavigate } from "react-router";
 import getUser from "./serverDataHooks/getUser.js";
 import MuzoxApp from "./pages/wrapperPages/MuzoxApp.jsx";
 import { queryClient } from "./utils/axiosRequests.config.js";
@@ -34,7 +34,7 @@ const ProtectedRoute = () => {
 
   // Use a single ref for AudioPlayer
   const audioPlayerRef = useRef(null);
-
+  const navigate = useNavigate();
   const { queue } = useAudioPlayer();
   const { soundBarPopUp } = usePopUp();
 
@@ -75,6 +75,15 @@ const ProtectedRoute = () => {
       queryClient.clear();
     };
   }, []);
+
+
+  useEffect(()=>{
+    console.log("triggered");
+    if(!user){
+      navigate('/login')
+    }
+  } , [user]);
+
 
   if (isPending) {
     return <Loading src={loadingPlayIcon} />;
@@ -250,7 +259,7 @@ const ProtectedRoute = () => {
           {/* LAST RESIZE HANDLE */}
           {isDesktopOrLaptop && isSideBarOpen && (
             <PanelResizeHandle
-              className="w-[1px] bg-gray-300/60 cursor-ew-resize"
+              className="w-[1px] ml-1 bg-gray-300/60 cursor-ew-resize"
               id="right-panel-handle"
             />
           )}
@@ -286,7 +295,7 @@ const ProtectedRoute = () => {
         )}
         {/* Mobile SoundBar Display */}
         {isTabletOrMobile && (
-        <div className="w-full absolute bottom-0 z-777 bg-[linear-gradient(180deg,transparent_10%,rgba(0,0,0,1.2)_100%)]">
+        <div className="w-full absolute bottom-0 translate-y-1 z-777 bg-[linear-gradient(180deg,transparent_10%,rgba(0,0,0,.8)_100%)] backdrop:blur-sm">
             {queue.length > 0 && audioReady && (
               <div className="p-2">
                 <MobileSoundBarDisplay audioElement={getAudio()} />

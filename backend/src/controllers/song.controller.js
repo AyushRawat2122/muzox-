@@ -40,7 +40,9 @@ const uploadSong = asyncHandler(async (req, res, next) => {
   if (!song || !coverImg) {
     await deleteOnCloudinary(song?.public_id);
     await deleteOnCloudinary(coverImg?.public_id);
-    return next(new ApiError(500, "uploading song req to server failed unexpectedly"));
+    return next(
+      new ApiError(500, "uploading song req to server failed unexpectedly")
+    );
   }
   //check for the successful upload
   const uploadedSong = await Song.create({
@@ -180,25 +182,61 @@ const unlikeSong = asyncHandler(async (req, res, next) => {
 const forTheUserHomePage = asyncHandler(async (req, res, next) => {
   const { _id } = req.user;
 
-  const userLike = await Like.findOne({
-    likedBy: new mongoose.Types.ObjectId(_id),
-  }).lean();
-
-  if (!userLike) {
+  // 1. Get likes
+  const userLikes = await Like.find({ likedBy: _id }).lean();
+  if (!userLikes.length) {
     return res
       .status(404)
       .json(new ApiResponse(404, null, "No liked songs found"));
   }
 
-  const song = await Song.findById(userLike.song).lean();
-  if (!song) {
-    return res.status(404).json(new ApiResponse(404, null, "Song not found"));
+  // extract liked song IDs
+  const likedSongIds = new Set(userLikes.map(like => like.song.toString()));
+
+  // 2. Get liked songs (optional, if you need full objects later)
+  const likedSongs = await Promise.all(
+    Array.from(likedSongIds).map(id => Song.findById(id).lean())
+  );
+  const songs = likedSongs.filter(Boolean);
+  if (!songs.length) {
+    return res
+      .status(404)
+      .json(new ApiResponse(404, null, "Liked songs not found"));
   }
 
-  const songsByArtist = await Song.find({ artist: song.artist }).lean();
+  // 3. Find similar songs by artist
+  //    For each liked song, find others by same artist
+  const nested = await Promise.all(
+    songs.map(song =>
+      Song.find({
+        artist: { $regex: song.artist, $options: "i" },
+        _id: { $nin: Array.from(likedSongIds) }  // exclude already liked
+      })
+      .lean()
+    )
+  );
 
-  return res.status(200).json(new ApiResponse(200, songsByArtist, "haha"));
+  // flatten and dedupe
+  const allRecs = nested.flat();
+  const seen = new Set();
+  const recommendations = allRecs.filter(song => {
+    const id = song._id.toString();
+    if (seen.has(id)) return false;
+    seen.add(id);
+    return true;
+  });
+
+  if (!recommendations.length) {
+    return res
+      .status(404)
+      .json(new ApiResponse(404, null, "No similar songs found"));
+  }
+  // 4. Return results
+  return res
+    .status(200)
+    .json(new ApiResponse(200, recommendations, "Success"));
 });
+
 
 const newlyAddedSectionForHomePage = asyncHandler(async (req, res, next) => {
   const { _id } = req.user;

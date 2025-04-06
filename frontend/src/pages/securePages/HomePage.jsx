@@ -4,40 +4,38 @@ import { useQuery } from "@tanstack/react-query";
 import Loading from "../../components/loaders/Loading";
 import { loadingDotsOrange } from "../../utils/lottie";
 import PlaylistCarousel from "../../components/carousel/PlaylistCarousel";
-import {
-  PlaylistCard,
-  SearchListSongCard,
-} from "../../components/asset components";
+import { PlaylistCard, SearchListSongCard } from "../../components/asset components";
 import { useNavigate } from "react-router";
 import { Play } from "lucide-react";
 import useAudioPlayer from "../../store/useAudioPlayer";
 import { getRecentSongs } from "../../utils/frontendStorage";
-const HomePage = () => {
-  const [data, setData] = useState({
-    playlists: [],
-    songs: [],
-    newlyAdded: [],
-  });
-  const [recentSongs, setRecentSongs] = useState([]);
-  const navigate = useNavigate();
 
-  const fetchData = async () => {
+const fetchHomePageData = async () => {
+  try {
     const [playlistRes, songRes, newSongRes] = await Promise.all([
       normalRequest.get("/playlist/home-page-playlist"),
       normalRequest.get("/songs/song-for-home"),
       normalRequest.get("/songs/newlyAddedSong"),
     ]);
-
     return {
-      playlists: playlistRes.data.data,
-      songs: songRes.data.data,
-      newlyAdded: newSongRes.data.data,
+      playlists: playlistRes?.data?.data || [],
+      songs: songRes?.data?.data || [],
+      newlyAdded: newSongRes?.data?.data || [],
     };
-  };
+  } catch (err) {
+    console.error("Error fetching homepage data:", err);
+    return { playlists: [], songs: [], newlyAdded: [] };
+  }
+};
 
-  const { data: homePageData, isPending } = useQuery({
+const HomePage = () => {
+  const [data, setData] = useState({ playlists: [], songs: [], newlyAdded: [] });
+  const [recentSongs, setRecentSongs] = useState([]);
+  const navigate = useNavigate();
+
+  const { data: homePageData, isLoading } = useQuery({
     queryKey: ["homePageData"],
-    queryFn: fetchData,
+    queryFn: fetchHomePageData,
   });
 
   useEffect(() => {
@@ -46,13 +44,11 @@ const HomePage = () => {
 
   useEffect(() => {
     getRecentSongs()
-      .then((fetchedSongs) => {
-        setRecentSongs(fetchedSongs);
-      })
+      .then((fetched) => setRecentSongs(fetched || []))
       .catch((err) => console.error("Error fetching recent songs:", err));
   }, []);
 
-  if (isPending) {
+  if (isLoading) {
     return (
       <div className="flex items-center justify-center h-screen">
         <Loading src={loadingDotsOrange} />
@@ -60,75 +56,120 @@ const HomePage = () => {
     );
   }
 
+  const { playlists, songs, newlyAdded } = data;
+
   return (
     <div className="max-lg:pb-[18vh] overflow-y-scroll h-full px-1 capitalize space-y-6">
-    {/* Jump back in Time */}
-    <section>
-      <h1 className="text-2xl font-bold mb-2">Jump back in Time</h1>
-      <PlaylistCarousel>
-        {recentSongs.map((song) => (
-          <HoverCard
-            key={song?._id}
-            img={song?.coverImage?.url}
-            name={song?.title}
-            song={song}
-          />
-        ))}
-      </PlaylistCarousel>
-    </section>
-  
-    {/* Top Playlist For You */}
-    <section>
-      <h1 className="text-2xl font-bold mb-2">Top Playlist For You</h1>
-      <PlaylistCarousel>
-        {data.playlists.map((item) => (
-          <PlaylistCard
-            key={item._id}
-            playlist={item}
-            onClick={() => navigate(`/playlist/${item?._id}`)}
-          />
-        ))}
-      </PlaylistCarousel>
-    </section>
-  
-    {/* Recommended Songs */}
-    <section>
-      <h1 className="text-2xl font-bold mb-2">Recommended Songs</h1>
-      <PlaylistCarousel>
-        {data.songs.map((song) => (
-          <HoverCard
-            key={song?._id}
-            img={song?.coverImage?.url}
-            name={song?.title}
-            song={song}
-          />
-        ))}
-      </PlaylistCarousel>
-    </section>
-  
-    {/* Latest Songs */}
-    <section>
-      <h1 className="text-2xl font-bold mb-2">Latest Songs</h1>
-      <div className="grid sm:grid-cols-2 gap-4">
-        {data.newlyAdded.map((song, idx) => (
-          <SearchListSongCard key={`${idx}LatestSongKEY`} song={song} />
-        ))}
-      </div>
-    </section>
-  </div>
-  
+      {/* Jump back in Time */}
+      {Array.isArray(recentSongs) && recentSongs.length > 0 && (
+        <section>
+          <h1 className="text-2xl font-bold mb-2">Jump back in Time</h1>
+          <PlaylistCarousel>
+            {recentSongs.map((song, idx) => (
+              <HoverCard
+                key={song?._id || idx}
+                img={song?.coverImage?.url}
+                name={song?.title || "Unknown Title"}
+                song={song}
+              />
+            ))}
+          </PlaylistCarousel>
+        </section>
+      )}
+
+      <section>
+        <video
+          src="/WELCOME.mp4"
+          className="w-full"
+          loop
+          autoPlay
+          muted
+        />
+      </section>
+
+      {/* Top Playlist For You */}
+      {Array.isArray(playlists) && playlists.length > 0 && (
+        <section>
+          <h1 className="text-2xl font-bold mb-2">Top Playlist For You</h1>
+          <PlaylistCarousel>
+            {playlists.map((item, idx) => (
+              <PlaylistCard
+                key={item?._id || idx}
+                playlist={item}
+                onClick={() => navigate(`/playlist/${item?._id}`)}
+              />
+            ))}
+          </PlaylistCarousel>
+        </section>
+      )}
+
+      {/* Recommended Songs */}
+      {Array.isArray(songs) && songs.length > 6 && (
+        <section>
+          <h1 className="text-2xl font-bold mb-2">Recommended Songs</h1>
+          <PlaylistCarousel>
+            {songs.slice(6).map((song, idx) => (
+              <HoverCard
+                key={song?._id || idx}
+                img={song?.coverImage?.url}
+                name={song?.title || "Unknown Title"}
+                song={song}
+              />
+            ))}
+          </PlaylistCarousel>
+        </section>
+      )}
+
+      <section>
+        <video
+          src="/MUZOX.mp4"
+          className="w-full"
+          loop
+          autoPlay
+          muted
+        />
+      </section>
+
+      {/* Latest Songs */}
+      {Array.isArray(newlyAdded) && newlyAdded.length > 0 && (
+        <section>
+          <h1 className="text-2xl font-bold mb-2">Latest Songs</h1>
+          <div className="grid sm:grid-cols-2 gap-4">
+            {newlyAdded.map((song, idx) => (
+              <SearchListSongCard key={song?._id || idx} song={song} />
+            ))}
+          </div>
+        </section>
+      )}
+
+      {/* Curated Just for You */}
+      {Array.isArray(songs) && songs.length > 0 && (
+        <section>
+          <h1 className="text-2xl font-bold mb-2">Curated Just for You</h1>
+          <div className="grid grid-cols-5 lg:h-[300px] w-full max-sm:flex max-sm:flex-col">
+            {songs.slice(0, 5).map((song, idx) => (
+              <HANDPICK
+                key={song?._id || idx}
+                img={song?.coverImage?.url}
+                name={song?.title || "Unknown Title"}
+                artist={song?.artist || "Unknown Artist"}
+                genre={song?.genre || "Unknown Genre"}
+                song={song}
+              />
+            ))}
+          </div>
+        </section>
+      )}
+    </div>
   );
 };
 
 const HoverCard = ({ img, name, song }) => {
   const { initializeQueue } = useAudioPlayer();
-  const handleClick = (e) => {
-    initializeQueue([song], song?._id);
-  };
   return (
     <div
-      className="hover:bg-white/10 main w-[150px] h-[180px] rounded-md overflow-hidden shadow-sm flex flex-col p-1"
-      onClick={handleClick}
+      className="hover:bg-white/10 main w-[150px] h-[180px] rounded-md overflow-hidden shadow-sm flex flex-col p-1 cursor-pointer"
+      onClick={() => initializeQueue([song], song?._id)}
     >
       <div className="relative w-full rounded-lg overflow-hidden">
         <img
@@ -146,6 +187,28 @@ const HoverCard = ({ img, name, song }) => {
         <p className="text-white text-sm text-left whitespace-nowrap text-ellipsis overflow-hidden">
           {name}
         </p>
+      </div>
+    </div>
+  );
+};
+
+const HANDPICK = ({ img, name, artist, genre, song }) => {
+  const { initializeQueue } = useAudioPlayer();
+  return (
+    <div
+      className="main w-full relative h-full rounded-md overflow-hidden shadow-sm flex flex-col p-1 cursor-pointer group"
+      onClick={() => initializeQueue([song], song?._id)}
+    >
+      <img
+        src={img}
+        alt={name}
+        className="w-full h-full aspect-square object-cover rounded-md"
+      />
+      {/* Overlay */}
+      <div className="absolute inset-0 bg-black/40 opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-2 text-white">
+        <div className="font-semibold truncate text-3xl">{name}</div>
+        <div className="truncate text-xl">{artist}</div>
+        <div className="italic opacity-80 text-lg">{genre}</div>
       </div>
     </div>
   );

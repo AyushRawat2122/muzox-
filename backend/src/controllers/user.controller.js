@@ -9,7 +9,7 @@ import { uploadOnCloudinary, deleteOnCloudinary } from "../utils/cloudinary.js";
 import Playlist from "../models/playlist.models.js";
 import Song from "../models/song.models.js";
 //will generate token
-const tokenGenerators = async (userId) => {
+const tokenGenerators = async (userId , next) => {
   try {
     console.log("Reached token generators");
 
@@ -54,7 +54,9 @@ const signup = asyncHandler(async (req, res, next) => {
   }
   const profilePic = await uploadOnCloudinary(profilePicLocal);
   if (!profilePic) {
-    return next(new ApiError(500, "Internal Serever Error plx try again later"));
+    return next(
+      new ApiError(500, "Internal Serever Error plx try again later")
+    );
   }
   const salt = await bcryptjs.genSalt(10);
 
@@ -106,8 +108,8 @@ const verifyUser = asyncHandler(async (req, res, next) => {
   if (!email || !otp) {
     return next(new ApiError(400, "Please enter to confirm your validations"));
   }
-
-  const user = await User.findOne(email);
+  console.log(email, otp);
+  const user = await User.findOne({ email: email });
   if (!user) {
     return next(new ApiError(404, "User not found"));
   }
@@ -118,7 +120,7 @@ const verifyUser = asyncHandler(async (req, res, next) => {
     return next(new ApiError(400, "Invalid OTP"));
   }
   if (Date.now() > user.verifyTokenExpiry) {
-    await User.findByIdAndDelete(userId);
+    await User.findByIdAndDelete(user._id);
     await deleteOnCloudinary(user.profilePic);
     return next(new ApiError(400, "OTP has expired.You need to signup again"));
   }
@@ -163,16 +165,20 @@ const login = asyncHandler(async (req, res, next) => {
     return next(new ApiError(400, "Invalid Email or password"));
   }
 
-  const options = {
-    secure: true,
-    sameSite: "None",
-    httpOnly: true,
-  };
-
-  const { accessToken, refreshToken } = await tokenGenerators(user._id);
+  const { accessToken, refreshToken } = await tokenGenerators(user._id , next);
   res
-    .cookie("accessToken", accessToken, options)
-    .cookie("refreshToken", refreshToken, options);
+    .cookie("accessToken", accessToken, {
+      secure: true,
+      sameSite: "None",
+      httpOnly: true,
+      maxAge: 24 * 60 * 60 * 1000, // 1 day
+    })
+    .cookie("refreshToken", refreshToken, {
+      secure: true,
+      sameSite: "None",
+      httpOnly: true,
+      maxAge: 10 * 24 * 60 * 60 * 1000, // 10 days
+    });
   return res.status(200).json(
     new ApiResponse(
       200,
@@ -190,16 +196,18 @@ const login = asyncHandler(async (req, res, next) => {
 });
 
 const passwordResetMail = asyncHandler(async (req, res, next) => {
-  const {email}=req.params
+  const { email } = req.params;
 
   if (!email) {
     return next(new ApiError(404, "Email is required"));
   }
 
-  const user = await User.findOne({email:email});
+  const user = await User.findOne({ email: email });
 
   if (!user) {
-    return next(new ApiError(404, "No User found associated with this Email Address"));
+    return next(
+      new ApiError(404, "No User found associated with this Email Address")
+    );
   }
 
   const otp = Math.floor(100000 + Math.random() * 900000).toString();
@@ -231,24 +239,29 @@ const passwordResetMail = asyncHandler(async (req, res, next) => {
 
 const refreshAccessToken = asyncHandler(async (req, res, next) => {
   const currRefreshToken = req.cookies?.refreshToken;
-  if (!currRefreshToken) return next(new ApiError(401, "No refresh token provided"));
+  if (!currRefreshToken)
+    return next(new ApiError(401, "No refresh token provided"));
 
   const user = await User.findOne({ refreshToken: currRefreshToken }).select(
     "-refreshToken"
   );
 
   if (!user) return next(new ApiError(401, "Invalid refresh token"));
-  const { accessToken, refreshToken } = await tokenGenerators(user._id);
+  const { accessToken, refreshToken } = await tokenGenerators(user._id , next);
 
-  const options = {
-    httpOnly: true,
-    secure: true,
-    sameSite: "None",
-  };
-
-  res.cookie("accessToken", accessToken, options);
-
-  res.cookie("refreshToken", refreshToken, options);
+  res
+    .cookie("accessToken", accessToken, {
+      secure: true,
+      sameSite: "None",
+      httpOnly: true,
+      maxAge: 24 * 60 * 60 * 1000, // 1 day
+    })
+    .cookie("refreshToken", refreshToken, {
+      secure: true,
+      sameSite: "None",
+      httpOnly: true,
+      maxAge: 10 * 24 * 60 * 60 * 1000, // 10 days
+    });
 
   return res
     .status(200)
@@ -261,15 +274,15 @@ const refreshAccessToken = asyncHandler(async (req, res, next) => {
     );
 });
 
-const resetOtpVerification=asyncHandler(async(req,res,next)=>{
-  const {otp} = req.body;
-  const {email}=req.params;
+const resetOtpVerification = asyncHandler(async (req, res, next) => {
+  const { otp } = req.body;
+  const { email } = req.params;
   const user = await User.findOne({ email });
   if (!user) return next(new ApiError(404, "User not found"));
-  if(user.passwordToken !== otp){
-    return next(new ApiError(401, "Invalid OTP"))
+  if (user.passwordToken !== otp) {
+    return next(new ApiError(401, "Invalid OTP"));
   }
-  
+
   if (new Date() > user.passwordTokenExpiry) {
     return next(new ApiError(404, "OTP has expired Please try again later"));
   }
@@ -281,23 +294,27 @@ const resetOtpVerification=asyncHandler(async(req,res,next)=>{
     .status(200)
 
     .json(new ApiResponse(200, "OTP verified Success"));
-})
+});
 
 const resetPassword = asyncHandler(async (req, res) => {
-  const {email} = req.params;
+  const { email } = req.params;
   const { password, newPassword } = req.body;
   if (!email) {
     return next(new ApiError(404, "Page Not Found"));
   }
 
-  if ( password===""||newPassword === "") {
-    return next(new ApiError(400, "Password and New Password fields are required"));
+  if (password === "" || newPassword === "") {
+    return next(
+      new ApiError(400, "Password and New Password fields are required")
+    );
   }
 
-  if(password!==newPassword){
-    return next(new ApiError(400, "Password and New Password fields must be same"))
+  if (password !== newPassword) {
+    return next(
+      new ApiError(400, "Password and New Password fields must be same")
+    );
   }
-  const user = await User.findOne({email:email});
+  const user = await User.findOne({ email: email });
   if (!user) {
     return next(new ApiError(404, "User not found Please try again later"));
   }
@@ -509,5 +526,5 @@ export {
   userSongs,
   likedSong,
   refreshAccessToken,
-  resetOtpVerification
+  resetOtpVerification,
 };

@@ -3,13 +3,22 @@ import useAudioPlayer from "../../store/useAudioPlayer.js";
 import { EmptyQueue, SideBarMusicCards } from "../asset components/index.js";
 import { GiLoveSong } from "react-icons/gi";
 import useSideBar from "../../store/useSideBar.js";
-
+import usePopUp from "../../store/usePopUp.js";
+import { CirclePlus } from "lucide-react";
+import { useMediaQuery } from "react-responsive";
 const CurrentSongAbout = () => {
   const { currentSong, queue, currentSongIdx, playNext, isLooped, isShuffled } =
     useAudioPlayer();
   const { toggleQueueDisplay } = useSideBar();
   const [nextSong, setNextSong] = useState({});
-
+  const isTabletOrMobile = useMediaQuery({ query: "(max-width: 1224px)" });
+  const { toggleAddPopUp, addPopUp, setContext } = usePopUp();
+  const handleAddToLibrary = () => {
+    if (addPopUp === false) {
+      setContext(currentSong);
+      toggleAddPopUp();
+    }
+  };
   useEffect(() => {
     console.log(currentSong);
     if (currentSongIdx < queue.length - 1) {
@@ -33,9 +42,22 @@ const CurrentSongAbout = () => {
         alt="coverImage"
       />
       <hr className="text-[#ffffff51]" />
-      <div className="w-full text-clip capitalize">
-        <h1 className="text-2xl font-bold whitespace-nowrap overflow-hidden text-ellipsis">{currentSong?.title}</h1>
-        <h2 className="text-lg text-[#c9c9c9] whitespace-nowrap overflow-hidden text-ellipsis">{currentSong?.artist}</h2>
+      <div className="w-full text-clip capitalize flex justify-between items-center">
+        <div className="truncate">
+          <h1 className="text-2xl font-bold whitespace-nowrap overflow-hidden text-ellipsis">
+            {currentSong?.title}
+          </h1>
+          <h2 className="text-lg text-[#c9c9c9] whitespace-nowrap overflow-hidden text-ellipsis">
+            {currentSong?.artist}
+          </h2>
+        </div>
+        <div>
+          {!isTabletOrMobile && currentSong && (
+            <button onClick={handleAddToLibrary}>
+              <CirclePlus />
+            </button>
+          )}
+        </div>
       </div>
       <hr className="text-[#ffffff51]" />
       <div>
