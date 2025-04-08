@@ -302,7 +302,7 @@ const PlaylistPage = () => {
       <AnimatePresence mode="wait">
         {deletePopup && (
           <div
-            className="h-full w-full overflow-hidden px-3 fixed z-777 bg-black/30 backdrop-blur-sm top-0 flex justify-center items-center"
+            className="h-full w-full overflow-hidden px-3 fixed z-777 bg-black/30 backdrop-blur-sm top-0 left-0 flex justify-center items-center"
             onClick={handleOnBlur}
           >
             <DeletePlayList

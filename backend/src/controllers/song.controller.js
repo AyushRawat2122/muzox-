@@ -7,6 +7,9 @@ import mongoose from "mongoose";
 import Like from "../models/like.models.js";
 import { unlinkSync } from "fs";
 //upload song
+function escapeRegExp(str) {
+  return str.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
 
 const uploadSong = asyncHandler(async (req, res, next) => {
   //this will come from middleware verifyJWT
@@ -182,62 +185,49 @@ const unlikeSong = asyncHandler(async (req, res, next) => {
 const forTheUserHomePage = asyncHandler(async (req, res, next) => {
   const { _id } = req.user;
 
-  // 1. Get likes
-  const userLikes = await Like.find({ likedBy: _id }).lean();
-  if (!userLikes.length) {
-    return res
-      .status(404)
-      .json(new ApiResponse(404, null, "No liked songs found"));
+  // 1️⃣ Get liked song IDs
+  const likedDocs = await Like.find({ likedBy: _id })
+    .select("song -_id")
+    .lean();
+  const likedSongIds = likedDocs.map((d) => d.song.toString());
+
+  let recommendations = [];
+
+  if (likedSongIds.length) {
+    // 2️⃣ Get fav artists
+    const artistsRaw = await Song.find({ _id: { $in: likedSongIds } })
+      .select("artist -_id")
+      .lean();
+    const favArtists = [
+      ...new Set(artistsRaw.map((s) => s.artist).filter(Boolean)),
+    ];
+
+    // 3️⃣ Build and log regex list
+    const regexList = favArtists.map((name) => {
+      const esc = escapeRegExp(name.trim());
+      return new RegExp(esc, "i");
+    });
+    console.log("🔍 Fav artists:", favArtists);
+    console.log("🔍 Regex list:", regexList);
+
+    // 4️⃣ Query once with $in of regex
+    const rawRecs = await Song.find({
+      artist: { $in: regexList },
+      _id: { $nin: likedSongIds },
+    }).lean();
+
+    // 5️⃣ Dedupe by _id
+    const seen = new Set();
+    recommendations = rawRecs.filter((song) => {
+      const id = song._id.toString();
+      if (seen.has(id)) return false;
+      seen.add(id);
+      return true;
+    });
   }
 
-  // extract liked song IDs
-  const likedSongIds = new Set(userLikes.map(like => like.song.toString()));
-
-  // 2. Get liked songs (optional, if you need full objects later)
-  const likedSongs = await Promise.all(
-    Array.from(likedSongIds).map(id => Song.findById(id).lean())
-  );
-  const songs = likedSongs.filter(Boolean);
-  if (!songs.length) {
-    return res
-      .status(404)
-      .json(new ApiResponse(404, null, "Liked songs not found"));
-  }
-
-  // 3. Find similar songs by artist
-  //    For each liked song, find others by same artist
-  const nested = await Promise.all(
-    songs.map(song =>
-      Song.find({
-        artist: { $regex: song.artist, $options: "i" },
-        _id: { $nin: Array.from(likedSongIds) }  // exclude already liked
-      })
-      .lean()
-    )
-  );
-
-  // flatten and dedupe
-  const allRecs = nested.flat();
-  const seen = new Set();
-  const recommendations = allRecs.filter(song => {
-    const id = song._id.toString();
-    if (seen.has(id)) return false;
-    seen.add(id);
-    return true;
-  });
-
-  if (!recommendations.length) {
-    return res
-      .status(404)
-      .json(new ApiResponse(404, null, "No similar songs found"));
-  }
-  // 4. Return results
-  return res
-    .status(200)
-    .json(new ApiResponse(200, recommendations, "Success"));
+  return res.status(200).json(new ApiResponse(200, recommendations, "Success"));
 });
-
-
 const newlyAddedSectionForHomePage = asyncHandler(async (req, res, next) => {
   const { _id } = req.user;
   const tenDaysAgo = new Date();
