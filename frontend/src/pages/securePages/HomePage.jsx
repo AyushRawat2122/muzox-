@@ -44,13 +44,12 @@ const HomePage = () => {
     queryKey: ["homePageData"],
     queryFn: fetchHomePageData,
     retry: (failureCount, error) => {
-      if (error.response?.status === 404) return false; // Don't retry on 404
-      return failureCount < 4;
+      if (error.response?.status === 404) return false; 
+      return failureCount < 2;
     },
     retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 3000),
     retryOnMount: true,
     keepPreviousData: true,
-    refetchOnWindowFocus: false,
     refetchOnReconnect: true,
   });
 
