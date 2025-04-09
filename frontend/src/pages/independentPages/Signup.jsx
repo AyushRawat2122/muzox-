@@ -83,6 +83,7 @@ const Signup = () => {
       }
     },
     onError: (error) => {
+      console.log(error);
       notifyError(
         error.response.data.message ||
           "signed up process failed due to unexpected reason"

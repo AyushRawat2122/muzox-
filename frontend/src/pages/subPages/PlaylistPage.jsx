@@ -153,14 +153,22 @@ const PlaylistPage = () => {
           const blobUrl = URL.createObjectURL(blob); // Create a local Blob URL
 
           if (imgRef.current) {
-            imgRef.current.src = blobUrl; // Set Blob URL as img src
-            const color = await Vibrant.from(imgRef.current).getPalette();
-            setDominantColor(color.Vibrant.hex);
+            imgRef.current.crossOrigin = 'anonymous'; // Set this if needed for cross-origin images
+            imgRef.current.onload = async () => {
+              try {
+                const vibrantPalette = await Vibrant.from(imgRef.current).getPalette();
+                setDominantColor(vibrantPalette.Vibrant.hex);
+              } catch (error) {
+                console.error("Error extracting colors:", error);
+              }
+            };
+            imgRef.current.src = blobUrl;
           }
         } catch (err) {
           console.error("Error fetching image:", err);
         }
       }
+      console.log(playlist?.playListCover?.url);
       fetchImageAsBlob(playlist?.playListCover?.url);
     }
     // Replace with your actual image URL

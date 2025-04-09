@@ -42,7 +42,7 @@ const AudioPlayer = forwardRef((props, ref) => {
         const blob = await response.blob(); // Convert it into a Blob
         const blobUrl = URL.createObjectURL(blob); // Create a local Blob URL
         const color = await Vibrant.from(blobUrl).getPalette();
-        console.log(color);
+        
         setColor(color);
       } catch (err) {
         console.error("Error fetching image:", err);
