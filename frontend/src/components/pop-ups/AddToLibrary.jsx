@@ -13,6 +13,8 @@ import {
 } from "../../store/useNotification.js";
 import PlaylistCard from "../asset components/PlaylistCard.jsx";
 import { addToPlaylist } from "../../serverDataHooks/playlistsMutations.js";
+import { loadingDotsOrange } from "../../utils/lottie.js";
+import Loading from "../loaders/Loading.jsx";
 //liked song component
 const LikedSong = React.memo(() => {
   const { context } = usePopUp();
@@ -41,7 +43,7 @@ const LikedSong = React.memo(() => {
   }, [mutation.isSuccess, mutation.isError]);
 
   if (likedSongNot) {
-    return <p> loading... </p>;
+    return <Loading src={loadingDotsOrange}></Loading>;
   }
 
   return (
@@ -75,16 +77,19 @@ const AddToLibrary = () => {
   const popUp = useRef(null);
   const date = new Date();
   const [userPlaylist, setUserPlaylist] = useState([]);
+  const [loading, setLoading] = useState(false);
   const { data: user, isPending: userNot } = getUser();
   const { data: playlists, isPending: playlistNot } = getUserPlaylists();
   const { context } = usePopUp();
   useEffect(() => {
+    setLoading(true);
     if (playlists?.data?.length > 0) {
       const created = playlists?.data?.filter(
         (playlist) => playlist?.owner === user?._id
       );
       setUserPlaylist(created);
     }
+    setLoading(false);
   }, [playlists]);
 
   const handleBackdropClick = (e) => {
@@ -165,6 +170,8 @@ const AddToLibrary = () => {
                 );
               })}
             </PlaylistCarousel>
+          ) : loading ? (
+            <Loading src={loadingDotsOrange} />
           ) : (
             <p className="text-gray-300">
               No created playlist found, create playlist first

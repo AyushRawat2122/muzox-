@@ -3,9 +3,10 @@ import { useLocation, Outlet, NavLink } from "react-router";
 import getUser from "../../serverDataHooks/getUser";
 import getUserLikedSong from "../../serverDataHooks/getUserLikedSong";
 import getUserPlaylists from "../../serverDataHooks/getUserPlaylists";
-
+import Loading from "../../components/loaders/Loading";
 // Import icons from lucide-react
 import { List, Heart, Plus } from "lucide-react";
+import { loadingDotsOrange } from "../../utils/lottie";
 
 // Inline Card component for reusability
 const Card = ({ icon, title, defaultBg, hoverBg }) => (
@@ -41,7 +42,7 @@ const Library = () => {
   if (userPending || likedSongsPending || playlistsPending) {
     return (
       <div className="h-screen w-full flex justify-center items-center bg-black text-white text-2xl">
-        Loading...
+        <Loading src={loadingDotsOrange}></Loading>
       </div>
     );
   }
@@ -60,7 +61,7 @@ const Library = () => {
             }
           }
         `}</style>
-        <div className="max-lg:pb-[18vh]  max-lg:pb-[18vh] h-full w-full bg-black text-white p-4 sm:p-8 overflow-y-scroll">
+        <div className="max-lg:pb-[18vh] h-full w-full bg-black text-white p-4 sm:p-8 overflow-y-scroll">
           <h1 className="text-3xl font-bold mb-8">Library</h1>
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
             {/* Card 1: Your Playlists */}

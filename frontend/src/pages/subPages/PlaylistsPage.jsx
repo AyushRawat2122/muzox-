@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import getUserPlaylists from "../../serverDataHooks/getUserPlaylists.js";
-import { loadingPlayIcon } from "../../utils/lottie.js";
+import { loadingDotsOrange } from "../../utils/lottie.js";
 import Loading from "../../components/loaders/Loading.jsx";
 import getUser from "../../serverDataHooks/getUser.js";
 import PlaylistCarousel from "../../components/carousel/PlaylistCarousel.jsx";
@@ -28,7 +28,7 @@ const PlaylistsPage = () => {
   const navigate = useNavigate();
   const date = new Date();
   if (playlistPending || userPending) {
-    return <Loading src={loadingPlayIcon} />;
+    return <Loading src={loadingDotsOrange} />;
   }
 
   return (

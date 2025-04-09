@@ -17,7 +17,7 @@ import {
 } from "lucide-react";
 import useAudioPlayer from "../../store/useAudioPlayer.js";
 import getUserPlaylists from "../../serverDataHooks/getUserPlaylists.js";
-import { loadingPlayIcon } from "../../utils/lottie.js";
+import { loadingDotsOrange } from "../../utils/lottie.js";
 import Loading from "../../components/loaders/Loading.jsx";
 import getUser from "../../serverDataHooks/getUser.js";
 import {
@@ -175,7 +175,7 @@ const PlaylistPage = () => {
   }, [playlist]);
 
   if (userPending || playlistPending || libraryPending) {
-    return <Loading src={loadingPlayIcon} />;
+    return <Loading src={loadingDotsOrange} />;
   }
   return (
     <main className="h-full max-lg:pb-[18vh] w-full relative overflow-y-auto bg-black text-white">
@@ -431,7 +431,7 @@ const DeletePlayList = ({ setDeletePopUp, playlistID }) => {
     },
   });
   if (userPending) {
-    <Loading src={loadingPlayIcon} />;
+    <Loading src={loadingDotsOrange} />;
   }
   return (
     <motion.div
