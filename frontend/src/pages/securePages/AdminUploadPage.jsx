@@ -9,6 +9,7 @@ import Loading from "../../components/loaders/Loading";
 import { Upload, Music, Loader } from "lucide-react";
 import { notifyError, notifySuccess, notifyWarning } from "../../store/useNotification";
 
+import { normalRequest } from "../../utils/axiosRequests.config";
 const USchema = z.object({
   title: z.string().min(1, "Title is required"),
   artist: z.string().min(1, "Artist is required"),
@@ -79,8 +80,8 @@ function AdminUploadPage() {
         formData.append("song", f2);
         console.log(data.song[0].name);
 
-        const res = await axios.post(
-          `${import.meta.env.VITE_SERVER_BASE_URL}/api/muzox-/songs/uploadMusic`,
+        const res = await normalRequest.post(
+          `/songs/uploadMusic`,
           formData,
           {
             headers: { "Content-Type": "multipart/form-data" },
