@@ -90,6 +90,7 @@ function AdminUploadPage() {
         notifySuccess("Song Uploaded Successfully");
         reset();
       } catch (error) {
+        console.log(error);
         notifyError("Song Upload Failed");
       } finally {
         setSubmitting(false);
