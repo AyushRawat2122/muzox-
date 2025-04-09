@@ -9,7 +9,7 @@ import { uploadOnCloudinary, deleteOnCloudinary } from "../utils/cloudinary.js";
 import Playlist from "../models/playlist.models.js";
 import Song from "../models/song.models.js";
 //will generate token
-const tokenGenerators = async (userId , next) => {
+const tokenGenerators = async (userId, next) => {
   try {
     console.log("Reached token generators");
 
@@ -165,17 +165,17 @@ const login = asyncHandler(async (req, res, next) => {
     return next(new ApiError(400, "Invalid Email or password"));
   }
 
-  const { accessToken, refreshToken } = await tokenGenerators(user._id , next);
+  const { accessToken, refreshToken } = await tokenGenerators(user._id, next);
   res
     .cookie("accessToken", accessToken, {
       secure: true,
-      sameSite: "None",
+      sameSite: "lax",
       httpOnly: true,
       maxAge: 24 * 60 * 60 * 1000, // 1 day
     })
     .cookie("refreshToken", refreshToken, {
       secure: true,
-      sameSite: "None",
+      sameSite: "lax",
       httpOnly: true,
       maxAge: 10 * 24 * 60 * 60 * 1000, // 10 days
     });
@@ -247,18 +247,18 @@ const refreshAccessToken = asyncHandler(async (req, res, next) => {
   );
 
   if (!user) return next(new ApiError(401, "Invalid refresh token"));
-  const { accessToken, refreshToken } = await tokenGenerators(user._id , next);
+  const { accessToken, refreshToken } = await tokenGenerators(user._id, next);
 
   res
     .cookie("accessToken", accessToken, {
       secure: true,
-      sameSite: "None",
+      sameSite: "lax",
       httpOnly: true,
       maxAge: 24 * 60 * 60 * 1000, // 1 day
     })
     .cookie("refreshToken", refreshToken, {
       secure: true,
-      sameSite: "None",
+      sameSite: "lax",
       httpOnly: true,
       maxAge: 10 * 24 * 60 * 60 * 1000, // 10 days
     });
@@ -352,7 +352,7 @@ const logout = asyncHandler(async (req, res) => {
   const options = {
     httpOnly: true,
     secure: true,
-    sameSite: "None",
+    sameSite: "lax",
   };
 
   return res

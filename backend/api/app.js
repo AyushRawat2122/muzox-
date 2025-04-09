@@ -19,7 +19,10 @@ const PORT = process.env.PORT || 5000;
 // Middlewares
 app.use(
   cors({
-    origin: "http://localhost:5173",
+    origin: [
+      "https://muzox.vercel.app/",
+      "https://muzox-2l00mz7wk-ayushs-projects-dc209762.vercel.app/",
+    ],
     credentials: true, // Cookies allow karni ho toh
     methods: ["GET", "POST", "PUT", "DELETE", "PATCH"], // Jo methods allow karni ho
     allowedHeaders: ["Content-Type", "Authorization"], // Jo headers allow karne ho
@@ -53,9 +56,9 @@ const startServer = async () => {
 
 startServer();
 
-app.get('/', (req ,res) =>{
+app.get("/", (req, res) => {
   res.send("hii");
-})
+});
 
 //Testing
 app.use("/api/muzox-/user", userRouter);
