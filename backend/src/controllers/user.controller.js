@@ -46,7 +46,7 @@ const signup = asyncHandler(async (req, res, next) => {
     return next(new ApiError(400, "User already exists"));
   }
 
-  const profilePicLocal = req.files?.profilePic?.[0]?.path;
+  const profilePicLocal = req.files?.profilePic?.[0]?.buffer;
 
   console.log(profilePicLocal);
   if (!profilePicLocal) {
@@ -415,7 +415,7 @@ const updateUserDetails = asyncHandler(async (req, res) => {
 const updateProfilePic = asyncHandler(async (req, res) => {
   const id = req.user._id;
 
-  const profilePicLocal = req.files?.profilePic[0]?.path;
+  const profilePicLocal = req.files?.profilePic[0]?.buffer;
   if (!profilePicLocal) {
     return next(new ApiError(400, "Please upload a profile picture"));
   }

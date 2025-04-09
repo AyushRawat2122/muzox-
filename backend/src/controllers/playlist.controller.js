@@ -25,7 +25,7 @@ const createPlayList = asyncHandler(async (req, res, next) => {
     return next(new ApiError(400, "Invalid User ID"));
   }
 
-  const playListCoverLocal = req.files?.playListCover?.[0]?.path;
+  const playListCoverLocal = req.files?.playListCover?.[0]?.buffer;
   let playListCover;
 
   // Check for duplicate playlist name

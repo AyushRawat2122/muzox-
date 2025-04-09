@@ -1,5 +1,5 @@
 import { v2 as cloudinary } from "cloudinary";
-import { unlinkSync } from "fs";
+import streamifier from "streamifier";
 //configuration of cloudinary
 cloudinary.config({
   cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
@@ -8,23 +8,23 @@ cloudinary.config({
   secure:true,
 });
 
-const uploadOnCloudinary = async (uploadedFilePath) => {
-  try {
-    if (!uploadedFilePath) {
-      return null; // if no local path given we ll return null and handle this where called
-    }
-    //uploading file on the cloud service
-    const uploadedFile = await cloudinary.uploader.upload(uploadedFilePath, {
-      resource_type: "auto",
-    });
+const uploadOnCloudinary = async (fileBuffer) => {
+  if (!fileBuffer || !Buffer.isBuffer(fileBuffer)) return null;
 
-    unlinkSync(uploadedFilePath); //synchronously unlinking that file
-    return uploadedFile;
-  } catch (error) {
-    unlinkSync(uploadedFilePath); //synchronously unlinking that file , even If file was not uploaded hence removing before error comes
+  try {
+    const result = await new Promise((resolve, reject) => {
+      const uploadStream = cloudinary.uploader.upload_stream(
+        { resource_type: "auto" },
+        (err, res) => (err ? reject(err) : resolve(res))
+      );
+      streamifier.createReadStream(fileBuffer).pipe(uploadStream);
+    });
+    return result;
+  } catch {
     return null;
   }
 };
+
 
 const deleteOnCloudinary = async (publicId) => {
   try {

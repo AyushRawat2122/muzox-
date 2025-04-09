@@ -5,7 +5,6 @@ import { deleteOnCloudinary, uploadOnCloudinary } from "../utils/cloudinary.js";
 import Song from "../models/song.models.js";
 import mongoose from "mongoose";
 import Like from "../models/like.models.js";
-import { unlinkSync } from "fs";
 //upload song
 function escapeRegExp(str) {
   return str.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
@@ -20,15 +19,14 @@ const uploadSong = asyncHandler(async (req, res, next) => {
     return next(new ApiError(400, "title and artist are required"));
   } // title and artist shouldnt be empty
 
-  const localSongPath = req.files?.song?.[0]?.path;
-  const localCoverImgPath = req.files?.coverImage?.[0]?.path;
+  const localSongPath = req.files?.song?.[0]?.buffer;
+  const localCoverImgPath = req.files?.coverImage?.[0]?.buffer;
 
   const isPresent = await Song.findOne({
     $and: [{ title: title }, { artist: artist }],
   });
   if (isPresent) {
-    unlinkSync(localSongPath);
-    unlinkSync(localCoverImgPath);
+
     return next(new ApiError(400, "song already exists"));
   }
 

@@ -1,13 +1,12 @@
 import multer from  "multer";
  
-const storage = multer.diskStorage({
-   
-    destination:(req,file,cb)=>{
-        cb(null,'./public/temp')
+const storage = multer.memoryStorage();
+ // shifting to memory buffer because diskStorage causing issue and max size is less than 10 mb so no worries.
+const uploader = multer({
+    storage: storage,
+    limits: {
+      fileSize: 10 * 1024 * 1024, // 10MB limit
     },
-    filename:(req,file,cb)=>{
-        cb(null,file.originalname+"-"+Date.now());
-    }
-})
-const uploader=multer({storage:storage});
+  });
+
 export default uploader;
