@@ -95,7 +95,7 @@ const LyricsPage = () => {
             <pre className="whitespace-pre-wrap font-mono text-[33px] font-semibold text-center tracking-wider  text-gray-200 pointer-events-none no-copy">
               {lyrics}
             </pre>
-            <p className="py-2 border-t-2 border-gray-400/50 text-sm text-gray-300 text-left px-2 w-full  max-lg:pb-[18vh]">
+            <p className="py-2 border-t-2 underline underline-offset-4 border-gray-400/50 text-sm text-gray-300 text-left px-2 w-full  max-lg:pb-[18vh]">
               Powered by Lyrics.ovh-
             </p>
           </div>
