@@ -80,7 +80,7 @@ function AdminUploadPage() {
         console.log(data.song[0].name);
 
         const res = await axios.post(
-          "http://localhost:3000/api/muzox-/songs/uploadMusic",
+          `${import.meta.env.VITE_SERVER_BASE_URL}/api/muzox-/songs/uploadMusic`,
           formData,
           {
             headers: { "Content-Type": "multipart/form-data" },

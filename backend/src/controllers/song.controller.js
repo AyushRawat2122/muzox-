@@ -185,7 +185,6 @@ const unlikeSong = asyncHandler(async (req, res, next) => {
 const forTheUserHomePage = asyncHandler(async (req, res, next) => {
   const { _id } = req.user;
 
-  // 1️⃣ Get liked song IDs
   const likedDocs = await Like.find({ likedBy: _id })
     .select("song -_id")
     .lean();
@@ -194,7 +193,7 @@ const forTheUserHomePage = asyncHandler(async (req, res, next) => {
   let recommendations = [];
 
   if (likedSongIds.length) {
-    // 2️⃣ Get fav artists
+
     const artistsRaw = await Song.find({ _id: { $in: likedSongIds } })
       .select("artist -_id")
       .lean();
@@ -202,21 +201,17 @@ const forTheUserHomePage = asyncHandler(async (req, res, next) => {
       ...new Set(artistsRaw.map((s) => s.artist).filter(Boolean)),
     ];
 
-    // 3️⃣ Build and log regex list
     const regexList = favArtists.map((name) => {
       const esc = escapeRegExp(name.trim());
       return new RegExp(esc, "i");
     });
-    console.log("🔍 Fav artists:", favArtists);
-    console.log("🔍 Regex list:", regexList);
 
-    // 4️⃣ Query once with $in of regex
     const rawRecs = await Song.find({
       artist: { $in: regexList },
       _id: { $nin: likedSongIds },
     }).lean();
 
-    // 5️⃣ Dedupe by _id
+  
     const seen = new Set();
     recommendations = rawRecs.filter((song) => {
       const id = song._id.toString();
@@ -230,25 +225,10 @@ const forTheUserHomePage = asyncHandler(async (req, res, next) => {
 });
 const newlyAddedSectionForHomePage = asyncHandler(async (req, res, next) => {
   const { _id } = req.user;
-  const tenDaysAgo = new Date();
-  tenDaysAgo.setDate(tenDaysAgo.getDate() - 10);
-  const newlyAddedSong = await Song.find({
-    createdAt: {
-      $gte: tenDaysAgo,
-    },
-  });
-  const songHuh = [];
-  let ind = 0;
-  for (let i = 0; i < newlyAddedSong.length; i++) {
-    if (ind >= 10) {
-      break;
-    }
-    songHuh.push(newlyAddedSong[i]);
-    ind++;
-  }
+  const newlyAdded = await Song.find({}).sort({createdAt:-1}).limit(20);
   return res
     .status(200)
-    .json(new ApiResponse(200, songHuh, "Newly Added Song"));
+    .json(new ApiResponse(200, newlyAdded, "Newly Added Song"));
 });
 
 //exports

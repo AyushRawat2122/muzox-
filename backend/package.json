@@ -7,7 +7,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "serve": "node app.js",
-    "dev": "nodemon -r dotenv/config --experimental-json-modules app.js"
+    "dev": "nodemon -r dotenv/config --experimental-json-modules ./api/app.js"
   },
   "author": "ayush roshan",
   "license": "ISC",

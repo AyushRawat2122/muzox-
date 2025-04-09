@@ -2,18 +2,15 @@ import axios from "axios";
 import { QueryClient } from "@tanstack/react-query";
 
 const queryClient = new QueryClient();
-
-const securedRequest = axios.create({
-  baseURL: "http://localhost:3000/api/muzox-",
+const baseConfig = {
+  baseURL: `${import.meta.env.VITE_SERVER_BASE_URL}/api/muzox-`,
   withCredentials: true,
   credentials: "include",
-});
+};
 
-const normalRequest = axios.create({
-  baseURL: "http://localhost:3000/api/muzox-",
-  withCredentials: true,
-  credentials: "include",
-});
+const securedRequest = axios.create(baseConfig);
+
+const normalRequest = axios.create(baseConfig);
 
 // this is a response interceptor that will work with the response it takes 2 methods as an arguments
 // 1st method -> works on success response
@@ -39,7 +36,7 @@ securedRequest.interceptors.response.use(
       console.log("retrying with refreshToken");
       try {
         const res = await axios.get(
-          "http://localhost:3000/api/muzox-/user/generateAccessToken",
+          `${ import.meta.env.VITE_SERVER_BASE_URL}/api/muzox-/user/generateAccessToken`,
           {
             withCredentials: true,
             credentials: "include",

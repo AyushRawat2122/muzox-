@@ -1,13 +1,13 @@
 //imports
 import cors from "cors";
 import express from "express";
-import connect from "./src/database/dbConfig.js";
+import connect from "../src/database/dbConfig.js";
 import dotenv from "dotenv";
 import cookieParser from "cookie-parser";
-import errorHandler from "./src/middlewares/errorHandler.js";
-import userRouter from "./src/router/user.routes.js";
-import SongRouter from "./src/router/song.routes.js";
-import PlaylistRouter from "./src/router/playlist.routes.js";
+import errorHandler from "../src/middlewares/errorHandler.js";
+import userRouter from "../src/router/user.routes.js";
+import SongRouter from "../src/router/song.routes.js";
+import PlaylistRouter from "../src/router/playlist.routes.js";
 import mongoose from "mongoose";
 
 mongoose.set("debug", true);
@@ -52,6 +52,11 @@ const startServer = async () => {
 };
 
 startServer();
+
+app.get('/', (req ,res) =>{
+  res.send("hii");
+})
+
 //Testing
 app.use("/api/muzox-/user", userRouter);
 app.use("/api/muzox-/songs", SongRouter);
@@ -60,3 +65,5 @@ app.use("/api/muzox-/playlist", PlaylistRouter);
 //error in json format :}
 
 app.use(errorHandler);
+
+export default app;
