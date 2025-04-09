@@ -5,11 +5,7 @@ import tailwindcss from '@tailwindcss/vite'
 export default defineConfig(({ mode }) => {
   return {
     plugins: [
-      react({
-        babel: {
-          plugins: mode === 'production' ? ['transform-remove-console'] : [],
-        },
-      }),
+      react(),
       tailwindcss()
     ],
   };
