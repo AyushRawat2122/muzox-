@@ -169,13 +169,13 @@ const login = asyncHandler(async (req, res, next) => {
   res
     .cookie("accessToken", accessToken, {
       secure: true,
-      sameSite: "lax",
+      sameSite: "none",
       httpOnly: true,
       maxAge: 24 * 60 * 60 * 1000, // 1 day
     })
     .cookie("refreshToken", refreshToken, {
       secure: true,
-      sameSite: "lax",
+      sameSite: "none",
       httpOnly: true,
       maxAge: 10 * 24 * 60 * 60 * 1000, // 10 days
     });
@@ -252,13 +252,13 @@ const refreshAccessToken = asyncHandler(async (req, res, next) => {
   res
     .cookie("accessToken", accessToken, {
       secure: true,
-      sameSite: "lax",
+      sameSite: "none",
       httpOnly: true,
       maxAge: 24 * 60 * 60 * 1000, // 1 day
     })
     .cookie("refreshToken", refreshToken, {
       secure: true,
-      sameSite: "lax",
+      sameSite: "none",
       httpOnly: true,
       maxAge: 10 * 24 * 60 * 60 * 1000, // 10 days
     });
@@ -352,7 +352,7 @@ const logout = asyncHandler(async (req, res) => {
   const options = {
     httpOnly: true,
     secure: true,
-    sameSite: "lax",
+    sameSite: "none",
   };
 
   return res
