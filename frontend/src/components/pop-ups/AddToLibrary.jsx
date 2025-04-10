@@ -200,14 +200,14 @@ const AddToLibrary = () => {
                 </button>
               </div>
               {isMobile && (
-                <div className="flex gap-2.5 px-2 bg-black/30 p-1 items-center rounded-md">
+                <div className="flex overflow-hidden gap-2.5 px-2 bg-black/30 p-1 items-center rounded-md">
                   <img
                     src={context?.coverImage?.url || "/tempTrackCover.jpeg"}
                     alt=""
                     className="h-[50px] w-[50px] aspect-square object-cover rounded-md"
                     ref={imgRef}
                   />
-                  <div className="flex flex-col">
+                  <div className="flex grow flex-col overflow-hidden">
                     <Marquee pauseOnHover gradient={false} speed={60}>
                       <span className="text-lg sm:text-lg capitalize mr-5">
                         {context?.title}
