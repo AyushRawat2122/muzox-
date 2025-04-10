@@ -159,7 +159,7 @@ const AddToLibrary = () => {
             transition: { duration: 0.3, ease: "easeInOut" },
           }}
           transition={{ duration: 0.3 }}
-          className="relative w-[80%] h-[70%] border-2 border-[#ffffff24] overflow-y-scroll hiddenScrollPC bg-black/50 text-white rounded-lg"
+          className="relative h-full w-full sm:w-[80%] sm:h-[70%] border-2 border-[#ffffff24] overflow-y-scroll hiddenScrollPC bg-black/50 text-white rounded-lg"
           style={{ scrollbarWidth: "none" }}
         >
           {/* Close Button */}
