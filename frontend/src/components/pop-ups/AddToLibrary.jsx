@@ -276,11 +276,6 @@ const AddToLibrary = () => {
               </div>
             )}
             {loading && <Loading src={loadingDotsOrange} />}
-            {!loading && userPlaylist.length <= 0 && (
-              <p className="text-gray-300">
-                No created playlist found, create playlist first
-              </p>
-            )}
           </div>
         </motion.div>
       </motion.div>
