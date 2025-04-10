@@ -209,12 +209,12 @@ const AddToLibrary = () => {
                   />
                   <div className="flex flex-col">
                     <Marquee pauseOnHover gradient={false} speed={60}>
-                      <span className="text-lg sm:text-lg capitalize">
+                      <span className="text-lg sm:text-lg capitalize mr-5">
                         {context?.title}
                       </span>
                     </Marquee>
                     <Marquee pauseOnHover gradient={false} speed={40}>
-                      <span className="text-sm sm:text-lg capitalize">
+                      <span className="text-sm sm:text-lg capitalize mr-5">
                         {context?.artist}
                       </span>
                     </Marquee>

@@ -39,7 +39,7 @@ const MobileTabletsView = (props) => {
               </h1>
               <div className="capitalize text-bold text-lg w-[80%] sm:text-xl text-gray-100 text-center ">
                 <Marquee pauseOnHover gradient={false} speed={40}>
-                  <span className="text-lg sm:text-lg capitalize font-semibold mr-0">
+                  <span className="text-lg sm:text-lg capitalize font-semibold mr-5">
                     {currentSong?.title + " | " + currentSong?.artist}
                   </span>
                 </Marquee>
