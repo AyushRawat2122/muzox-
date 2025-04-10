@@ -19,7 +19,10 @@ const uploadOnCloudinary = async (fileBuffer) => {
       );
       streamifier.createReadStream(fileBuffer).pipe(uploadStream);
     });
-    return result;
+    return {
+      ...result,
+      url: result.secure_url || result.url,
+    }
   } catch {
     return null;
   }
