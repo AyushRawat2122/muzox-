@@ -4,7 +4,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { CircleAlert, Eye, EyeClosed } from "lucide-react";
 import Logo from "/Logo.png";
-import { Link, Navigate , useNavigate} from "react-router";
+import { Link, Navigate, useNavigate } from "react-router";
 import {
   normalRequest,
   queryClient,
@@ -14,6 +14,7 @@ import { useMutation } from "@tanstack/react-query";
 import Loading from "../../components/loaders/Loading.jsx";
 import { loadingPlayIcon } from "../../utils/lottie.js";
 import { notifyError, notifySuccess } from "../../store/useNotification.js";
+import usePopUp from "../../store/usePopUp.js";
 const schema = z.object({
   email: z.string().email("Invalid email"),
   password: z
@@ -31,7 +32,7 @@ const schema = z.object({
 });
 
 const Login = () => {
-  const { data: user, isSuccess , isLoading } = getUser();
+  const { data: user, isSuccess, isLoading } = getUser();
   const navigate = useNavigate();
   const [isVisible, setIsVisible] = useState(false);
   const {
@@ -42,7 +43,7 @@ const Login = () => {
     resolver: zodResolver(schema),
     mode: "onChange",
   });
-
+  const { toggleDisclaimerPopUp } = usePopUp();
   const onLogin = async (data) => {
     const email = data?.email;
     const password = data?.password;
@@ -65,22 +66,23 @@ const Login = () => {
   const mutation = useMutation({
     mutationFn: onLogin,
     onSuccess: () => {
-      notifySuccess("logged in successfully")
+      notifySuccess("logged in successfully");
       queryClient.invalidateQueries([{ queryKey: "user" }]);
-      navigate('/');
+      toggleDisclaimerPopUp(true);
+      navigate("/");
     },
     onError: (error) => {
       notifyError(error.response.data.message || "login failed");
     },
   });
-  
+
   const toggleIsVisible = (e) => {
     e.preventDefault();
     setIsVisible((prev) => !prev);
   };
 
-  if(isSuccess && user){
-    return <Navigate to={"/"} replace/>
+  if (isSuccess && user) {
+    return <Navigate to={"/"} replace />;
   }
 
   if (mutation.isPending || isLoading) {

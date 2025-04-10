@@ -223,7 +223,7 @@ function UserProfile() {
                 </div>
               ) : (
                 <span
-                  className="cursor-pointer text-2xl max-sm:text-center w-full capitalize font-extrabold md:text-6xl hover:text-white"
+                  className="cursor-pointer text-2xl max-sm:text-center text-right w-full capitalize font-extrabold md:text-6xl hover:text-white"
                   onClick={() => {
                     setTempUsername(user?.data?.username ?? "");
                     setEditingUsername(true);

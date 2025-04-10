@@ -54,7 +54,7 @@ const MobileSoundBarDisplay = ({ audioElement }) => {
         <img
           src={currentSong?.coverImage?.url || null}
           alt="cover"
-          className="w-[50px] h-[50px]  object-cover aspect-square rounded-md"
+          className="w-[45px] h-[45px]  object-cover aspect-square rounded-md"
         />
         <div className="w-full overflow-hidden bg-transparent">
           {isMobile && (

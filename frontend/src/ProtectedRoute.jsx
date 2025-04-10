@@ -1,6 +1,12 @@
 import React, { useEffect, useRef, useState, useCallback } from "react";
 import { Outlet } from "react-router";
-import { Navigate, useLocation, NavLink, Link , useNavigate } from "react-router";
+import {
+  Navigate,
+  useLocation,
+  NavLink,
+  Link,
+  useNavigate,
+} from "react-router";
 import getUser from "./serverDataHooks/getUser.js";
 import MuzoxApp from "./pages/wrapperPages/MuzoxApp.jsx";
 import { queryClient } from "./utils/axiosRequests.config.js";
@@ -25,6 +31,7 @@ import MobileTabletsView from "./components/pop-ups/MobileTabletsView.jsx";
 import MobileSoundBarDisplay from "./components/bars/MobileSoundBarDisplay.jsx";
 import { AnimatePresence } from "framer-motion";
 import { debounce } from "lodash";
+import Disclaimer from "./components/pop-ups/Disclaimer.jsx";
 const ProtectedRoute = () => {
   const location = useLocation();
   const { data: user, isPending, error } = getUser();
@@ -36,13 +43,13 @@ const ProtectedRoute = () => {
   const audioPlayerRef = useRef(null);
   const navigate = useNavigate();
   const { queue } = useAudioPlayer();
-  const { soundBarPopUp } = usePopUp();
+  const { soundBarPopUp, disclaimerPopUp } = usePopUp();
 
   const isDesktopOrLaptop = useMediaQuery({
     query: "(min-width: 1224px)",
   });
   const isTabletOrMobile = useMediaQuery({ query: "(max-width: 1224px)" });
-
+  console.log(disclaimerPopUp);
   // Helper to get the audio element
   const getAudio = () => {
     return audioPlayerRef.current
@@ -76,14 +83,12 @@ const ProtectedRoute = () => {
     };
   }, []);
 
-
-  useEffect(()=>{
+  useEffect(() => {
     console.log("triggered");
-    if(!user){
-      navigate('/login')
+    if (!user) {
+      navigate("/login");
     }
-  } , [user]);
-
+  }, [user]);
 
   if (isPending) {
     return <Loading src={loadingPlayIcon} />;
@@ -99,6 +104,7 @@ const ProtectedRoute = () => {
     <MuzoxApp className={"relative"}>
       {/* Mobile popup gets the audio element via prop instead of ref */}
       <AnimatePresence mode="wait">
+        {disclaimerPopUp && <Disclaimer />}
         {soundBarPopUp && isTabletOrMobile && audioReady && (
           <MobileTabletsView key="mobileView" audioElement={getAudio()} />
         )}
@@ -108,7 +114,9 @@ const ProtectedRoute = () => {
         <AudioPlayer ref={audioPlayerRef} />
 
         {/* Top bar */}
-        {((isTabletOrMobile && (location.pathname !== "/search" && location.pathname !== "/lyrics" )) ||
+        {((isTabletOrMobile &&
+          location.pathname !== "/search" &&
+          location.pathname !== "/lyrics") ||
           isDesktopOrLaptop) && (
           <div className="flex py-2 max-sm:px-2 justify-between bg-black/50">
             <div>
@@ -295,7 +303,7 @@ const ProtectedRoute = () => {
         )}
         {/* Mobile SoundBar Display */}
         {isTabletOrMobile && (
-        <div className="w-full absolute bottom-0 translate-y-1 z-777 bg-[linear-gradient(180deg,transparent_10%,rgba(0,0,0,.8)_100%)] backdrop:blur-sm">
+          <div className="w-full absolute bottom-0 translate-y-1 z-777 bg-[linear-gradient(180deg,transparent_10%,rgba(0,0,0,1.8)_100%)] backdrop:blur-sm">
             {queue.length > 0 && audioReady && (
               <div className="p-2">
                 <MobileSoundBarDisplay audioElement={getAudio()} />

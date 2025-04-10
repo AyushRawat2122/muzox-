@@ -9,7 +9,6 @@ const Error = ({}) => {
 
   useEffect(() => {
     if (!from) {
-      // User typed /error manually — not allowed
       navigate("/");
     }
   }, [from, navigate]);

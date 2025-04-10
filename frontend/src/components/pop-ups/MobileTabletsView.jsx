@@ -4,7 +4,7 @@ import { SoundBar } from "../bars/index.js";
 import useAudioPlayer from "../../store/useAudioPlayer.js";
 import { ChevronDownCircle } from "lucide-react";
 import usePopUp from "../../store/usePopUp.js";
-
+import Marquee from "react-fast-marquee";
 const MobileTabletsView = (props) => {
   const { audioElement } = props;
   const { currentSong } = useAudioPlayer();
@@ -33,15 +33,22 @@ const MobileTabletsView = (props) => {
               setSoundBarPopUp(false);
             }}
           >
-           
             <div className="flex flex-col items-center pt-1">
-              <h1 className="text-sm sm:text-base text-gray-300">Now Playing</h1>
-              <p className="capitalize text-bold text-lg sm:text-xl text-gray-100 text-center ">
-                {" "}
-                {currentSong?.title + " | " + currentSong?.artist}{" "}
-              </p>
+              <h1 className="text-sm sm:text-base text-gray-300">
+                Now Playing
+              </h1>
+              <div className="capitalize text-bold text-lg w-[80%] sm:text-xl text-gray-100 text-center ">
+                <Marquee pauseOnHover gradient={false} speed={40}>
+                  <span className="text-lg sm:text-lg capitalize font-semibold mr-0">
+                    {currentSong?.title + " | " + currentSong?.artist}
+                  </span>
+                </Marquee>
+              </div>
             </div>
-            <ChevronDownCircle size={25} className="text-[#ffffffa5] bg-white/10 rounded-full backdrop:blur-7xl absolute bottom-0 translate-y-[60%]" />
+            <ChevronDownCircle
+              size={25}
+              className="text-[#ffffffa5] bg-white/10 rounded-full backdrop:blur-7xl absolute bottom-0 translate-y-[60%]"
+            />
           </div>
           <div className="grow pointer-events-none"></div>
           <motion.div

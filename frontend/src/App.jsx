@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 import { ToastContainer } from "react-toastify";
 import { Outlet, useLocation, useNavigate } from "react-router";
 function App() {
- 
   const [isOnline, setIsOnline] = useState();
   const location = useLocation();
   const navigate = useNavigate();
@@ -10,11 +9,13 @@ function App() {
   useEffect(() => {
     const handleOnlineStatus = () => {
       setIsOnline(true);
-      console.log("online")
+      console.log(
+        "online",
+        location.pathname === "/error",
+        location.state?.from || "/"
+      );
       if (location.pathname === "/error") {
-        const prevlocation = location.state?.from || "/";
-        console.log(prevlocation , "navigating")
-        navigate(prevlocation);
+        navigate(location.state?.from || "/");
       }
     };
     const handleOfflineStatus = () => {

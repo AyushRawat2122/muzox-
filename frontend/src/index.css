@@ -74,7 +74,14 @@ button {
 .muzoxPurple:hover {
   color: #fe7641;
 }
+.hiddenScrollPC {
+  scrollbar-width: none; /* For Firefox */
+  -ms-overflow-style: none; /* For Internet Explorer and Edge */
+}
 
+.hiddenScrollPC::-webkit-scrollbar {
+  display: none; /* For Chrome, Safari, and Opera */
+}
 @media (max-width: 1023px) {
   .hiddenScroll {
     scrollbar-width: none; /* For Firefox */
@@ -84,7 +91,7 @@ button {
   .hiddenScroll::-webkit-scrollbar {
     display: none; /* For Chrome, Safari, and Opera */
   }
-  *{
+  * {
     scrollbar-width: none; /* For Firefox */
     -ms-overflow-style: none; /* For Internet Explorer and Edge */
   }

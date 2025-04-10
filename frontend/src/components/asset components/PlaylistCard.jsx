@@ -1,6 +1,13 @@
 import React, { useState } from "react";
 import { Play } from "lucide-react";
-const PlaylistCard = ({ playlist, onClick, playBtn = true }) => {
+const PlaylistCard = ({
+  playlist,
+  onClick,
+  playBtn = true,
+  style = {},
+  text = {},
+  description = true,
+}) => {
   const [hover, setHover] = useState(false);
   return (
     <div
@@ -12,10 +19,14 @@ const PlaylistCard = ({ playlist, onClick, playBtn = true }) => {
       onMouseLeave={() => {
         setHover(false);
       }}
+      style={style}
     >
       <div className="relative w-full h-fit overflow-hidden">
-        <div className="absolute h-full w-full flex items-end px-1 bg-black/20">
-          <h1 className="text-left w-[70%] whitespace-nowrap text-lg sm:text-2xl font-bold overflow-ellipsis overflow-hidden">
+        <div className="absolute h-full w-full flex items-end px-1 bg-black/40">
+          <h1
+            className="text-left w-[70%] whitespace-nowrap text-lg sm:text-2xl font-bold overflow-ellipsis overflow-hidden"
+            style={text}
+          >
             {playlist?.name}
           </h1>
         </div>
@@ -35,11 +46,13 @@ const PlaylistCard = ({ playlist, onClick, playBtn = true }) => {
         />
       </div>
 
-      <div className="w-[100%] py-2 text-left">
-        <p className="whitespace-nowrap text-gray-300 text-sm font-medium overflow-ellipsis w-full overflow-hidden">
-          {playlist?.description}
-        </p>
-      </div>
+      {description && (
+        <div className="w-[100%] py-2 text-left">
+          <p className="whitespace-nowrap text-gray-300 text-sm font-medium overflow-ellipsis w-full overflow-hidden">
+            {playlist?.description}
+          </p>
+        </div>
+      )}
     </div>
   );
 };
