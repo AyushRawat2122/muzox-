@@ -97,13 +97,13 @@ const AddToLibrary = () => {
   const date = new Date();
   const isMobile = useMediaQuery({ query: "(max-width: 40rem)" });
   const [userPlaylist, setUserPlaylist] = useState([]);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const { data: user, isPending: userNot } = getUser();
   const { data: playlists, isPending: playlistNot } = getUserPlaylists();
   const [colors, setColor] = useState({});
   const imgRef = useRef(null);
+
   useEffect(() => {
-    setLoading(true);
     if (playlists?.data?.length > 0) {
       const created = playlists?.data?.filter(
         (playlist) => playlist?.owner === user?._id
