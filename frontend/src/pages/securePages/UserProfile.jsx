@@ -4,10 +4,10 @@ import getUser from "../../serverDataHooks/getUser";
 import { normalRequest, queryClient } from "../../utils/axiosRequests.config";
 import { useMutation } from "@tanstack/react-query";
 import Loading from "../../components/loaders/Loading";
-import { loadingDotsOrange, premium } from "../../utils/lottie.js";
+import { loadingDotsOrange, premium, tryPremium } from "../../utils/lottie.js";
 import { useNavigate } from "react-router";
 import { DotLottieReact } from "@lottiefiles/dotlottie-react";
-import {notifyInfo} from "../../store/useNotification.js"
+import { notifyInfo } from "../../store/useNotification.js";
 
 function UserProfile() {
   const [state, setState] = useState("stats");
@@ -21,10 +21,23 @@ function UserProfile() {
     if (!updatedAt) return "";
     const [year, month, day] = updatedAt.split("T")[0].split("-");
     const months = [
-      "January", "February", "March", "April", "May", "June",
-      "July", "August", "September", "October", "November", "December",
+      "January",
+      "February",
+      "March",
+      "April",
+      "May",
+      "June",
+      "July",
+      "August",
+      "September",
+      "October",
+      "November",
+      "December",
     ];
-    return `${months[parseInt(month, 10) - 1]} ${parseInt(day, 10)}, 2k${year.slice(2)}`;
+    return `${months[parseInt(month, 10) - 1]} ${parseInt(
+      day,
+      10
+    )}, 2k${year.slice(2)}`;
   };
 
   const formattedJoinDate = useMemo(
@@ -33,7 +46,6 @@ function UserProfile() {
   );
 
   const TakeToAdmin = () => navigate("/admin-panel");
-  const TakeToAdminRequest = () => navigate("/admin-panel-req");
 
   const mutation1 = useMutation({
     mutationFn: async () => {
@@ -149,16 +161,18 @@ function UserProfile() {
 
   return (
     <div className="w-full h-full max-lg:pb-[18vh] overflow-y-scroll bg-zinc-950 text-white p-4 md:p-8">
-      <header className="flex justify-between items-center mb-6">
+      <header className="flex justify-between items-center">
         <div className="flex items-center">
           <h2 className="font-bold grow text-2xl md:text-5xl">Your Profile</h2>
-          <DotLottieReact
-            src={premium}
-            autoplay
-            loop
-            className="max-sm:h-[50px] max-sm:w-[50px] h-[80px] w-[80px]"
-            title="premium user"
-          />
+          {user?.data?.isPremiumUser && (
+            <DotLottieReact
+              src={premium}
+              autoplay
+              loop
+              className="max-sm:h-[50px] max-sm:w-[50px] h-[80px] w-[80px]"
+              title="premium user"
+            />
+          )}
         </div>
         <button
           onClick={() => mutation.mutate()}
@@ -205,7 +219,9 @@ function UserProfile() {
                   <input
                     value={tempUsername}
                     onChange={(e) => setTempUsername(e.target.value)}
-                    onKeyDown={(e) => e.key === "Enter" && handleUsernameUpdate()}
+                    onKeyDown={(e) =>
+                      e.key === "Enter" && handleUsernameUpdate()
+                    }
                     className="text-white text-right outline-none capitalize text-2xl md:text-6xl p-2 w-full"
                   />
                   <button
@@ -270,7 +286,7 @@ function UserProfile() {
           {state === "stats" ? (
             <div>
               <h2 className="text-2xl font-bold text-white">
-                {user?.data?.playlists?.length ?? 0}
+                {user?.data?.playlists?.length || 0}
               </h2>
               <div>
                 <h2 className="text-xl font-semibold text-gray-300">Songs</h2>
@@ -281,7 +297,9 @@ function UserProfile() {
                     ))}
                   </ul>
                 ) : (
-                  <p className="text-sm text-gray-400">No playlists available.</p>
+                  <p className="text-sm text-gray-400">
+                    No playlists available.
+                  </p>
                 )}
               </div>
             </div>
@@ -306,24 +324,40 @@ function UserProfile() {
         </div>
       </div>
 
-      <div className="flex items-center justify-center mt-5 font-semibold">
+      <div className="flex items-center max-sm:flex-col sm:gap-3 justify-center mt-5 font-semibold">
         {user?.data?.isAdmin ? (
           <button
             onClick={TakeToAdmin}
-            className="px-6 py-2 rounded-lg border border-amber-300 text-amber-200 hover:bg-amber-300 hover:text-zinc-950 transition duration-200"
+            className="px-6 py-2.5 rounded-full border-3 border-amber-300 text-amber-200 hover:bg-amber-300 hover:text-zinc-950 transition duration-200"
             aria-label="Go to Admin Panel"
           >
             Distributor page
           </button>
         ) : (
           <button
-            onClick={()=>{
-              notifyInfo("Distributor applications are currently closed")
+            onClick={() => {
+              notifyInfo("Distributor applications are currently closed");
             }}
-            className="px-6 py-2 rounded-lg border border-green-400 text-green-400 hover:bg-green-400 hover:text-white transition duration-200"
+            className="px-6 py-2.5 rounded-full border-3 border-lime-400 text-lime-400 hover:bg-lime-600 hover:text-white transition duration-200"
             aria-label="Request Admin Access"
           >
             Register as Distributor
+          </button>
+        )}
+
+        {!user?.data?.isPremiumUser && (
+          <button
+            onClick={() => {
+              navigate("/premium");
+            }}
+          >
+            <DotLottieReact
+              src={tryPremium}
+              autoplay
+              loop
+              title="ExplorePremium"
+              className="w-[250px] max-sm:w-[150px]"
+            />
           </button>
         )}
       </div>

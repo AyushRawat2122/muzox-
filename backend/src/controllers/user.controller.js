@@ -38,11 +38,11 @@ const signup = asyncHandler(async (req, res, next) => {
     return next(new ApiError(400, "All fields are required"));
   } // check that incoming body isn't empty
 
-  const alreadyAUser = await User.findOne({
-    $or: [{ username }, { email }],
-  });
+  const alreadyAUser = await User.findOne({ email: email.toLowerCase() });
 
-  if (alreadyAUser) {
+  if (!alreadyAUser?.isVerified) {
+    await User.deleteOne({ email: email.toLowerCase() });
+  } else {
     return next(new ApiError(400, "User already exists"));
   }
 
@@ -99,6 +99,37 @@ const signup = asyncHandler(async (req, res, next) => {
 });
 
 //verify user
+const verifyOtpResend = asyncHandler(async (req, res, next) => {
+  const { email } = req.params;
+  if (!email) {
+    return next(new ApiError(400, "email is required"));
+  }
+  const user = await User.findOne({ email: email.toLowerCase() });
+  if (!user) {
+    return next(new ApiError(400, "No user exists with this email id"));
+  }
+  if (user?.isVerified) {
+    return next(new ApiError(400, "User is already verified"));
+  }
+  const otp = Math.floor(100000 + Math.random() * 900000).toString();
+  const expiryDate = new Date(Date.now() + 600000);
+
+  await User.findByIdAndUpdate(user?._id, {
+    $set: { verifyToken: otp, verifyTokenExpiry: expiryDate },
+  });
+
+  await sendEmail({
+    email: email,
+    otp: otp,
+    name: user?.username,
+    type: "VERIFICATION",
+    userId: user?._id,
+  });
+
+  return res
+    .status(200)
+    .json(new ApiResponse(200, [], "otp sent successfully"));
+});
 
 const verifyUser = asyncHandler(async (req, res, next) => {
   const { email } = req.params;
@@ -139,17 +170,13 @@ const verifyUser = asyncHandler(async (req, res, next) => {
 const login = asyncHandler(async (req, res, next) => {
   const { email, password } = req.body;
 
-  console.log(email, password);
-
   if (email === "" || password === "") {
     return next(new ApiError(400, "Please enter your email and password"));
   }
 
-  const user = await User.findOne({ email }).select(
+  const user = await User.findOne({ email: email.toLowerCase() }).select(
     "-playlists -refreshToken -verifyToken -verifyTokenExpiry -passwordToken -passwordTokenExpiry"
   );
-
-  console.log(user);
 
   if (!user) {
     return next(new ApiError(404, "User not found"));
@@ -527,4 +554,5 @@ export {
   likedSong,
   refreshAccessToken,
   resetOtpVerification,
+  verifyOtpResend,
 };

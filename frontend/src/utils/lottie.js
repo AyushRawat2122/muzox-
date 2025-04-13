@@ -14,6 +14,8 @@ const cat404 =
   "https://lottie.host/06168cc4-7785-48a0-a852-ed4420a2f73c/67AfdYsxLV.lottie";
 const astronaut503 =
   "https://lottie.host/5e41ab33-c3b0-4f2a-bdbf-0defee89d572/zCOS0Qhqpu.lottie";
+const tryPremium =
+  "https://lottie.host/7b3b519d-8d3a-4c9a-ab00-e2f2a1e6ce42/WvRvAwYLoG.lottie";
 export {
   loadingPlayIcon,
   floatingMusicIcons,
@@ -22,5 +24,6 @@ export {
   loadingDotsOrange,
   premium,
   cat404,
-  astronaut503
+  astronaut503,
+  tryPremium
 };

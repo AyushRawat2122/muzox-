@@ -8,6 +8,7 @@ import { useMutation } from "@tanstack/react-query";
 import Loading from "../../components/loaders/Loading";
 import { loadingPlayIcon } from "../../utils/lottie.js";
 import { notifyError, notifySuccess } from "../../store/useNotification.js";
+import { useEffect, useRef, useState } from "react";
 const schema = z.object({
   otp: z
     .string()
@@ -16,7 +17,7 @@ const schema = z.object({
 });
 
 const Verify = () => {
-  const { userID } = useParams(); 
+  const { userID } = useParams();
   const {
     register,
     handleSubmit,
@@ -25,10 +26,16 @@ const Verify = () => {
     resolver: zodResolver(schema),
     mode: "onChange",
   });
-
+  const timerRef = useRef(null);
   const navigate = useNavigate();
   const location = useLocation();
-
+  useEffect(() => {
+    if (!location.state?.email) {
+      navigate("/login");
+    }
+  }, []);
+  const [available, setAvailable] = useState(true);
+  const [seconds, setSeconds] = useState(0);
   const email = location.state?.email || "";
   const onVerifyMe = async (data) => {
     try {
@@ -42,6 +49,35 @@ const Verify = () => {
     }
   };
 
+  const resendOtp = async () => {
+    if (timerRef.current !== null) return;
+    try {
+      const res = await normalRequest.post(
+        `/user/resendVerifyMail/${email}`,
+        [],
+        {
+          headers: { "Content-Type": "application/json" },
+        }
+      );
+      setAvailable(false);
+      setSeconds(30);
+      timerRef.current = setInterval(() => {
+        setSeconds((second) => {
+          if (second - 1 <= 0) {
+            setAvailable(true);
+            clearInterval(timerRef.current);
+            timerRef.current = null;
+          }
+          return second - 1;
+        });
+      }, 1000);
+      notifySuccess("Otp resend successfully");
+    } catch (error) {
+      notifyError(error?.response?.data || "Failed to regenerate Otp");
+      console.log(error);
+    }
+  };
+
   const mutation = useMutation({
     mutationFn: onVerifyMe,
     onSuccess: () => {
@@ -49,7 +85,7 @@ const Verify = () => {
       navigate("/login");
     },
     onError: (error) => {
-      notifyError(error.response.data.message || "user verification failed")
+      notifyError(error.response.data.message || "user verification failed");
     },
   });
 
@@ -65,7 +101,7 @@ const Verify = () => {
         </h1>
         <p className="text-center">
           otp has been sent successfully to your registerd email address <br />
-          <span className="text-[#a159e4]">{email}</span>
+          <span className="text-[#fe7641]">{email}</span>
         </p>
         <form
           onSubmit={handleSubmit((data) => {
@@ -106,15 +142,21 @@ const Verify = () => {
             Verify
           </button>
         </form>
-        <p className="text-gray-400 text-center">
-          Didn't receive OTP?{" "}
-          <a
-            href="#"
-            className="muzoxPurple underline underline-offset-2 text-white"
-          >
-            Resend OTP
-          </a>
-        </p>
+        {available ? (
+          <p className="text-gray-400 text-center">
+            Didn't receive OTP?{" "}
+            <span
+              className="muzoxPurple cursor-pointer underline underline-offset-2 text-white"
+              onClick={resendOtp}
+            >
+              Resend OTP
+            </span>
+          </p>
+        ) : (
+          <p className="muzoxPurple text-center underline-offset-2 text-gray-400">
+            resend otp <span className="text-[#fe7641]"> {seconds} </span> seconds.
+          </p>
+        )}
       </div>
     </div>
   );

@@ -7,6 +7,7 @@ const fetchUserData = async () => {
         "Content-Type": "application/json",
       },
     });
+    console.log(userData?.data?.data);
     return userData?.data?.data;
   } catch (error) {
     console.log(error);

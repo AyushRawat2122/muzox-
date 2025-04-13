@@ -16,6 +16,7 @@ const userSchema = new mongoose.Schema(
     email: {
       type: String,
       unique: true,
+      lowercase: true,
       required: [true, "Email is required"],
       trim: true,
       match: [/\S+@\S+\.\S+/, "Please provide a valid email address"],
@@ -26,10 +27,10 @@ const userSchema = new mongoose.Schema(
       trim: true,
     },
     profilePic: {
-      type:{
-        public_id:String,
-        url:String
-      }
+      type: {
+        public_id: String,
+        url: String,
+      },
     },
     playlists: [
       {
@@ -90,16 +91,18 @@ userSchema.methods = {
     );
   },
   generateAccessToken: function () {
-    return jwt.sign({
-      _id:this._id,
-      username:this.username,
-      email:this.email
-    },
-    process.env.ACCESS_TOKEN_SECRET,    
-    {
-      expiresIn:process.env.ACCESS_TOKEN_EXPIRY
-    })
-  }
+    return jwt.sign(
+      {
+        _id: this._id,
+        username: this.username,
+        email: this.email,
+      },
+      process.env.ACCESS_TOKEN_SECRET,
+      {
+        expiresIn: process.env.ACCESS_TOKEN_EXPIRY,
+      }
+    );
+  },
 };
 
 const User = mongoose.model("User", userSchema);

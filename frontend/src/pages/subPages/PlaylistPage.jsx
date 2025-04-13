@@ -145,7 +145,6 @@ const PlaylistPage = () => {
 
   useEffect(() => {
     if (playlist) {
-
       async function fetchImageAsBlob(url) {
         try {
           const response = await fetch(url, { mode: "cors" }); // Fetch the image
@@ -153,10 +152,12 @@ const PlaylistPage = () => {
           const blobUrl = URL.createObjectURL(blob); // Create a local Blob URL
 
           if (imgRef.current) {
-            imgRef.current.crossOrigin = 'anonymous'; // Set this if needed for cross-origin images
+            imgRef.current.crossOrigin = "anonymous"; // Set this if needed for cross-origin images
             imgRef.current.onload = async () => {
               try {
-                const vibrantPalette = await Vibrant.from(imgRef.current).getPalette();
+                const vibrantPalette = await Vibrant.from(
+                  imgRef.current
+                ).getPalette();
                 setDominantColor(vibrantPalette.Vibrant.hex);
               } catch (error) {
                 console.error("Error extracting colors:", error);
@@ -213,19 +214,22 @@ const PlaylistPage = () => {
         <div className="sticky top-0 bg-black px-2 py-2 border-b-[1px] border-[#ffffff3d] flex items-center justify-between gap-2">
           <div className="flex items-center gap-2">
             {" "}
-           <div className="w-14 h-14 rounded-full overflow-hidden" style={{ backgroundColor: dominantColor }}>
-           <button
-              className={`w-full h-full rounded-full flex items-center justify-center bg-black/15`}
-              onClick={handlePlayButtonClick}
-              title="Play/Pause"
+            <div
+              className="w-14 h-14 rounded-full overflow-hidden"
+              style={{ backgroundColor: dominantColor }}
             >
-              {isPlaying && queueID === playlist?._id ? (
-                <Pause size={25} strokeWidth={3.5}/>
-              ) : (
-                <Play size={25} strokeWidth={3.5}/>
-              )}
-            </button>
-           </div>
+              <button
+                className={`w-full h-full rounded-full flex items-center justify-center bg-black/15`}
+                onClick={handlePlayButtonClick}
+                title="Play/Pause"
+              >
+                {isPlaying && queueID === playlist?._id ? (
+                  <Pause size={25} strokeWidth={3.5} />
+                ) : (
+                  <Play size={25} strokeWidth={3.5} />
+                )}
+              </button>
+            </div>
             <button
               className="w-10 h-10 rounded-full flex items-center justify-center"
               onClick={handleQueueLooping}
@@ -253,12 +257,24 @@ const PlaylistPage = () => {
               </button>
             )}
             {user._id !== playlist.owner && isSaved && (
-              <button className="h-[40px] w-[40px]" title="Remove from Library" onClick={()=>{playlistRemoveMutation.mutate(playlist)}}>
+              <button
+                className="h-[40px] w-[40px]"
+                title="Remove from Library"
+                onClick={() => {
+                  playlistRemoveMutation.mutate(playlist);
+                }}
+              >
                 <BookmarkMinus size={25} />
               </button>
             )}
             {user._id !== playlist.owner && !isSaved && (
-              <button className="h-[40px] w-[40px]" title="Save to Library" onClick={()=>{playlistAddMutation.mutate(playlist)}}>
+              <button
+                className="h-[40px] w-[40px]"
+                title="Save to Library"
+                onClick={() => {
+                  playlistAddMutation.mutate(playlist);
+                }}
+              >
                 <BookmarkPlus size={25} />
               </button>
             )}
@@ -300,9 +316,10 @@ const PlaylistPage = () => {
               key={index}
               song={song}
               index={index}
-              queueRef={playlist._id}
+              queueRef={playlist?._id}
               ownerRef={playlist?.owner}
-              userRef={user._id}
+              userRef={user?._id}
+              playlistSongs={playlist?.songs}
             />
           ))}
         </div>
@@ -323,18 +340,25 @@ const PlaylistPage = () => {
     </main>
   );
 };
-const SongItem = ({ song, index, queueRef, ownerRef, userRef }) => {
-  const { setCurrentSong, queueID, isShuffled, shuffleBack } = useAudioPlayer();
+const SongItem = ({
+  song,
+  index,
+  queueRef,
+  ownerRef,
+  userRef,
+  playlistSongs,
+}) => {
+  const { setCurrentSong, queueID, isShuffled, shuffleBack, initializeQueue } =
+    useAudioPlayer();
   const changeCurrentSongOfQueue = (e) => {
     e.stopPropagation();
     if (queueID !== queueRef) {
-      return;
-    } else {
-      if (isShuffled) {
-        shuffleBack();
-      }
-      setCurrentSong(index);
+      initializeQueue((playlistSongs || []), queueRef);
     }
+    if (isShuffled) {
+      shuffleBack();
+    }
+    setCurrentSong(index);
   };
   const mutation = removeFromPlaylist();
   const handleRemoveSong = (e) => {
