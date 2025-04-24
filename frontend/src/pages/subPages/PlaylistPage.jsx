@@ -87,7 +87,7 @@ const PlaylistPage = () => {
     } else {
       setIsSaved(false);
     }
-  }, [library, librarySuccess]);
+  }, [library, librarySuccess, playlist, playlistSuccess]);
 
   const handlePlayButtonClick = () => {
     if (playlist?.songs?.length <= 0) {
@@ -147,12 +147,12 @@ const PlaylistPage = () => {
     if (playlist) {
       async function fetchImageAsBlob(url) {
         try {
-          const response = await fetch(url, { mode: "cors" }); // Fetch the image
-          const blob = await response.blob(); // Convert it into a Blob
-          const blobUrl = URL.createObjectURL(blob); // Create a local Blob URL
+          const response = await fetch(url, { mode: "cors" });
+          const blob = await response.blob();
+          const blobUrl = URL.createObjectURL(blob);
 
           if (imgRef.current) {
-            imgRef.current.crossOrigin = "anonymous"; // Set this if needed for cross-origin images
+            imgRef.current.crossOrigin = "anonymous";
             imgRef.current.onload = async () => {
               try {
                 const vibrantPalette = await Vibrant.from(
@@ -172,7 +172,6 @@ const PlaylistPage = () => {
       console.log(playlist?.playListCover?.url);
       fetchImageAsBlob(playlist?.playListCover?.url);
     }
-    // Replace with your actual image URL
   }, [playlist]);
 
   if (userPending || playlistPending || libraryPending) {
@@ -353,7 +352,7 @@ const SongItem = ({
   const changeCurrentSongOfQueue = (e) => {
     e.stopPropagation();
     if (queueID !== queueRef) {
-      initializeQueue((playlistSongs || []), queueRef);
+      initializeQueue(playlistSongs || [], queueRef);
     }
     if (isShuffled) {
       shuffleBack();
