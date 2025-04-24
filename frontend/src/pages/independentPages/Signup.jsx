@@ -79,7 +79,7 @@ const Signup = () => {
       if (data) {
         const userID = data?._id;
         const email = data?.email;
-        navigate(`/verify/${userID}`, { state: { email } });
+        navigate(`/verify/${userID}/${email}`, { state: { email } });
       }
     },
     onError: (error) => {

@@ -17,7 +17,7 @@ const schema = z.object({
 });
 
 const Verify = () => {
-  const { userID } = useParams();
+  const { userID, emailID } = useParams();
   const {
     register,
     handleSubmit,
@@ -30,13 +30,13 @@ const Verify = () => {
   const navigate = useNavigate();
   const location = useLocation();
   useEffect(() => {
-    if (!location.state?.email) {
+    if (!location.state?.email || !emailID) {
       navigate("/login");
     }
   }, []);
   const [available, setAvailable] = useState(true);
   const [seconds, setSeconds] = useState(0);
-  const email = location.state?.email || "";
+  const email = location.state?.email || emailID || "";
   const onVerifyMe = async (data) => {
     try {
       console.log(data);
@@ -154,7 +154,8 @@ const Verify = () => {
           </p>
         ) : (
           <p className="muzoxPurple text-center underline-offset-2 text-gray-400">
-            resend otp <span className="text-[#fe7641]"> {seconds} </span> seconds.
+            resend otp <span className="text-[#fe7641]"> {seconds} </span>{" "}
+            seconds.
           </p>
         )}
       </div>

@@ -53,7 +53,7 @@ const PlaylistPage = () => {
       console.log(error);
     }
   };
-  const [isSaved, setIsSaved] = useState(false);
+  const [isSaved, setIsSaved] = useState(true);
   const [isPublic, setIsPublic] = useState(false);
   const [deletePopup, setDeletePopUp] = useState(false);
   const {
@@ -245,7 +245,7 @@ const PlaylistPage = () => {
             </button>
           </div>
           <div className="flex items-center gap-1">
-            {user._id === playlist.owner && (
+            {user?._id === playlist?.owner && (
               <button
                 className="h-[40px] w-[40px] text-red-500"
                 title="Delete Playlist"
@@ -256,7 +256,7 @@ const PlaylistPage = () => {
                 <Trash2 size={25} />
               </button>
             )}
-            {user._id !== playlist.owner && isSaved && (
+            {user?._id !== playlist?.owner && isSaved && (
               <button
                 className="h-[40px] w-[40px]"
                 title="Remove from Library"
@@ -267,7 +267,7 @@ const PlaylistPage = () => {
                 <BookmarkMinus size={25} />
               </button>
             )}
-            {user._id !== playlist.owner && !isSaved && (
+            {user?._id !== playlist?.owner && !isSaved && (
               <button
                 className="h-[40px] w-[40px]"
                 title="Save to Library"
@@ -278,7 +278,7 @@ const PlaylistPage = () => {
                 <BookmarkPlus size={25} />
               </button>
             )}
-            {user._id === playlist.owner && !isPublic && (
+            {user?._id === playlist?.owner && !isPublic && (
               <button
                 className="h-[40px] w-[40px]"
                 title="Make Public"
@@ -289,7 +289,7 @@ const PlaylistPage = () => {
                 <Globe size={25} />
               </button>
             )}
-            {user._id === playlist.owner && isPublic && (
+            {user?._id === playlist?.owner && isPublic && (
               <button
                 className="h-[40px] w-[40px]"
                 title="Make Private"
@@ -384,15 +384,15 @@ const SongItem = ({
       <div className="flex items-center gap-2 overflow-hidden">
         <img
           src={song?.coverImage?.url || "/placeholder.svg?height=40&width=40"}
-          alt={song.title}
+          alt={song?.title}
           className="w-10 h-10 rounded object-cover"
         />
         <div className="overflow-hidden ">
           <p className="font-medium text-ellipsis whitespace-nowrap overflow-hidden">
-            {song.title}
+            {song?.title}
           </p>
           <p className="text-xs text-gray-400 text-ellipsis whitespace-nowrap overflow-hidden">
-            {song.artist}
+            {song?.artist}
           </p>
         </div>
       </div>

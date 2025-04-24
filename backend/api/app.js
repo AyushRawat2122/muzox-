@@ -21,8 +21,7 @@ app.use(
   cors({
     origin: [
       "https://muzox.vercel.app",
-      "https://muzox-2l00mz7wk-ayushs-projects-dc209762.vercel.app",
-      "http://localhost:5173"
+      "https://muzox-2l00mz7wk-ayushs-projects-dc209762.vercel.app"
     ],
     credentials: true, // Cookies allow karni ho toh
     methods: ["GET", "POST", "PUT", "DELETE", "PATCH"], // Jo methods allow karni ho

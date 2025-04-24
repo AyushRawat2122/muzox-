@@ -15,9 +15,9 @@ const Disclaimer = () => {
         stiffness: 260,
         damping: 20,
       }}
-      className="min-h-screen absolute z-[999999] w-full h-full bg-black/70 backdrop-blur-md flex items-center justify-center p-4"
+      className="min-h-screen absolute z-[999999] w-full h-full bg-black/50 backdrop-blur-md flex items-center justify-center p-4"
     >
-      <div className="max-w-2xl bg-black p-8 rounded-lg shadow-xl">
+      <div className="max-w-2xl bg-black/40 p-8 rounded-lg shadow-xl">
         <div className="flex items-center gap-3 mb-6">
           <AlertTriangle className="w-8 h-8 text-yellow-500" />
           <h1 className="text-2xl font-bold text-white">Disclaimer</h1>

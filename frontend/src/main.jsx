@@ -39,7 +39,7 @@ const route = createBrowserRouter([
         path: "/verify",
         children: [
           { index: true, element: <Navigate to="/login" replace /> },
-          { path: ":userID", element: <Verify /> },
+          { path: ":userID/:emailID", element: <Verify /> },
         ],
       },
       {
