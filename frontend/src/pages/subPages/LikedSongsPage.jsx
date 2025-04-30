@@ -146,13 +146,13 @@ const SongItem = ({ song, index, queueRef }) => {
       <div className="flex items-center justify-center">
         <span>{index + 1}</span>
       </div>
-      <div className="flex items-center gap-3">
+      <div className="flex items-center  gap-2 overflow-hidden">
         <img
           src={song?.coverImage?.url || "/placeholder.svg?height=40&width=40"}
           alt={song.title}
           className="w-10 h-10 rounded object-cover"
         />
-        <div className="truncate">
+        <div className="overflow-hidden ">
           <div className="font-medium truncate">{song.title}</div>
           <div className="text-xs text-gray-400 truncate">{song.artist}</div>
         </div>
