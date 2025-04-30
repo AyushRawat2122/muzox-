@@ -8,7 +8,7 @@ import jwt from "jsonwebtoken";
 import { uploadOnCloudinary, deleteOnCloudinary } from "../utils/cloudinary.js";
 import Playlist from "../models/playlist.models.js";
 import Song from "../models/song.models.js";
-//will generate token
+
 const tokenGenerators = async (userId, next) => {
   try {
     console.log("Reached token generators");
@@ -28,8 +28,6 @@ const tokenGenerators = async (userId, next) => {
     return next(new ApiError(500, "Internal Server Error"));
   }
 };
-
-//sign up
 
 const signup = asyncHandler(async (req, res, next) => {
   const { username, email, password } = req.body;
@@ -98,7 +96,6 @@ const signup = asyncHandler(async (req, res, next) => {
   );
 });
 
-//verify user
 const verifyOtpResend = asyncHandler(async (req, res, next) => {
   const { email } = req.params;
   if (!email) {

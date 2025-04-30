@@ -27,6 +27,11 @@ import {
 import { queryClient } from "./utils/axiosRequests.config.js";
 import ProtectedRoute from "./ProtectedRoute.jsx";
 import AdminUploadPage from "./pages/securePages/AdminUploadPage.jsx";
+// Register service worker
+import { registerSW } from 'virtual:pwa-register';
+
+// Simple auto-update registration
+registerSW();
 
 const route = createBrowserRouter([
   {
