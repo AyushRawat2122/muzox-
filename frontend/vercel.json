@@ -1,8 +1,8 @@
 {
   "rewrites": [
     {
-      "source": "/api/muzox-/:path*",
-      "destination": "https://muzoxbackend.vercel.app/api/muzox-/:path*"
+      "source": "/:prefix*/api/muzox-/:rest*",
+      "destination": "https://muzoxbackend.vercel.app/api/muzox-/:rest*"
     },
     { "source": "/(.*)", "destination": "/" }
   ]
