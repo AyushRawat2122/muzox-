@@ -92,7 +92,22 @@ const LyricsPage = () => {
             </div>
           )}
           <div className="px-2 w-full flex flex-col items-center justify-center shadow-lg">
-            <pre className="whitespace-pre-wrap font-mono text-[33px] underline decoration-2 underline-offset-4 font-semibold text-center tracking-wider  text-gray-200 pointer-events-none no-copy">
+            <pre
+              className="
+              inter
+              whitespace-pre-wrap 
+              font-sans 
+              text-lg sm:text-xl md:text-2xl lg:text-4xl xl:text-5xl 
+              leading-7 sm:leading-8 md:leading-10 lg:leading-[3.5rem] xl:leading-[4rem] 
+              font-medium 
+              text-center 
+              tracking-wide 
+              text-gray-200 
+              pointer-events-none 
+              no-copy
+            "
+              style={{ color: colors?.LightMuted?.hex }}
+            >
               {lyrics}
             </pre>
             <p className="py-2 border-t-2 border-gray-400/50 text-sm text-gray-300 text-left px-2 w-full  max-lg:pb-[18vh]">

@@ -22,6 +22,10 @@ button {
 .jakartha {
   font-family: "Plus Jakarta Sans", sans-serif;
 }
+.inter{
+  font-family: "Inter", sans-serif;
+}
+
 .adjustCenter {
   position: absolute;
   top: 50%;
