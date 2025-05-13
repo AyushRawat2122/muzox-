@@ -12,6 +12,8 @@ import { useNavigate } from "react-router";
 import { Play } from "lucide-react";
 import useAudioPlayer from "../../store/useAudioPlayer";
 import { getRecentSongs } from "../../utils/frontendStorage";
+import { motion, AnimatePresence } from "framer-motion";
+import { FaMusic, FaClock, FaStar, FaFire, FaHeart } from "react-icons/fa";
 
 const fetchHomePageData = async () => {
   try {
@@ -44,7 +46,7 @@ const HomePage = () => {
     queryKey: ["homePageData"],
     queryFn: fetchHomePageData,
     retry: (failureCount, error) => {
-      if (error.response?.status === 404) return false; 
+      if (error.response?.status === 404) return false;
       return failureCount < 2;
     },
     retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 3000),
@@ -73,96 +75,168 @@ const HomePage = () => {
 
   const { playlists, songs, newlyAdded } = data;
 
+  const sectionVariants = {
+    hidden: { opacity: 0, y: 30 },
+    visible: (i) => ({
+      opacity: 1,
+      y: 0,
+      transition: { delay: i * 0.2, duration: 0.5 },
+    }),
+  };
+
   return (
     <div className="max-lg:pb-[18vh] overflow-y-scroll h-full px-1 capitalize space-y-6">
-      {/* Jump back in Time */}
-      {Array.isArray(recentSongs) && recentSongs.length > 0 && (
-        <section>
-          <h1 className="text-2xl font-bold mb-2">Jump back in Time</h1>
-          <PlaylistCarousel>
-            {recentSongs.map((song, idx) => (
-              <HoverCard
-                key={song?._id || idx}
-                img={song?.coverImage?.url}
-                name={song?.title || "Unknown Title"}
-                song={song}
-              />
-            ))}
-          </PlaylistCarousel>
-        </section>
-      )}
+      <AnimatePresence>
+        {/* Jump back in Time */}
+        {Array.isArray(recentSongs) && recentSongs.length > 0 && (
+          <motion.section
+            key="recentSongs"
+            initial="hidden"
+            animate="visible"
+            exit="hidden"
+            custom={0}
+            variants={sectionVariants}
+          >
+            <h1 className="text-2xl font-bold mb-2 flex items-center">
+              <FaClock className="mr-2 text-orange-500" /> Jump back in Time
+            </h1>
+            <PlaylistCarousel>
+              {recentSongs.map((song, idx) => (
+                <HoverCard
+                  key={song?._id || idx}
+                  img={song?.coverImage?.url}
+                  name={song?.title || "Unknown Title"}
+                  song={song}
+                />
+              ))}
+            </PlaylistCarousel>
+          </motion.section>
+        )}
 
-      <section>
-        <video src="/WELCOME.mp4" className="w-full" loop autoPlay muted />
-      </section>
+        {/* Welcome Video */}
+        <motion.section
+          key="welcomeVideo"
+          initial="hidden"
+          animate="visible"
+          exit="hidden"
+          custom={1}
+          variants={sectionVariants}
+        >
+          <video src="/WELCOME.mp4" className="w-full" loop autoPlay muted />
+        </motion.section>
 
-      {/* Top Playlist For You */}
-      {Array.isArray(playlists) && playlists.length > 0 && (
-        <section>
-          <h1 className="text-2xl font-bold mb-2">Top Playlist For You</h1>
-          <PlaylistCarousel>
-            {playlists.map((item, idx) => (
-              <PlaylistCard
-                key={item?._id || idx}
-                playlist={item}
-                onClick={() => navigate(`/playlist/${item?._id}`)}
-              />
-            ))}
-          </PlaylistCarousel>
-        </section>
-      )}
+        {/* Top Playlist For You */}
+        {Array.isArray(playlists) && playlists.length > 0 && (
+          <motion.section
+            key="topPlaylists"
+            initial="hidden"
+            animate="visible"
+            exit="hidden"
+            custom={2}
+            variants={sectionVariants}
+          >
+            <h1 className="text-2xl font-bold mb-2 flex items-center">
+              <FaMusic className="mr-2 text-orange-500" /> Top Playlist For You
+            </h1>
+            <PlaylistCarousel>
+              {playlists.map((item, idx) => (
+                <PlaylistCard
+                  key={item?._id || idx}
+                  playlist={item}
+                  onClick={() => navigate(`/playlist/${item?._id}`)}
+                />
+              ))}
+            </PlaylistCarousel>
+          </motion.section>
+        )}
 
-      {/* Recommended Songs */}
-      {Array.isArray(songs) && songs.length > 6 && (
-        <section>
-          <h1 className="text-2xl font-bold mb-2">Recommended Songs</h1>
-          <PlaylistCarousel>
-            {songs.slice(6).map((song, idx) => (
-              <HoverCard
-                key={song?._id || idx}
-                img={song?.coverImage?.url}
-                name={song?.title || "Unknown Title"}
-                song={song}
-              />
-            ))}
-          </PlaylistCarousel>
-        </section>
-      )}
+        {/* Recommended Songs */}
+        {Array.isArray(songs) && songs.length > 6 && (
+          <motion.section
+            key="recommendedSongs"
+            initial="hidden"
+            animate="visible"
+            exit="hidden"
+            custom={3}
+            variants={sectionVariants}
+          >
+            <h1 className="text-2xl font-bold mb-2 flex items-center">
+              <FaStar className="mr-2 text-orange-500" /> Recommended Songs
+            </h1>
+            <PlaylistCarousel>
+              {songs.slice(6).map((song, idx) => (
+                <HoverCard
+                  key={song?._id || idx}
+                  img={song?.coverImage?.url}
+                  name={song?.title || "Unknown Title"}
+                  song={song}
+                />
+              ))}
+            </PlaylistCarousel>
+          </motion.section>
+        )}
 
-      <section>
-        <video src="/MUZOX.mp4" className="w-full" loop autoPlay muted />
-      </section>
+        {/* MUZOX Video */}
+        <motion.section
+          key="muzoxVideo"
+          initial="hidden"
+          animate="visible"
+          exit="hidden"
+          custom={4}
+          variants={sectionVariants}
+        >
+          <video src="/MUZOX.mp4" className="w-full" loop autoPlay muted />
+        </motion.section>
 
-      {/* Latest Songs */}
-      {Array.isArray(newlyAdded) && newlyAdded.length > 0 && (
-        <section>
-          <h1 className="text-2xl font-bold mb-2">Latest Songs</h1>
-          <div className="grid sm:grid-cols-2 gap-4">
-            {newlyAdded.map((song, idx) => (
-              <SearchListSongCard key={song?._id || idx} song={song} />
-            ))}
-          </div>
-        </section>
-      )}
+        {/* Latest Songs */}
+        {Array.isArray(newlyAdded) && newlyAdded.length > 0 && (
+          <motion.section
+            key="latestSongs"
+            initial="hidden"
+            animate="visible"
+            exit="hidden"
+            custom={5}
+            variants={sectionVariants}
+          >
+            <h1 className="text-2xl font-bold mb-2 flex items-center">
+              <FaFire className="mr-2 text-orange-500" /> Latest Songs
+            </h1>
+            <div className="grid sm:grid-cols-2 gap-4">
+              {newlyAdded.map((song, idx) => (
+                <SearchListSongCard key={song?._id || idx} song={song} />
+              ))}
+            </div>
+          </motion.section>
+        )}
 
-      {/* Curated Just for You */}
-      {Array.isArray(songs) && songs.length > 0 && (
-        <section>
-          <h1 className="text-2xl font-bold mb-2">Curated Just for You</h1>
-          <div className="grid grid-cols-5 lg:h-[300px] w-full max-sm:flex max-sm:flex-col">
-            {songs.slice(0, 5).map((song, idx) => (
-              <HANDPICK
-                key={song?._id || idx}
-                img={song?.coverImage?.url}
-                name={song?.title || "Unknown Title"}
-                artist={song?.artist || "Unknown Artist"}
-                genre={song?.genre || "Unknown Genre"}
-                song={song}
-              />
-            ))}
-          </div>
-        </section>
-      )}
+        {/* Curated Just for You */}
+        {Array.isArray(songs) && songs.length > 0 && (
+          <motion.section
+            key="curatedSongs"
+            initial="hidden"
+            animate="visible"
+            exit="hidden"
+            custom={6}
+            variants={sectionVariants}
+          >
+            <h1 className="text-2xl font-bold mb-2 flex items-center">
+              <FaHeart className="mr-2 text-orange-500" /> Curated Just for You
+            </h1>
+            <div className="grid grid-cols-5 lg:h-[300px] w-full max-sm:flex max-sm:flex-col">
+              {songs.slice(0, 5).map((song, idx) => (
+                <HANDPICK
+                  key={song?._id || idx}
+                  img={song?.coverImage?.url}
+                  name={song?.title || "Unknown Title"}
+                  artist={song?.artist || "Unknown Artist"}
+                  genre={song?.genre || "Unknown Genre"}
+                  song={song}
+                />
+              ))}
+            </div>
+          </motion.section>
+        )}
+      </AnimatePresence>
     </div>
   );
 };

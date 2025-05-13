@@ -4,9 +4,9 @@
       "source": "/:prefix*/api/muzox-/:rest*",
       "destination": "https://muzoxbackend.vercel.app/api/muzox-/:rest*"
     },
-    { 
-      "source": "/((?!api/).+)", 
-      "destination": "/index.html" 
+    {
+      "source": "/((?!api/).+)",
+      "destination": "/index.html"
     }
   ]
 }
