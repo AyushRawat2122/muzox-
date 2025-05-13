@@ -62,7 +62,7 @@ const LyricsPage = () => {
       <div className="h-full w-full">
         <div
           className="h-full w-full"
-          style={{ backgroundColor: `${colors?.Vibrant?.hex || ""}` }}
+          style={{ backgroundColor: `${colors?.Vibrant?.titleTextColor || "white"}` }}
         >
           <div className="h-full w-full px-2.5 flex justify-center items-center bg-black/25">
             <Loading src={loadingDotsOrange} />
@@ -106,7 +106,7 @@ const LyricsPage = () => {
               pointer-events-none 
               no-copy
             "
-              style={{ color: colors?.LightMuted?.hex }}
+              style={{ color: colors?.LightMuted?.titleTextColor }}
             >
               {lyrics}
             </pre>
