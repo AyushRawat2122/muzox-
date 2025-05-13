@@ -99,14 +99,14 @@ const LyricsPage = () => {
               font-sans 
               text-lg sm:text-xl md:text-2xl lg:text-4xl xl:text-5xl 
               leading-7 sm:leading-8 md:leading-10 lg:leading-[3.5rem] xl:leading-[4rem] 
-              font-medium 
+              lg:font-semibold 
               text-center 
               tracking-wide 
               text-gray-200 
               pointer-events-none 
               no-copy
             "
-              style={{ color: colors?.LightMuted?.titleTextColor }}
+              style={{ color: colors?.LightMuted?.hex || "white" }}
             >
               {lyrics}
             </pre>
