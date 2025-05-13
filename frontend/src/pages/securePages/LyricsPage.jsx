@@ -113,7 +113,7 @@ const LyricsPage = () => {
           <div className="px-2 w-full flex flex-col items-center justify-center shadow-lg">
             <pre
               className="inter whitespace-pre-wrap font-sans text-lg sm:text-xl md:text-2xl lg:text-4xl xl:text-5xl leading-7 sm:leading-8 md:leading-10 lg:leading-[3.5rem] xl:leading-[4rem] lg:font-semibold text-center tracking-wide pointer-events-none no-copy"
-              style={{ color: textColor }}
+              style={{ color: "white" }}
             >
               {lyrics}
             </pre>
