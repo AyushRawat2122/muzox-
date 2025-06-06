@@ -93,10 +93,10 @@ const LikedSongsPage = () => {
       {/* Section 3: Songs List */}
       <div className="mt-6">
         {/* Header */}
-        <div className="grid gap-5 sm:gap-10 grid-cols-[40px_1fr_auto] px-4 items-center border-b border-gray-700 pb-2 mb-2 text-sm text-gray-400">
-          <div>#</div>
+        <div className="grid grid-cols-[2rem_1fr_auto] px-4 items-center border-b border-gray-700 pb-2 mb-2 text-sm text-gray-400">
+          <div className="text-right pr-3">#</div>
           <div>Title</div>
-          <div className="text-right">Duration</div>
+          <div className="text-right pr-2">Duration</div>
         </div>
         {/* Songs */}
         {likedSongs?.data?.map((song, index) => (
@@ -140,11 +140,11 @@ const SongItem = ({ song, index, queueRef, likedSongs }) => {
   };
   return (
     <div
-      className="grid gap-5 sm:gap-10 grid-cols-[40px_1fr_auto] items-center px-4 py-2 transition-colors hover:bg-gray-800 cursor-pointer"
+      className="grid grid-cols-[2rem_1fr_auto] items-center px-4 py-2 transition-colors hover:bg-gray-800 cursor-pointer"
       onClick={changeCurrentSongOfQueue}
     >
-      <div className="flex items-center justify-center w-[40px]">
-        <span className="text-center">{index + 1}</span>
+      <div className="text-right pr-3">
+        <span>{index + 1}</span>
       </div>
       <div className="flex items-center gap-2 overflow-hidden">
         <img
@@ -157,8 +157,8 @@ const SongItem = ({ song, index, queueRef, likedSongs }) => {
           <div className="text-xs text-gray-400 truncate">{song.artist}</div>
         </div>
       </div>
-      <div className="text-xs text-gray-400 flex gap-2 items-center min-w-[60px] justify-end">
-        {convertToMinSecFormat(song?.duration)}
+      <div className="text-xs text-gray-400 flex gap-1 items-center min-w-max">
+        <span className="inline-block min-w-[3rem] text-right">{convertToMinSecFormat(song?.duration)}</span>
         <span title="remove from liked songs">
           <BookmarkMinus
             className="hover:text-red-500 cursor-pointer"
