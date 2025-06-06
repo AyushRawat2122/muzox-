@@ -374,19 +374,19 @@ const SongItem = ({
   };
   return (
     <div
-      className="grid gap-5 sm:gap-10 grid-cols-[auto_1fr_auto] w-full overflow-hidden items-center px-4 py-2 transition-colors hover:bg-gray-800"
+      className="grid gap-5 sm:gap-10 grid-cols-[40px_1fr_auto] w-full overflow-hidden items-center px-4 py-2 transition-colors hover:bg-gray-800"
       onClick={changeCurrentSongOfQueue}
     >
-      <div className="flex items-center justify-center">
-        <span>{index + 1}</span>
+      <div className="flex items-center justify-center w-[40px]">
+        <span className="text-center">{index + 1}</span>
       </div>
       <div className="flex items-center gap-2 overflow-hidden">
         <img
           src={song?.coverImage?.url || "/placeholder.svg?height=40&width=40"}
           alt={song?.title}
-          className="w-10 h-10 rounded object-cover"
+          className="w-10 h-10 rounded object-cover flex-shrink-0"
         />
-        <div className="overflow-hidden ">
+        <div className="overflow-hidden">
           <p className="font-medium text-ellipsis whitespace-nowrap overflow-hidden">
             {song?.title}
           </p>
@@ -395,7 +395,7 @@ const SongItem = ({
           </p>
         </div>
       </div>
-      <div className="text-xs text-gray-400 text-right flex gap-2 items-center">
+      <div className="text-xs text-gray-400 flex gap-2 items-center min-w-[60px] justify-end">
         {convertToMinSecFormat(song?.duration)}
         {ownerRef === userRef && (
           <span title="remove from playlist">

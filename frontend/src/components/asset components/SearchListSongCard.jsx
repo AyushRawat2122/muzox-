@@ -41,7 +41,8 @@ const SearchListSongCard = ({ song }) => {
       onMouseLeave={hidePlayIcon}
       onClick={handleClick}
     >
-      <div className="relative h-[50px] w-[50px] rounded-md overflow-hidden aspect-square object-cover">
+      {/* Image container with fixed dimensions */}
+      <div className="flex-shrink-0 relative h-[50px] w-[50px] rounded-md overflow-hidden">
         {playIcon && (
           <Play
             className="absolute bg-black/50 h-full w-full p-3"
@@ -54,15 +55,31 @@ const SearchListSongCard = ({ song }) => {
           className="h-full w-full aspect-square object-cover"
         />
       </div>
-      <div className="grow flex justify-between items-center gap-2">
-        <div className="min-w-0 max-w-[70%]">
-          <h1 className="capitalize overflow-hidden text-ellipsis whitespace-nowrap">{title}</h1>
-          <p className="text-gray-300 capitalize overflow-hidden text-ellipsis whitespace-nowrap">{artist}</p>
+
+      {/* Content container with proper spacing */}
+      <div className="grow flex items-center min-w-0">
+        {/* Title and artist container with controlled width */}
+        <div className="flex-grow min-w-0 mr-2">
+          <h1 className="capitalize overflow-hidden text-ellipsis whitespace-nowrap font-medium">
+            {title}
+          </h1>
+          <p className="text-gray-300 capitalize overflow-hidden text-ellipsis whitespace-nowrap text-sm">
+            {artist}
+          </p>
         </div>
-        <p className="text-sm text-gray-300 whitespace-nowrap">{convertToMinSecFormat(duration)}</p>
+        
+        {/* Duration with fixed width */}
+        <div className="flex-shrink-0 w-[45px] text-right">
+          <p className="text-sm text-gray-300">{convertToMinSecFormat(duration)}</p>
+        </div>
       </div>
-      <button className="hoverIcon" onClick={handleAddToLibraryClick}>
-        <Ellipsis />
+      
+      {/* Button with fixed width and positioning */}
+      <button 
+        className="flex-shrink-0 w-8 h-8 flex justify-center items-center hover:bg-white/10 rounded-full" 
+        onClick={handleAddToLibraryClick}
+      >
+        <Ellipsis size={18} />
       </button>
     </div>
   );

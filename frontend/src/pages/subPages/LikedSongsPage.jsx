@@ -47,7 +47,7 @@ const LikedSongsPage = () => {
     <main className="max-lg:pb-[18vh] h-full w-full overflow-y-auto bg-black text-white">
       {/* Section 1: Playlist Info */}
       <div
-        className="flex  max-sm:flex-col sm:items-end gap-4  mb-6 sm:p-4 lg:rounded-t-lg"
+        className="flex max-sm:flex-col sm:items-end gap-4 mb-6 sm:p-4 lg:rounded-t-lg"
         style={customGradient}
       >
         <img
@@ -93,7 +93,7 @@ const LikedSongsPage = () => {
       {/* Section 3: Songs List */}
       <div className="mt-6">
         {/* Header */}
-        <div className="grid gap-5 sm:gap-10 grid-cols-[auto_1fr_auto] px-4 items-center border-b border-gray-700 pb-2 mb-2 text-sm text-gray-400">
+        <div className="grid gap-5 sm:gap-10 grid-cols-[40px_1fr_auto] px-4 items-center border-b border-gray-700 pb-2 mb-2 text-sm text-gray-400">
           <div>#</div>
           <div>Title</div>
           <div className="text-right">Duration</div>
@@ -105,6 +105,7 @@ const LikedSongsPage = () => {
             song={song}
             index={index}
             queueRef={"likedSongs"}
+            likedSongs={likedSongs?.data}
           />
         ))}
       </div>
@@ -112,18 +113,17 @@ const LikedSongsPage = () => {
   );
 };
 
-const SongItem = ({ song, index, queueRef }) => {
-  const { setCurrentSong, queueID , isShuffled ,shuffleBack} = useAudioPlayer();
+const SongItem = ({ song, index, queueRef, likedSongs }) => {
+  const { setCurrentSong, queueID, isShuffled, shuffleBack, initializeQueue } = useAudioPlayer();
   const changeCurrentSongOfQueue = (e) => {
     e.stopPropagation();
     if (queueID !== queueRef) {
-      return;
-    } else {
-      if(isShuffled){
-        shuffleBack();
-      }
-      setCurrentSong(index);
+      initializeQueue(likedSongs || [], queueRef);
     }
+    if(isShuffled){
+      shuffleBack();
+    }
+    setCurrentSong(index);
   };
   const mutation = useUnlikeSong();
   const handleRemoveSong = (e) => {
@@ -140,24 +140,24 @@ const SongItem = ({ song, index, queueRef }) => {
   };
   return (
     <div
-      className="grid gap-5 sm:gap-10 grid-cols-[auto_1fr_auto] items-center px-4 py-2 transition-colors hover:bg-gray-800"
+      className="grid gap-5 sm:gap-10 grid-cols-[40px_1fr_auto] items-center px-4 py-2 transition-colors hover:bg-gray-800 cursor-pointer"
       onClick={changeCurrentSongOfQueue}
     >
-      <div className="flex items-center justify-center">
-        <span>{index + 1}</span>
+      <div className="flex items-center justify-center w-[40px]">
+        <span className="text-center">{index + 1}</span>
       </div>
-      <div className="flex items-center  gap-2 overflow-hidden">
+      <div className="flex items-center gap-2 overflow-hidden">
         <img
           src={song?.coverImage?.url || "/placeholder.svg?height=40&width=40"}
           alt={song.title}
-          className="w-10 h-10 rounded object-cover"
+          className="w-10 h-10 rounded object-cover flex-shrink-0"
         />
-        <div className="overflow-hidden ">
+        <div className="overflow-hidden">
           <div className="font-medium truncate">{song.title}</div>
           <div className="text-xs text-gray-400 truncate">{song.artist}</div>
         </div>
       </div>
-      <div className="text-xs text-gray-400 text-right flex gap-2 items-center">
+      <div className="text-xs text-gray-400 flex gap-2 items-center min-w-[60px] justify-end">
         {convertToMinSecFormat(song?.duration)}
         <span title="remove from liked songs">
           <BookmarkMinus
