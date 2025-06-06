@@ -11,11 +11,11 @@ const SearchListSongCard = ({ song }) => {
     setPlayIcon(false);
   };
   const { initializeQueue } = useAudioPlayer();
-  const { artist, coverImage, title, duration , _id } = song;
-  const {toggleAddPopUp,setContext,context,addPopUp} = usePopUp();
+  const { artist, coverImage, title, duration, _id } = song;
+  const { toggleAddPopUp, setContext, context, addPopUp } = usePopUp();
   const handleClick = (e) => {
     e.stopPropagation();
-    initializeQueue([song] , _id);
+    initializeQueue([song], _id);
   };
   const convertToMinSecFormat = (number) => {
     const min = Math.floor(number / 60); //get min
@@ -25,9 +25,9 @@ const SearchListSongCard = ({ song }) => {
     return convertedStr;
   };
 
-  const handleAddToLibraryClick = (e) =>{
+  const handleAddToLibraryClick = (e) => {
     e.stopPropagation();
-    if(addPopUp){
+    if (addPopUp) {
       return;
     }
     setContext(song);
@@ -54,12 +54,12 @@ const SearchListSongCard = ({ song }) => {
           className="h-full w-full aspect-square object-cover"
         />
       </div>
-      <div className="grow flex justify-between items-center  gap-5 overflow-hidden">
-        <div className="grow overflow-hidden">
-          <h1 className="capitalize whitespace-nowrap overflow-hidden overflow-ellipsis">{title}</h1>
-          <p className="text-gray-300 capitalize whitespace-nowrap overflow-hidden overflow-ellipsis">{artist}</p>
+      <div className="grow flex justify-between items-center gap-2">
+        <div className="min-w-0 max-w-[70%]">
+          <h1 className="capitalize overflow-hidden text-ellipsis whitespace-nowrap">{title}</h1>
+          <p className="text-gray-300 capitalize overflow-hidden text-ellipsis whitespace-nowrap">{artist}</p>
         </div>
-        <p className="text-sm text-gray-300">{convertToMinSecFormat(duration)}</p>
+        <p className="text-sm text-gray-300 whitespace-nowrap">{convertToMinSecFormat(duration)}</p>
       </div>
       <button className="hoverIcon" onClick={handleAddToLibraryClick}>
         <Ellipsis />

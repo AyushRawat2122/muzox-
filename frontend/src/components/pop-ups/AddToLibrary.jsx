@@ -4,20 +4,17 @@ import { motion } from "framer-motion";
 import getUserLikedSong from "../../serverDataHooks/getUserLikedSong.js";
 import getUserPlaylists from "../../serverDataHooks/getUserPlaylists.js";
 import getUser from "../../serverDataHooks/getUser.js";
-import PlaylistCarousel from "../carousel/PlaylistCarousel.jsx";
 import { useLikeSong } from "../../serverDataHooks/songMutations.js";
 import {
   notifyError,
   notifySuccess,
   notifyWarning,
 } from "../../store/useNotification.js";
-import PlaylistCard from "../asset components/PlaylistCard.jsx";
 import { addToPlaylist } from "../../serverDataHooks/playlistsMutations.js";
 import { loadingDotsOrange } from "../../utils/lottie.js";
 import Loading from "../loaders/Loading.jsx";
 import { useMediaQuery } from "react-responsive";
-import { Heart, Music, MicVocal, Clock, Music2 } from "lucide-react";
-import Marquee from "react-fast-marquee";
+import {Clock} from "lucide-react";
 import { Vibrant } from "node-vibrant/browser";
 
 // Utility function for time conversion
